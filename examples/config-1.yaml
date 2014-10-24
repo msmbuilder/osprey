@@ -1,11 +1,16 @@
 estimator:
-    pickle: model.pickle
+    # pickle: model.pickle
+    eval: |
+        Pipeline([
+                ('featurizer', DihedralFeaturizer(types=['phi', 'psi'])),
+                ('tica', tICA())
+        ])
 
 cv: 5
 
 search:
     space:
-        n_components:
+        tica__n_components:
             min: 1
             max: 4
             type: float

@@ -1,16 +1,22 @@
 from __future__ import print_function, absolute_import, division
 import os
+import sys
 import yaml
 import glob
+import traceback
+
 from six.moves import cPickle
 from six import iteritems
+import sklearn.base
+
 
 from .trials import make_session
 from . import search
+from . import evalsupport
 
 
 FIELDS = {
-    'estimator':   ['pickle'],
+    'estimator':   ['pickle', 'eval'],
     'dataset':     ['trajectories', 'topology', 'stride'],
 
     'trials': ['uri'],
@@ -67,9 +73,29 @@ class Config(object):
             if not os.path.isfile(path):
                 raise RuntimeError('estimator/pickle %s is not a file' % pkl)
             with open(path) as f:
-                return cPickle.load(f)
+                estimator = cPickle.load(f)
+                if not isinstance(estimator, sklearn.base.BaseEstimator):
+                    raise RuntimeError('estimator/pickle must load a '
+                                       'sklearn-derived Estimator')
+                return estimator
 
-        # load from any other methods we implement...
+        evalstring = self.get_value('estimator/eval')
+        if evalstring is not None:
+            try:
+                estimator = eval(evalstring, {}, evalsupport.mixtape_globals())
+                if not isinstance(estimator, sklearn.base.BaseEstimator):
+                    raise RuntimeError('estimator/pickle must load a '
+                                       'sklearn-derived Estimator')
+                return estimator
+            except:
+                print('-'*78)
+                print('Error parsing estimator/eval', file=sys.stderr)
+                print('-'*78)
+
+                traceback.print_exc(file=sys.stderr)
+                print('-'*78)
+                sys.exit(1)
+
         raise RuntimeError('no estimator field')
 
     def search_space(self):

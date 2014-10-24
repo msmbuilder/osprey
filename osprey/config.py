@@ -3,7 +3,9 @@ import os
 import sys
 import yaml
 import glob
+import hashlib
 import traceback
+import importlib
 
 from six.moves import cPickle
 from six import iteritems
@@ -16,10 +18,10 @@ from . import evalsupport
 
 
 FIELDS = {
-    'estimator':   ['pickle', 'eval'],
+    'estimator':   ['pickle', 'eval', 'entry_point'],
     'dataset':     ['trajectories', 'topology', 'stride'],
 
-    'trials': ['uri'],
+    'trials': ['uri', 'table_name'],
     'search':  ['engine', 'space', 'seed'],
     'param_grid':  dict,
     'cv':          int,
@@ -95,6 +97,37 @@ class Config(object):
                 traceback.print_exc(file=sys.stderr)
                 print('-'*78)
                 sys.exit(1)
+                
+        entry_point = self.get_value('estimator/entry_point')
+        if entry_point is not None:
+            try:
+                package_str, obj_str = entry_point.split(':')
+            except ValueError:
+                raise RuntimeError('estimator/entry_point syntax error')
+
+            try:
+                package = importlib.import_module(package_str)
+            except ImportError:
+                print('-'*78)
+                print('Error parsing estimator/entry_point', file=sys.stderr)
+                print('-'*78)
+                traceback.print_exc(sys.stderr)
+                sys.exit(1)
+
+            try:
+                estimator = getattr(package, obj_str)
+            except (AttributeError, KeyError):
+                raise RuntimeError('estimator/entry_point: %r does not contain '
+                                    'object %r' % (package_str, obj_str))
+            
+            if issubclass(estimator, sklearn.base.BaseEstimator):
+                estimator = estimator()
+            
+            if not isinstance(estimator, sklearn.base.BaseEstimator):
+                raise RuntimeError('estimator/pickle must load a '
+                                   'sklearn-derived Estimator')
+            return estimator
+            
 
         raise RuntimeError('no estimator field')
 
@@ -149,6 +182,8 @@ class Config(object):
 
     def trials(self):
         uri = self.get_value('trials/uri')
+        table_name = self.get_value('trials/table_name', default='trials')
+        
         curdir = os.path.abspath(os.curdir)
         try:
             # move into that directory when creating the DB, since if it's
@@ -156,11 +191,15 @@ class Config(object):
             # those to be interpreted relative to the config file's directory,
             # not the curdir of the client instantiating this python script.
             os.chdir(os.path.dirname(self.path))
-            value = make_session(uri)
+            value = make_session(uri, table_name)
         finally:
             os.chdir(curdir)
 
         return value
+        
+    def sha1(self):
+        with open(self.path) as f:
+            return hashlib.sha1(f.read()).hexdigest()
 
 
 def parse(data):

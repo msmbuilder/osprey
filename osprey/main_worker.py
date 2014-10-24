@@ -35,9 +35,10 @@ def execute(args, parser):
     bounds = config.search_space()
     engine = config.search_engine()
     seed = config.search_seed()
+    config_sha1 = config.sha1()
 
     print('Loading dataset...')
-    dataset = config.dataset()
+    X, y = config.dataset()
     print('  %d sequences' % len(dataset))
 
     print('Loaded estimator:')
@@ -56,10 +57,10 @@ def execute(args, parser):
 
         run_single_trial(
             estimator=estimator, dataset=dataset, params=params,
-            cv=cv, session=session)
+            cv=cv, config_sha1=config_sha1, session=session)
 
 
-def run_single_trial(estimator, dataset, params, cv, session):
+def run_single_trial(estimator, dataset, params, cv, config_sha1, session):
     from sklearn.base import clone, BaseEstimator
     from sklearn.grid_search import GridSearchCV
 
@@ -71,7 +72,8 @@ def run_single_trial(estimator, dataset, params, cv, session):
     print('Running parameters:\n  %r\n' % params)
 
     t = Trial(status='PENDING', parameters=params, host=gethostname(),
-                     user=getuser(), started=datetime.now())
+              user=getuser(), started=datetime.now(),
+              config_sha1=config_sha1)
     session.add(t)
     session.commit()
 

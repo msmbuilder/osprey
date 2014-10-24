@@ -1,25 +1,48 @@
 estimator:
-    # pickle: model.pickle
-    eval: |
-        Pipeline([
-                ('featurizer', DihedralFeaturizer(types=['phi', 'psi'])),
-                ('tica', tICA())
-        ])
-
+    # pickle: model.pkl
+    entry_point: sklearn.cluster:KMeans
+    # eval: |
+    #     Pipeline([
+    #             ('featurizer', DihedralFeaturizer(types=['phi', 'psi'])),
+    #             ('tica', tICA())
+    #     ])
+    
+scorer: rocaucscore
+    
+    
 cv: 5
 
 search:
+    engine: hyperopt_tpe
     space:
         tica__n_components:
             min: 1
             max: 4
-            type: float
-    engine: hyperopt_tpe
+            type: int
+        
+        # featurizer__types:
+        #     options:
+        #         - ['phi', 'psi']
+        #         - ['phi', 'psi', 'chi1']
+        #     type: enum
+        #
+        # tica__gamma:
+        #     min: 1e-10
+        #     max: 1e-1
+        #     type: float
+        #     transform: log
+        
+
 
 dataset:
+    __loader__: mixtape.MDTrajDataset
     trajectories: ~/local/msmbuilder/Tutorial/XTC/*/*.xtc
     topology: ~/local/msmbuilder/Tutorial/native.pdb
     stride: 1
+    
+    
 
 trials:
+    # http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html#database-urls
     uri: sqlite:///foo.db
+    table_name: trials

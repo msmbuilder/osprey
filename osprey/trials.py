@@ -24,7 +24,7 @@ class JSONEncoded(TypeDecorator):
 
 
 class Trial(Base):
-    __tablename__ = 'experiments'
+    __tablename__ = 'trails'
 
     id = Column(Integer, primary_key=True)
     status = Column(Enum('PENDING', 'SUCCEEDED', 'FAILED'))
@@ -38,9 +38,10 @@ class Trial(Base):
     host = Column(String(512))
     user = Column(String(512))
     traceback = Column(Text())
+    config_sha1 = Column(String(40))
 
-
-def make_session(uri, echo=False):
+def make_session(uri, table_name='trials', echo=False):
+    Trial.__tablename__ = table_name
     engine = create_engine(uri, echo=echo)
     Base.metadata.create_all(engine)
     session = Session(engine)

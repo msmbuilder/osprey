@@ -35,6 +35,7 @@ def execute(args, parser):
     engine = config.search_engine()
     seed = config.search_seed()
     config_sha1 = config.sha1()
+    scorer = config.scorer()
 
     print('Loading dataset...')
     dataset = config.dataset()
@@ -55,11 +56,11 @@ def execute(args, parser):
         params = engine(history, bounds, seed)
 
         run_single_trial(
-            estimator=estimator, dataset=dataset, params=params,
+            estimator=estimator, scorer=scorer, dataset=dataset, params=params,
             cv=cv, config_sha1=config_sha1, session=session)
 
 
-def run_single_trial(estimator, dataset, params, cv, config_sha1, session):
+def run_single_trial(estimator, scorer, dataset, params, cv, config_sha1, session):
     from sklearn.base import clone, BaseEstimator
     from sklearn.grid_search import GridSearchCV
 
@@ -79,7 +80,7 @@ def run_single_trial(estimator, dataset, params, cv, config_sha1, session):
     try:
         grid = GridSearchCV(
             estimator, param_grid={k: [v] for k, v in iteritems(params)},
-            cv=cv, verbose=1, refit=False)
+            scorer=scorer, cv=cv, verbose=1, refit=False)
         grid.fit(dataset)
         score = grid.grid_scores_[0]
 

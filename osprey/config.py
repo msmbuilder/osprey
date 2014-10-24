@@ -3,6 +3,7 @@ import os
 import sys
 import yaml
 import glob
+import types
 import hashlib
 import traceback
 import importlib
@@ -17,12 +18,13 @@ from . import evalsupport
 
 FIELDS = {
     'estimator':   ['pickle', 'eval', 'entry_point'],
-    'dataset':     ['trajectories', 'topology', 'stride'],
+    'dataset':     dict,
 
     'trials': ['uri', 'table_name'],
     'search':  ['engine', 'space', 'seed'],
     'param_grid':  dict,
     'cv':          int,
+    'scorer':      str,
 }
 
 
@@ -200,6 +202,13 @@ class Config(object):
     def sha1(self):
         with open(self.path) as f:
             return hashlib.sha1(f.read()).hexdigest()
+
+    def scorer(self):
+        scorer = self.get_section('scorer')
+        if len(scorer) == 0:
+            scorer = None
+        assert isinstance(scorer, (str, types.NoneType))
+        return scorer
 
 
 def parse(data):

@@ -1,6 +1,6 @@
 from __future__ import print_function
 import sys
-import argparse
+from argparse import ArgumentDefaultsHelpFormatter
 import traceback
 from socket import gethostname
 from getpass import getuser
@@ -13,16 +13,15 @@ from .config import Config
 from .trials import Trial
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('config', help='Path to worker config file (yaml)')
-    parser.add_argument('--n-iters', default=1, type=int, help='Number of '
-                        'trials to run sequentially. default=1')
+def configure_parser(sub_parsers):
+    help = 'Run worker'
+    p = sub_parsers.add_parser('worker', description=help, help=help,
+                               formatter_class=ArgumentDefaultsHelpFormatter)
+    p.add_argument('config', help='Path to worker config file (yaml)')
+    p.add_argument('--n-iters', default=1, type=int, help='Number of '
+                   'trials to run sequentially.')
 
-    parser.parse_args()
-    parser.set_defaults(func=execute)
-    args = parser.parse_args()
-    args_func(args, parser)
+    p.set_defaults(func=execute)
 
 
 def execute(args, parser):
@@ -38,7 +37,7 @@ def execute(args, parser):
     config_sha1 = config.sha1()
 
     print('Loading dataset...')
-    X, y = config.dataset()
+    dataset = config.dataset()
     print('  %d sequences' % len(dataset))
 
     print('Loaded estimator:')
@@ -105,21 +104,3 @@ def run_single_trial(estimator, dataset, params, cv, config_sha1, session):
         session.commit()
 
     return t.status
-
-
-def args_func(args, p):
-    try:
-        args.func(args, p)
-    except RuntimeError as e:
-        sys.exit("Error: %s" % e)
-    except Exception as e:
-        if e.__class__.__name__ not in ('ScannerError', 'ParserError'):
-            message = """\
-An unexpected error has occurred, please consider sending the
-following traceback to the mixtape GitHub issue tracker at:
-
-        https://github.com/rmcgibbo/mixtape/issues
-
-"""
-            print(message, file=sys.stderr)
-        raise  # as if we did not catch it

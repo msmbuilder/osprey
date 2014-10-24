@@ -1,4 +1,8 @@
 import json
+from datetime import datetime, timedelta
+
+from six import iteritems
+
 from sqlalchemy import Column, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.types import (TypeDecorator, Text, Float, Integer, Enum,
@@ -39,6 +43,17 @@ class Trial(Base):
     user = Column(String(512))
     traceback = Column(Text())
     config_sha1 = Column(String(40))
+
+    def to_dict(self):
+        item = {}
+        for k, v in iteritems(self.__dict__):
+            if k.startswith('_'):
+                continue
+            if isinstance(v, (datetime, timedelta)):
+                v = str(v)
+            item[k] = v
+        return item
+
 
 def make_session(uri, table_name='trials', echo=False):
     Trial.__tablename__ = table_name

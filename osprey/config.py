@@ -9,8 +9,6 @@ import importlib
 
 from six.moves import cPickle
 from six import iteritems
-import sklearn.base
-
 
 from .trials import make_session
 from . import search
@@ -68,6 +66,8 @@ class Config(object):
                             section, key))
 
     def estimator(self):
+        import sklearn.base
+
         # load estimator from pickle field
         pkl = self.get_value('estimator/pickle')
         if pkl is not None:
@@ -97,7 +97,7 @@ class Config(object):
                 traceback.print_exc(file=sys.stderr)
                 print('-'*78)
                 sys.exit(1)
-                
+
         entry_point = self.get_value('estimator/entry_point')
         if entry_point is not None:
             try:
@@ -117,17 +117,17 @@ class Config(object):
             try:
                 estimator = getattr(package, obj_str)
             except (AttributeError, KeyError):
-                raise RuntimeError('estimator/entry_point: %r does not contain '
-                                    'object %r' % (package_str, obj_str))
-            
+                raise RuntimeError('estimator/entry_point: %r does not '
+                                   'contain object %r' % (
+                                       package_str, obj_str))
+
             if issubclass(estimator, sklearn.base.BaseEstimator):
                 estimator = estimator()
-            
+
             if not isinstance(estimator, sklearn.base.BaseEstimator):
                 raise RuntimeError('estimator/pickle must load a '
                                    'sklearn-derived Estimator')
             return estimator
-            
 
         raise RuntimeError('no estimator field')
 
@@ -183,7 +183,7 @@ class Config(object):
     def trials(self):
         uri = self.get_value('trials/uri')
         table_name = self.get_value('trials/table_name', default='trials')
-        
+
         curdir = os.path.abspath(os.curdir)
         try:
             # move into that directory when creating the DB, since if it's
@@ -196,7 +196,7 @@ class Config(object):
             os.chdir(curdir)
 
         return value
-        
+
     def sha1(self):
         with open(self.path) as f:
             return hashlib.sha1(f.read()).hexdigest()

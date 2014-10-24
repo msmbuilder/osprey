@@ -3,19 +3,18 @@ estimator:
 
 cv: 5
 
-param_grid:
-    cluster__n_clusters:
-        min: 10
-        max: 100
-
-    tica__n_components:
-        min: 2
-        max: 10
-        type: int
+search:
+    space:
+        n_components:
+            min: 1
+            max: 4
+            type: float
+    engine: hyperopt_tpe
 
 dataset:
     trajectories: ~/local/msmbuilder/Tutorial/XTC/*/*.xtc
     topology: ~/local/msmbuilder/Tutorial/native.pdb
     stride: 1
 
-experiments: sqlite:///foo.db
+trials:
+    uri: sqlite:///foo.db

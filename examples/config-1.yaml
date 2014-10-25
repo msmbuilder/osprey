@@ -1,13 +1,13 @@
 estimator:
     # pickle: model.pkl
-    entry_point: sklearn.cluster:KMeans
-    # eval: |
-    #     Pipeline([
-    #             ('featurizer', DihedralFeaturizer(types=['phi', 'psi'])),
-    #             ('tica', tICA())
-    #     ])
+    # entry_point: sklearn.cluster.KMeans
+    eval: |
+        Pipeline([
+                ('featurizer', DihedralFeaturizer(types=['phi', 'psi'])),
+                ('tica', tICA())
+        ])
     
-scorer: rocaucscore  # not required
+scoring: roc_auc  # not required
     
 cv: 5
 
@@ -34,7 +34,7 @@ search:
 
 
 dataset:
-    __loader__: mixtape.MDTrajDataset
+    __loader__: osprey.MDTrajDataset
     trajectories: ~/local/msmbuilder/Tutorial/XTC/*/*.xtc
     topology: ~/local/msmbuilder/Tutorial/native.pdb
     stride: 1

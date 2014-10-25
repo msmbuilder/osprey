@@ -2,16 +2,15 @@ from __future__ import print_function, absolute_import, division
 import os
 import sys
 import yaml
-import glob
 import types
 import hashlib
 import traceback
-import importlib
 
 from six.moves import cPickle
 from six import iteritems
 
 from .trials import make_session
+from .entry_point import load_entry_point
 from . import search
 from . import evalsupport
 
@@ -24,7 +23,7 @@ FIELDS = {
     'search':  ['engine', 'space', 'seed'],
     'param_grid':  dict,
     'cv':          int,
-    'scorer':      str,
+    'scoring':      str,
 }
 
 
@@ -102,30 +101,9 @@ class Config(object):
 
         entry_point = self.get_value('estimator/entry_point')
         if entry_point is not None:
-            try:
-                package_str, obj_str = entry_point.split(':')
-            except ValueError:
-                raise RuntimeError('estimator/entry_point syntax error')
-
-            try:
-                package = importlib.import_module(package_str)
-            except ImportError:
-                print('-'*78)
-                print('Error parsing estimator/entry_point', file=sys.stderr)
-                print('-'*78)
-                traceback.print_exc(sys.stderr)
-                sys.exit(1)
-
-            try:
-                estimator = getattr(package, obj_str)
-            except (AttributeError, KeyError):
-                raise RuntimeError('estimator/entry_point: %r does not '
-                                   'contain object %r' % (
-                                       package_str, obj_str))
-
+            estimator = load_entry_point(entry_point)
             if issubclass(estimator, sklearn.base.BaseEstimator):
                 estimator = estimator()
-
             if not isinstance(estimator, sklearn.base.BaseEstimator):
                 raise RuntimeError('estimator/pickle must load a '
                                    'sklearn-derived Estimator')
@@ -164,23 +142,18 @@ class Config(object):
         return int(self.get_section('cv'))
 
     def dataset(self):
-        traj_glob = self.get_value('dataset/trajectories')
-        topology = self.get_value('dataset/topology')
-        stride = int(self.get_value('dataset/stride', 1))
+        loader_str = self.get_value('dataset/__loader__', 'osprey.Dataset')
+        loader_factory = load_entry_point(loader_str)
+        loader = loader_factory(**self.get_section('dataset'))
 
-        if traj_glob is not None:
-            import mdtraj as md
+        curdir = os.path.abspath(os.curdir)
+        try:
+            os.chdir(os.path.dirname(self.path))
+            X, y = loader()
+        finally:
+            os.chdir(curdir)
 
-            traj_glob = expand_path(traj_glob, os.path.dirname(self.path))
-            if topology is not None:
-                topology = expand_path(topology, os.path.dirname(self.path))
-
-            filenames = glob.glob(traj_glob)
-            return [md.load(f, top=topology, stride=stride) for f in filenames]
-
-        # we should also support loading datasets from other forms
-        # (e.g. hdf5 or pickle files containing numpy arrays)
-        raise NotImplementedError()
+        return X, y
 
     def trials(self):
         uri = self.get_value('trials/uri')
@@ -203,12 +176,12 @@ class Config(object):
         with open(self.path) as f:
             return hashlib.sha1(f.read()).hexdigest()
 
-    def scorer(self):
-        scorer = self.get_section('scorer')
-        if len(scorer) == 0:
-            scorer = None
-        assert isinstance(scorer, (str, types.NoneType))
-        return scorer
+    def scoring(self):
+        scoring = self.get_section('scoring')
+        if len(scoring) == 0:
+            scoring = None
+        assert isinstance(scoring, (str, types.NoneType))
+        return scoring
 
 
 def parse(data):
@@ -229,10 +202,3 @@ def parse(data):
                     field, res[field].__class__.__name__))
 
     return res
-
-
-def expand_path(path, base):
-    path = os.path.expanduser(path)
-    if not os.path.isabs(path):
-        path = os.path.join(base, path)
-    return path

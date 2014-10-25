@@ -14,7 +14,7 @@ from .trials import Trial
 
 
 def configure_parser(sub_parsers):
-    help = 'Run worker'
+    help = 'Run worker processes'
     p = sub_parsers.add_parser('worker', description=help, help=help,
                                formatter_class=ArgumentDefaultsHelpFormatter)
     p.add_argument('config', help='Path to worker config file (yaml)')
@@ -27,7 +27,6 @@ def configure_parser(sub_parsers):
 def execute(args, parser):
     # Load the config file and extract the fields
     config = Config(args.config)
-    config.check_fields()
     estimator = config.estimator()
     session = config.trials()
     cv = config.cv()

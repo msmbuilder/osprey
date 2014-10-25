@@ -1,54 +1,60 @@
 from __future__ import print_function, absolute_import, division
-import os
 import sys
 import yaml
 import types
 import hashlib
 import traceback
+from os.path import join, isfile, dirname
 
 from six.moves import cPickle
 from six import iteritems
+from six.moves import reduce
+from pkg_resources import resource_filename
 
 from .trials import make_session
 from .entry_point import load_entry_point
-from .rcfile import RC
+from .rcfile import load_rcfile
+from .utils import dict_merge, in_directory
 from . import search
-from . import mixtape_evalsupport
 
 
 FIELDS = {
-    'estimator':   ['pickle', 'eval', 'entry_point'],
+    'estimator':   ['pickle', 'eval', '__eval_globals__', 'entry_point'],
     'dataset':     dict,
 
-    'trials': ['uri', 'table_name'],
-    'search':  ['engine', 'space', 'seed'],
+    'trials':      ['uri', 'table_name'],
+    'search':      ['engine', 'space', 'seed'],
     'param_grid':  dict,
     'cv':          int,
-    'scoring':      str,
+    'scoring':     str,
 }
-
-DEFAULT_DATASET_LOADER = RC.get('default_dataset_loader',
-                                'osprey.MDTrajDataset')
-DEFAULT_ESTIMATOR_EVAL_GLOBALS = mixtape_evalsupport.globals
 
 
 class Config(object):
 
     def __init__(self, path):
         self.path = path
-        if not os.path.isfile(self.path):
+        if not isfile(self.path):
             raise RuntimeError('%s does not exist' % self.path)
         with open(self.path) as f:
-            self.config = parse(f)
+            config = parse(f)
+        self.config = self._merge_defaults_and_rc(config)
+        self._check_fields()
+
+    def _merge_defaults_and_rc(self, config):
+        fn = resource_filename('osprey', join('data', 'default_config.yaml'))
+        with open(fn) as f:
+            default = parse(f)
+        rc = load_rcfile()
+        return reduce(dict_merge, [default, rc, config])
 
     @classmethod
     def fromdict(cls, config):
-        """
-        Create a Config object from config dict directly.
-        """
+        """Create a Config object from config dict directly."""
         m = super(Config, cls).__new__(cls)
         m.path = '.'
-        m.config = config
+        m.config = m._merge_defaults_and_rc(config)
+        m._check_fields()
         return m
 
     def get_section(self, section):
@@ -58,7 +64,7 @@ class Config(object):
         section, key = field.split('/')
         return self.get_section(section).get(key, default)
 
-    def check_fields(self):
+    def _check_fields(self):
         for section, submeta in iteritems(self.config):
             if section not in FIELDS:
                 raise RuntimeError("unknown section: %s" % section)
@@ -77,8 +83,8 @@ class Config(object):
         # load estimator from pickle field
         pkl = self.get_value('estimator/pickle')
         if pkl is not None:
-            path = os.path.join(os.path.dirname(self.path), pkl)
-            if not os.path.isfile(path):
+            path = join(dirname(self.path), pkl)
+            if not isfile(path):
                 raise RuntimeError('estimator/pickle %s is not a file' % pkl)
             with open(path) as f:
                 estimator = cPickle.load(f)
@@ -89,9 +95,10 @@ class Config(object):
 
         evalstring = self.get_value('estimator/eval')
         if evalstring is not None:
+            eval_globals = self.get_value('estimator/__eval_globals__')
+
             try:
-                estimator = eval(evalstring, {},
-                                 DEFAULT_ESTIMATOR_EVAL_GLOBALS())
+                estimator = eval(evalstring, {}, eval_globals())
                 if not isinstance(estimator, sklearn.base.BaseEstimator):
                     raise RuntimeError('estimator/pickle must load a '
                                        'sklearn-derived Estimator')
@@ -148,35 +155,19 @@ class Config(object):
         return int(self.get_section('cv'))
 
     def dataset(self):
-        loader_str = self.get_value('dataset/__loader__',
-                                    DEFAULT_DATASET_LOADER)
-        loader_factory = load_entry_point(loader_str, 'dataset/__loader__')
-        loader = loader_factory(**self.get_section('dataset'))
+        loader = load_entry_point(self.get_value('dataset/__loader__'))
 
-        curdir = os.path.abspath(os.curdir)
-        try:
-            os.chdir(os.path.dirname(self.path))
-            X, y = loader()
-        finally:
-            os.chdir(curdir)
+        with in_directory(dirname(self.path)):
+            X, y = loader(**self.get_section('dataset'))
 
         return X, y
 
     def trials(self):
         uri = self.get_value('trials/uri')
-        table_name = self.get_value('trials/table_name', default='trials')
+        table_name = self.get_value('trials/table_name')
 
-        curdir = os.path.abspath(os.curdir)
-        try:
-            # move into that directory when creating the DB, since if it's
-            # an sqlite3 DB, we want relative paths on the filesystem we want
-            # those to be interpreted relative to the config file's directory,
-            # not the curdir of the client instantiating this python script.
-            os.chdir(os.path.dirname(self.path))
+        with in_directory(dirname(self.path)):
             value = make_session(uri, table_name)
-        finally:
-            os.chdir(curdir)
-
         return value
 
     def sha1(self):
@@ -191,8 +182,8 @@ class Config(object):
         return scoring
 
 
-def parse(data):
-    res = yaml.load(data)
+def parse(f):
+    res = yaml.load(f)
     if res is None:
         res = {}
 

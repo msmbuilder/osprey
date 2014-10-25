@@ -1,12 +1,12 @@
 estimator:
     # pickle: model.pkl
-    # entry_point: sklearn.cluster.KMeans
-    eval: |
-        Pipeline([
-                ('featurizer', DihedralFeaturizer(types=['phi', 'psi'])),
-                ('tica', tICA())
-        ])
-    
+    entry_point: sklearn.cluster.KMeans
+    # eval: |
+    #     Pipeline([
+    #             ('featurizer', DihedralFeaturizer(types=['phi', 'psi'])),
+    #             ('tica', tICA())
+    #     ])
+
 scoring: roc_auc  # not required
     
 cv: 5
@@ -37,10 +37,8 @@ dataset:
     trajectories: ~/local/msmbuilder/Tutorial/XTC/*/*.xtc
     topology: ~/local/msmbuilder/Tutorial/native.pdb
     stride: 1
-    
-    
+
 
 trials:
     # http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html#database-urls
     uri: sqlite:///foo.db
-    table_name: trials

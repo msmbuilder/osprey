@@ -16,6 +16,7 @@ setup(
     cmdclass=versioneer.get_cmdclass(),
     packages=find_packages(),
     zip_safe=False,
+    package_data={'osprey': ['data/*']},
     entry_points={
         'console_scripts': [
             'osprey = osprey.main:main',

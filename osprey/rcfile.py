@@ -23,6 +23,7 @@ def load_rcfile():
     path = get_rc_path()
     if not path:
         return {}
+    print('Loading %s...' % path)
 
     with open(path) as f:
         return yaml.load(f) or {}

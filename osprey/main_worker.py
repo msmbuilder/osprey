@@ -14,7 +14,7 @@ from .trials import Trial
 
 
 def configure_parser(sub_parsers):
-    help = 'Run worker processes'
+    help = 'Run a worker process (hyperparameter optimization)'
     p = sub_parsers.add_parser('worker', description=help, help=help,
                                formatter_class=ArgumentDefaultsHelpFormatter)
     p.add_argument('config', help='Path to worker config file (yaml)')

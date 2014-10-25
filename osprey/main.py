@@ -10,7 +10,8 @@ from . import main_createrc
 
 
 def main():
-    p = argparse.ArgumentParser()
+    help = 'osprey is a tool for machine learning hyperparameter optimization.'
+    p = argparse.ArgumentParser(description=help)
     p.add_argument(
         '-V', '--version',
         action='version',

@@ -40,29 +40,28 @@ class Config(object):
             config = parse(f)
         self.config = self._merge_defaults_and_rc(config)
         self._check_fields()
+        print('Loading %s...' % path)
 
     def _merge_defaults_and_rc(self, config):
+        """The config object loads its values from three sources, with the
+        following precedence:
+
+            1. data/default_config.yaml
+            2. the .ospreyrc file, which can be located in the user's home
+               directory, the current directory, or specified with the OSPREYRC
+               variable (see rcfile.py)
+            3. The config file itself, passed in to this object in the
+               constructor as `path`.
+
+        Values specified in files with higher precedence (later in the above
+        list) always supersede values from lower in the list, in the case
+        of a conflict.
+        """
         fn = resource_filename('osprey', join('data', 'default_config.yaml'))
         with open(fn) as f:
             default = parse(f)
         rc = load_rcfile()
         return reduce(dict_merge, [default, rc, config])
-
-    @classmethod
-    def fromdict(cls, config):
-        """Create a Config object from config dict directly."""
-        m = super(Config, cls).__new__(cls)
-        m.path = '.'
-        m.config = m._merge_defaults_and_rc(config)
-        m._check_fields()
-        return m
-
-    def get_section(self, section):
-        return self.config.get(section, {})
-
-    def get_value(self, field, default=None):
-        section, key = field.split('/')
-        return self.get_section(section).get(key, default)
 
     def _check_fields(self):
         for section, submeta in iteritems(self.config):
@@ -77,7 +76,42 @@ class Config(object):
                         raise RuntimeError("in section %r: unknown key %r" % (
                             section, key))
 
+    @classmethod
+    def fromdict(cls, config):
+        """Create a Config object from config dict directly."""
+        m = super(Config, cls).__new__(cls)
+        m.path = '.'
+        m.config = m._merge_defaults_and_rc(config)
+        m._check_fields()
+        return m
+
+    def get_section(self, section):
+        """Sections are top-level entries in the config tree"""
+        return self.config.get(section, {})
+
+    def get_value(self, field, default=None):
+        """Get an entry from within a section, using a '/' delimiter"""
+        section, key = field.split('/')
+        return self.get_section(section).get(key, default)
+
+    # ----------------------------------------------------------------------- #
+
     def estimator(self):
+        """Get the estimator, an instance of a (subclass of)
+        sklearn.base.BaseEstimator
+
+        It can be loaded either from a pickle, from a string using eval(),
+        or from an entry point.
+
+        e.g.
+
+        estimator:
+            # only one of the following can actually be active in a given
+            # config file.
+            pickle: path-to-pickle-file.pkl
+            eval: "Pipeline([('cluster': KMeans())])"
+            entry_point: sklearn.linear_model.LogisticRegression
+        """
         import sklearn.base
 
         # load estimator from pickle field
@@ -148,12 +182,6 @@ class Config(object):
                                'engines are: %r' % (engine, search.__all__))
         return getattr(search, engine)
 
-    def search_seed(self):
-        return self.get_value('search/seed')
-
-    def cv(self):
-        return int(self.get_section('cv'))
-
     def dataset(self):
         loader = load_entry_point(self.get_value('dataset/__loader__'))
 
@@ -170,16 +198,23 @@ class Config(object):
             value = make_session(uri, table_name)
         return value
 
-    def sha1(self):
-        with open(self.path) as f:
-            return hashlib.sha1(f.read()).hexdigest()
-
     def scoring(self):
         scoring = self.get_section('scoring')
-        if len(scoring) == 0:
+        if scoring == {}:
             scoring = None
         assert isinstance(scoring, (str, types.NoneType))
         return scoring
+
+    def search_seed(self):
+        return self.get_value('search/seed')
+
+    def cv(self):
+        return int(self.get_section('cv'))
+
+    def sha1(self):
+        """SHA1 hash of the config file itself."""
+        with open(self.path) as f:
+            return hashlib.sha1(f.read()).hexdigest()
 
 
 def parse(f):

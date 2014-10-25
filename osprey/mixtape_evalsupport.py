@@ -2,7 +2,7 @@ from sklearn.base import BaseEstimator
 from six import iteritems
 
 
-def mixtape_globals():
+def globals():
     import mixtape.featurizer
     import mixtape.tica
     import mixtape.cluster

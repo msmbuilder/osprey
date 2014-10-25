@@ -11,8 +11,9 @@ from six import iteritems
 
 from .trials import make_session
 from .entry_point import load_entry_point
+from .rcfile import RC
 from . import search
-from . import evalsupport
+from . import mixtape_evalsupport
 
 
 FIELDS = {
@@ -25,6 +26,10 @@ FIELDS = {
     'cv':          int,
     'scoring':      str,
 }
+
+DEFAULT_DATASET_LOADER = RC.get('default_dataset_loader',
+                                'osprey.MDTrajDataset')
+DEFAULT_ESTIMATOR_EVAL_GLOBALS = mixtape_evalsupport.globals
 
 
 class Config(object):
@@ -85,7 +90,8 @@ class Config(object):
         evalstring = self.get_value('estimator/eval')
         if evalstring is not None:
             try:
-                estimator = eval(evalstring, {}, evalsupport.mixtape_globals())
+                estimator = eval(evalstring, {},
+                                 DEFAULT_ESTIMATOR_EVAL_GLOBALS())
                 if not isinstance(estimator, sklearn.base.BaseEstimator):
                     raise RuntimeError('estimator/pickle must load a '
                                        'sklearn-derived Estimator')
@@ -142,7 +148,8 @@ class Config(object):
         return int(self.get_section('cv'))
 
     def dataset(self):
-        loader_str = self.get_value('dataset/__loader__', 'osprey.Dataset')
+        loader_str = self.get_value('dataset/__loader__',
+                                    DEFAULT_DATASET_LOADER)
         loader_factory = load_entry_point(loader_str)
         loader = loader_factory(**self.get_section('dataset'))
 

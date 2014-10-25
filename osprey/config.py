@@ -107,7 +107,7 @@ class Config(object):
 
         entry_point = self.get_value('estimator/entry_point')
         if entry_point is not None:
-            estimator = load_entry_point(entry_point)
+            estimator = load_entry_point(entry_point, 'estimator/entry_point')
             if issubclass(estimator, sklearn.base.BaseEstimator):
                 estimator = estimator()
             if not isinstance(estimator, sklearn.base.BaseEstimator):
@@ -150,7 +150,7 @@ class Config(object):
     def dataset(self):
         loader_str = self.get_value('dataset/__loader__',
                                     DEFAULT_DATASET_LOADER)
-        loader_factory = load_entry_point(loader_str)
+        loader_factory = load_entry_point(loader_str, 'dataset/__loader__')
         loader = loader_factory(**self.get_section('dataset'))
 
         curdir = os.path.abspath(os.curdir)

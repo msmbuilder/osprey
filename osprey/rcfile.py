@@ -2,7 +2,7 @@ import os
 import sys
 import yaml
 
-__all__ = ['RC']
+__all__ = ['RC', 'USER_RC_PATH', 'CURDIR_RC_PATH']
 
 
 CURDIR_RC_PATH = os.path.abspath('.ospreyrc')

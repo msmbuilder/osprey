@@ -34,7 +34,6 @@ search:
 
 
 dataset:
-    __loader__: osprey.MDTrajDataset
     trajectories: ~/local/msmbuilder/Tutorial/XTC/*/*.xtc
     topology: ~/local/msmbuilder/Tutorial/native.pdb
     stride: 1

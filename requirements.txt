@@ -1,0 +1,3 @@
+six
+scikit-learn
+sqlalchemy

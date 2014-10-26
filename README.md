@@ -1,4 +1,4 @@
-Osprey
+Osprey [![Build Status](https://travis-ci.org/rmcgibbo/osprey.svg?branch=master)](https://travis-ci.org/rmcgibbo/osprey)
 ======
 
 _osprey is the plumbing for machine learning hyperparameter optimization._

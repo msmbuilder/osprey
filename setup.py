@@ -12,6 +12,7 @@ versioneer.parentdir_prefix = 'osprey-' # dirname like 'myproject-1.2.0'
 
 def main(**kwargs):
     classifiers = """\
+    Development Status :: 3 - Alpha
     Intended Audience :: Science/Research
     License :: OSI Approved :: Apache Software License
     Programming Language :: Python

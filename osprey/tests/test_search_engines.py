@@ -19,10 +19,10 @@ def hyperopt_x2_iterates(n_iters=100):
         iterates.append(params['x'])
         return params['x']**2
 
-    fmin(fn=fn, algo=tpe.suggest, max_evals=n_iters, trials=trials,
-         space={'x': hp.uniform('x', -10, 10)},
-         **_hyperopt_fmin_random_kwarg(random))
-    print(trials.trials[0:5])
+    for i in range(n_iters):
+        fmin(fn=fn, algo=tpe.suggest, max_evals=i+1, trials=trials,
+             space={'x': hp.uniform('x', -10, 10)},
+             **_hyperopt_fmin_random_kwarg(random))
 
     return np.array(iterates)
 

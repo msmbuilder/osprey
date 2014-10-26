@@ -95,5 +95,6 @@ Dependencies
 - numpy
 - scikit-learn
 - sqlalchemy
+- hyperopt (recommended, for `engine=hyperopt_tpe`)
 - scipy (optional, for testing)
 - nose (optional, for testing)

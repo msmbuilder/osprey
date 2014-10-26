@@ -36,6 +36,7 @@ def print_header():
 def execute(args, parser):
     # Load the config file and extract the fields
     print_header()
+    raise ValueError()
 
     config = Config(args.config)
     estimator = config.estimator()

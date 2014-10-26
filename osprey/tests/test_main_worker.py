@@ -16,6 +16,7 @@ OSPREY_BIN = find_executable('osprey')
 
 @skipif(not HAVE_MIXTAPE, 'this test requires mixtape')
 def test_1():
+    assert OSPREY_BIN is not None
     cwd = os.path.abspath(os.curdir)
     dirname = tempfile.mkdtemp()
 

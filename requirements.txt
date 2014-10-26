@@ -1,4 +1,5 @@
 six
+pyyaml
 nose
 numpy
 scipy

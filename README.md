@@ -90,16 +90,23 @@ You can dump the database to JSON or CSV with `osprey dump`.
 Installation
 ------------
 ```
-$ python setup.py install
+# grab the latest version from github
+$ pip install git+git://github.com/rmcgibbo/osprey.git
+```
+
+```
+# or clone the repo yourself and run `setup.py`
+$ git clone https://github.com/rmcgibbo/osprey.git
+$ cd osprey && python setup.py install
 ```
 
 Dependencies
 ------------
-- six
-- pyyaml
-- numpy
-- scikit-learn
-- sqlalchemy
-- hyperopt (recommended, required for `engine=hyperopt_tpe`)
-- scipy (optional, for testing)
-- nose (optional, for testing)
+- `six`
+- `pyyaml`
+- `numpy`
+- `scikit-learn`
+- `sqlalchemy`
+- `hyperopt` (recommended, required for `engine=hyperopt_tpe`)
+- `scipy` (optional, for testing)
+- `nose` (optional, for testing)

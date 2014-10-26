@@ -43,7 +43,7 @@ trials:
 Then run `osprey worker`. You can run multiple parallel instances
 of `osprey worker` simultaniously on a cluster too.
 
-```
+```python
 $ osprey worker config.yaml
 ======================================================================
 = osprey is a tool for machine learning hyperparameter optimization. =
@@ -75,10 +75,10 @@ Choosing next hyperparameters with hyperopt_tpe...
 Fitting 5 folds for each of 1 candidates, totalling 5 fits
 [Parallel(n_jobs=1)]: Done   1 jobs       | elapsed:    1.0s
 [Parallel(n_jobs=1)]: Done   5 out of   5 | elapsed:    3.8s finished
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 Success! Model score = 4.370210
 (best score so far   = 4.370210)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 
 1/1 models fit successfully.
 osprey-worker exiting.

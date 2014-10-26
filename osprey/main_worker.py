@@ -30,7 +30,7 @@ def execute(args, parser):
     estimator = config.estimator()
     session = config.trials()
     cv = config.cv()
-    bounds = config.search_space()
+    search_space = config.search_space()
     engine = config.search_engine()
     seed = config.search_seed()
     config_sha1 = config.sha1()
@@ -42,6 +42,8 @@ def execute(args, parser):
 
     print('Loaded estimator:')
     print('  %r' % estimator)
+    
+    print(search_space)
 
     for i in range(args.n_iters):
         print('='*78)

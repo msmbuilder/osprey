@@ -42,7 +42,7 @@ def args_func(args, p):
         if e.__class__.__name__ not in ('ScannerError', 'ParserError'):
             message = """\
 An unexpected error has occurred, please consider sending the
-following traceback to the mixtape GitHub issue tracker at:
+following traceback to the osprey GitHub issue tracker at:
 
         https://github.com/rmcgibbo/osprey/issues
 

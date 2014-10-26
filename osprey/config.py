@@ -15,6 +15,7 @@ from .trials import make_session
 from .entry_point import load_entry_point
 from .rcfile import load_rcfile
 from .utils import dict_merge, in_directory
+from .searchspace import SearchSpace
 from . import search
 
 
@@ -159,21 +160,47 @@ class Config(object):
         raise RuntimeError('no estimator field')
 
     def search_space(self):
-        grid = self.get_value('search/space')
-        required_fields = ['min', 'max']
+        ss = self.get_value('search/space')
 
-        for param_name, info in iteritems(grid):
-            for f in required_fields:
-                if f not in info:
-                    raise RuntimeError('param_grid/%s does not contain '
-                                       'required field "%s"' % (param_name, f))
-
+        searchspace = SearchSpace()
+        for param_name, info in iteritems(ss):
             if 'type' not in info:
-                info['type'] = 'int'
-            elif info['type'] not in ['int', 'float']:
-                raise RuntimeError('param_grid/%s must be "int" '
-                                   'or "float"' % param_name)
-        return grid
+                raise RuntimeError('search/space/%s does not contain '
+                                   'required field "type"' % (param_name))
+            type = info.pop('type')
+            if type not in ('int', 'float', 'enum'):
+                raise RuntimeError('search/space/%s type="%s" is not valid. '
+                                   'valid types are int, float and enum' %
+                                   param_name)
+            try:
+                if type == 'int':
+                    if sorted(list(info.keys())) != ['max', 'min']:
+                        raise RuntimeError(
+                            'search/space/%s type="int" must contain keys '
+                            '"min", "max"' % param_name)
+                    searchspace.add_int(param_name, **info)
+                elif type == 'enum':
+                    if sorted(list(info.keys())) != ['choices']:
+                        raise RuntimeError(
+                            'search/space/%s type="enum" must contain key '
+                            '"choices", "type"' % param_name)
+                    searchspace.add_enum(param_name, **info)
+                elif type == 'float':
+                    if sorted(list(info.keys())) not in (
+                            ['max', 'min'], ['max', 'min', 'warp']):
+                        raise RuntimeError(
+                            'search/space/%s type="float" must contain keys '
+                            '"min", "max", and optionally "warp"' % param_name)
+                    searchspace.add_float(param_name, **info)
+
+            except ValueError as e:
+                # searchspace.add_XXX can throw a ValueError on malformed
+                # input (e.g. max < min). re-raising as a runtimerror lets the
+                # CLI layer catch it appropriately without an "unexpected
+                # error" traceback
+                raise RuntimeError(e.message)
+
+        return searchspace
 
     def search_engine(self):
         engine = self.get_value('search/engine')

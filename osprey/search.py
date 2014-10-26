@@ -4,24 +4,11 @@ from sklearn.utils import check_random_state
 __all__ = ['random', 'hyperopt_tpe']
 
 
-def random(history, bounds, random_state=None):
+def random(history, searchspace, random_state=None):
     """
 
     """
-
-    rval = {}
-    random = check_random_state(random_state)
-
-    for param_name, info in iteritems(bounds):
-        low, high = info['min'], info['max']
-        if info['type'] == 'int':
-            rval[param_name] = random.randint(low, high)
-        elif info['type'] == 'float':
-            rval[param_name] = random.uniform(low, high)
-        else:
-            raise ValueError('type should be int/float')
-
-    return rval
+    return searchspace.rvs()
 
 
 def hyperopt_tpe(history, bounds, random_state=None):

@@ -15,7 +15,7 @@ install:
   - conda create --yes -n test python=$python `cat requirements.txt | xargs`
   - source activate test
   # install extra dependency for style checking
-  - conda install flake8
+  - conda install --yes flake8
   # instal hyperopt dependencies
   - '[ "$hyperopt" != "none" ] && conda install --yes pymongo networkx || echo ""'
   # install hyperopt

@@ -11,13 +11,22 @@ install:
   - bash Miniconda-latest-Linux-x86_64.sh -b
   - export PATH=$HOME/miniconda/bin:$PATH
 
-  - '[ $python = 2 ] && conda install --yes `cat requirements.txt | xargs` || echo ""'
-  - '[ $python = 3 ] && conda create --yes -n 3 python=3 `cat requirements.txt | xargs` && source activate 3 || echo ""'
-  
+  # install requirements file in python
+  - conda create --yes -n test python=$python `cat requirements.txt | xargs`
+  - source activate test
+  # install extra dependency for style checking
+  - conda install flake8
+  # instal hyperopt dependencies
   - '[ "$hyperopt" != "none" ] && conda install --yes pymongo networkx || echo ""'
+  # install hyperopt
   - '[ "$hyperopt" = "0.0.2" ] && conda install --yes pip && pip install hyperopt || echo ""'
   - '[ "$hyperopt" = "dev" ]   && git clone https://github.com/hyperopt/hyperopt.git && cd hyperopt && python setup.py -q install && cd - || echo ""'
+
 
 script:
   - python setup.py install
   - nosetests -v
+  # exclude versioneer.py and _version.py from style checking, since we don't
+  # write/maintain them
+  - flake8 `find . -name '*.py'  ! -name build ! -path './build/*' !
+            -name versioneer.py ! -name _version.py | xargs`

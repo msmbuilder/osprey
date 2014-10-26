@@ -257,7 +257,8 @@ class Config(object):
         engine = self.get_value('search/engine')
         if engine not in search_engines.__all__:
             raise RuntimeError('search/engine "%s" not supported. available'
-                               'engines are: %r' % (engine, search_engines.__all__))
+                               'engines are: %r' % (engine,
+                                                    search_engines.__all__))
         return getattr(search_engines, engine)
 
     def dataset(self):

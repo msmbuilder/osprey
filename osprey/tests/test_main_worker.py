@@ -6,7 +6,7 @@ from distutils.spawn import find_executable
 from numpy.testing.decorators import skipif
 
 try:
-    import mixtape
+    __import__('mixtape')
     HAVE_MIXTAPE = True
 except:
     HAVE_MIXTAPE = False

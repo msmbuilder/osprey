@@ -10,7 +10,6 @@ Example (with [mixtape](https://github.com/rmcgibbo/mixtape))
 -------------------------------------------------------------
 ```
 $ cat config.yaml
-
 estimator:
     eval: |
         Pipeline([
@@ -33,19 +32,16 @@ search:
             type: enum
 
 cv: 5
-
 dataset:
     trajectories: ~/local/msmbuilder/Tutorial/XTC/*/*.xtc
     topology: ~/local/msmbuilder/Tutorial/native.pdb
     stride: 1
-
 trials:
     uri: sqlite:///osprey-trials.db
 ```
 
-Then run `osprey worker`. you can run multiple parallel instances
+Then run `osprey worker`. You can run multiple parallel instances
 of `osprey worker` simultaniously on a cluster too.
-
 
 ```
 $ osprey worker config.yaml

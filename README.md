@@ -43,7 +43,7 @@ trials:
 Then run `osprey worker`. You can run multiple parallel instances
 of `osprey worker` simultaniously on a cluster too.
 
-```python
+```
 $ osprey worker config.yaml
 ======================================================================
 = osprey is a tool for machine learning hyperparameter optimization. =

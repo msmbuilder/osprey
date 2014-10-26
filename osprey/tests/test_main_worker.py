@@ -3,10 +3,18 @@ import shutil
 import subprocess
 import tempfile
 from distutils.spawn import find_executable
+from numpy.testing.decorators import skipif
+
+try:
+    import mixtape
+    HAVE_MIXTAPE = True
+except:
+    HAVE_MIXTAPE = False
 
 OSPREY_BIN = find_executable('osprey')
 
 
+@skipif(not HAVE_MIXTAPE, 'this test requires mixtape')
 def test_1():
     cwd = os.path.abspath(os.curdir)
     dirname = tempfile.mkdtemp()

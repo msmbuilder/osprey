@@ -1,3 +1,5 @@
+from __future__ import print_function, absolute_import, division
+import inspect
 from sklearn.utils import check_random_state
 
 from .search_space import EnumVariable
@@ -113,7 +115,18 @@ def hyperopt_tpe(history, searchspace, random_state=None):
         return 0
 
     fmin(fn=mock_fn, algo=tpe.suggest, space=hp_searchspace, trials=trials,
-         max_evals=len(trials.trials)+1, rstate=random)
+         max_evals=len(trials.trials)+1, **_hyperopt_fmin_random_kwarg(random))
     chosen_params = chosen_params_container[0]
 
     return chosen_params
+
+
+def _hyperopt_fmin_random_kwarg(random):
+    from hyperopt import fmin
+    if 'rstate' in inspect.getargspec(fmin).args:
+        # 0.0.3-dev version uses this argument
+        kwargs = {'rstate': random}
+    elif 'rseed' in inspect.getargspec(fmin).args:
+        # 0.0.2 version uses different argument
+        kwargs = {'rseed': random.randint(2**32-1)}
+    return kwargs

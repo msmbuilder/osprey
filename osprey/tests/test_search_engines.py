@@ -1,20 +1,29 @@
+import sys
 import numpy as np
-from hyperopt import hp, fmin, tpe
+from numpy.testing.decorators import skipif
+try:
+    from hyperopt import hp, fmin, tpe, Trials
+except:
+    pass
 
 from osprey.search_space import SearchSpace
-from osprey.search_engines import hyperopt_tpe
+from osprey.search_engines import hyperopt_tpe, _hyperopt_fmin_random_kwarg
 
 
 def hyperopt_x2_iterates(n_iters=100):
     iterates = []
+    trials = Trials()
+    random = np.random.RandomState(0)
 
     def fn(params):
         iterates.append(params['x'])
         return params['x']**2
 
-    fmin(fn=fn, algo=tpe.suggest, max_evals=n_iters,
+    fmin(fn=fn, algo=tpe.suggest, max_evals=n_iters, trials=trials,
          space={'x': hp.uniform('x', -10, 10)},
-         rstate=np.random.RandomState(0))
+         **_hyperopt_fmin_random_kwarg(random))
+    print(trials.trials[0:5])
+
     return np.array(iterates)
 
 
@@ -35,8 +44,9 @@ def our_x2_iterates(n_iters=100):
     return np.array([h[0]['x'] for h in history])
 
 
+@skipif('hyperopt.fmin' not in sys.modules, 'this test requires hyperopt')
 def test_1():
-    ref = hyperopt_x2_iterates(50)
-    ours = our_x2_iterates(50)
+    ours = our_x2_iterates(25)
+    ref = hyperopt_x2_iterates(25)
 
     np.testing.assert_array_equal(ref, ours)

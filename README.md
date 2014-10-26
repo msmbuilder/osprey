@@ -17,7 +17,6 @@ estimator:
                 ('cluster', MiniBatchKMeans()),
                 ('msm', MarkovStateModel(n_timescales=5, verbose=False)),
         ])
-
 search:
     engine: hyperopt_tpe
     space:
@@ -30,7 +29,6 @@ search:
                 - ['phi', 'psi']
                 - ['phi', 'psi', 'chi1']
             type: enum
-
 cv: 5
 dataset:
     trajectories: ~/local/msmbuilder/Tutorial/XTC/*/*.xtc

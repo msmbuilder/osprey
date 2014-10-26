@@ -13,8 +13,8 @@ install:
   - conda install --yes `cat requirements.txt | xargs`
   
   - conda install --yes pymongo networkx  # required for hyperopt
-  - '[ $hyperopt = 0.0.2 ] && conda install --yes pip && pip install hyperopt'
-  - '[ $hyperopt = dev ] && git clone https://github.com/hyperopt/hyperopt.git && cd hyperopt && python setup.py install && cd -'
+  - '[ $hyperopt = 0.0.2 ] && conda install --yes pip && pip install hyperopt || echo "skipping conda install hyperopt"'
+  - '[ $hyperopt = dev ] && git clone https://github.com/hyperopt/hyperopt.git && cd hyperopt && python setup.py install && cd - || echo "skipping pip install hyperopt"'
 
 script:
   - python setup.py install

@@ -1,0 +1,8 @@
+default_config.yaml:
+    this is the base set of default options used when loading config files
+    (overridden by .ospreyrc or config.yaml)
+
+mixtape_skeleton_config.yaml:
+    An example configuration skeleton for mixtape projects, copied out for
+    the user by `osprey skeleton -t mixtape`
+

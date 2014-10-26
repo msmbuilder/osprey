@@ -20,8 +20,7 @@ def main(**kwargs):
     Operating System :: MacOS
     Operating System :: Microsoft :: Windows
     Topic :: Scientific/Engineering
-    Topic :: Scientific/Engineering :: Information Analysis
-    """
+    Topic :: Scientific/Engineering :: Information Analysis"""
     setup(
         name='osprey',
         author='Robert T. McGibbon',
@@ -57,6 +56,6 @@ def readme_to_rst():
 
 if __name__ == '__main__':
     kwargs = {}
-    if 'upload' in sys.argv:
+    if any(e in sys.argv for e in ('upload', 'register', 'sdist')):
         kwargs = readme_to_rst()
     main(**kwargs)

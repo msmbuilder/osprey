@@ -1,16 +1,20 @@
 language: c
 
+env:
+    matrix:
+        - hyperopt=dev
+        - hyperopt=0.0.2
+
 install:
   - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
   - bash Miniconda-latest-Linux-x86_64.sh -b
   - export PATH=$HOME/miniconda/bin:$PATH
 
   - conda install `cat requirements.txt | xargs`
-
-  - git clone https://github.com/hyperopt/hyperopt.git
-  - cd hyperopt
-  - python setup.py install
-  - cd ..
+  
+  - conda install pymongo networkx  # required for hyperopt
+  - '[ $hyperopt = 0.0.2 ] && conda install pip && pip install hyperopt'
+  - '[ $hyperopt = dev ] && git clone https://github.com/hyperopt/hyperopt.git && cd hyperopt && python setup.py install && cd -'
 
 script:
   - python setup.py install

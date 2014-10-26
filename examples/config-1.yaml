@@ -1,18 +1,20 @@
 estimator:
     # pickle: model.pkl
-    entry_point: sklearn.cluster.KMeans
-    # eval: |
-    #     Pipeline([
-    #             ('featurizer', DihedralFeaturizer(types=['phi', 'psi'])),
-    #             ('tica', tICA())
-    #     ])
+    # entry_point: sklearn.cluster.KMeans
+    eval: |
+        Pipeline([
+                ('featurizer', DihedralFeaturizer(types=['phi', 'psi'])),
+                ('tica', tICA()),
+                ('cluster', KMeans()),
+                ('msm', MarkovStateModel(n_timescales=5, verbose=False)),
+        ])
 
-scoring: roc_auc  # not required
+# scoring: roc_auc
     
 cv: 5
 
 search:
-    engine: random
+    engine: hyperopt_tpe
     space:
         tica__n_components:
             min: 1

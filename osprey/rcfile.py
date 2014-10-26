@@ -8,7 +8,7 @@ CURDIR_RC_PATH = os.path.abspath('.ospreyrc')
 USER_RC_PATH = os.path.abspath(os.path.expanduser('~/.ospreyrc'))
 
 
-def load_rcfile():
+def load_rcfile(verbose=True):
     def get_rc_path():
         path = os.getenv('OSPREYRC')
         if path == ' ':
@@ -23,7 +23,8 @@ def load_rcfile():
     path = get_rc_path()
     if not path:
         return {}
-    print('Loading %s...' % path)
+    if verbose:
+        print('Loading .ospreyrc from %s...' % path)
 
     with open(path) as f:
         return yaml.load(f) or {}

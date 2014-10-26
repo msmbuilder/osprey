@@ -1,4 +1,5 @@
 six
+nose
 numpy
 scipy
 scikit-learn

@@ -11,24 +11,14 @@ def random(history, searchspace, random_state=None):
     return searchspace.rvs()
 
 
-def hyperopt_tpe(history, bounds, random_state=None):
+def hyperopt_tpe(history, searchspace, random_state=None):
     """
 
 
     """
-    from hyperopt import hp, pyll, Trials, tpe, Domain
+    from hyperopt import Trials, tpe, Domain
     random = check_random_state(random_state)
-
-    hp_searchspace = {}
-    for param_name, info in iteritems(bounds):
-        if info['type'] == 'int':
-            hp_searchspace['param_name'] = pyll.scope.int(hp.quniform(
-                param_name, info['min'], info['max'], q=1))
-        elif info['type'] == 'float':
-            hp_searchspace['param_name'] = hp.uniform(
-                param_name, info['min'], info['max'])
-        else:
-            raise ValueError('type should be int/float')
+    hp_searchspace = searchspace.to_hyperopt()
 
     trials = Trials()
     for i, h in enumerate(history):
@@ -37,7 +27,7 @@ def hyperopt_tpe(history, bounds, random_state=None):
             'exp_key': None,
             'misc': {
                 'cmd': ('domain_attachment', 'FMinIter_Domain'),
-                'idxs': dict((k, [i]) for k in bounds.keys()),
+                'idxs': dict((k, [i]) for k in hp_searchspace.keys()),
                 'tid': i,
                 'vals': h[0],
                 'workdir': None},

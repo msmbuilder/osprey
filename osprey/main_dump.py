@@ -15,7 +15,7 @@ def configure_parser(sub_parsers):
     p = sub_parsers.add_parser('dump', description=help, help=help,
                                formatter_class=ArgumentDefaultsHelpFormatter)
     p.add_argument('config', help='Path to worker config file (yaml)')
-    p.add_argument('-f', '--format', choices=['csv', 'json'], default='json',
+    p.add_argument('-o', '--output', choices=['csv', 'json'], default='json',
                    help='output format')
 
     p.set_defaults(func=execute)
@@ -27,17 +27,17 @@ def execute(args, parser):
     session = config.trials()
     columns = Trial.__mapper__.columns
 
-    if args.format == 'json':
+    if args.output == 'json':
         items = [curr.to_dict() for curr in session.query(Trial).all()]
         value = json.dumps(items)
 
-    elif args.format == 'csv':
+    elif args.output == 'csv':
         buf = cStringIO()
         outcsv = csv.writer(buf)
         outcsv.writerow([column.name for column in columns])
         for curr in session.query(Trial).all():
             row = [getattr(curr, column.name) for column in columns]
             outcsv.writerow(row)
-        value = buf.getvalue()
+        value = buf.getvalue().encode('string_escape')
 
     print(value)

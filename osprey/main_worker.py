@@ -24,44 +24,55 @@ def configure_parser(sub_parsers):
     p.set_defaults(func=execute)
 
 
+def print_header():
+    print('='*70)
+    print('= osprey is a tool for machine learning '
+          'hyperparameter optimization. =')
+    print('='*70)
+    print()
+
+
 def execute(args, parser):
     # Load the config file and extract the fields
+    print_header()
+
     config = Config(args.config)
     estimator = config.estimator()
     session = config.trials()
     cv = config.cv()
-    search_space = config.search_space()
+    searchspace = config.search_space()
     engine = config.search_engine()
     seed = config.search_seed()
     config_sha1 = config.sha1()
     scoring = config.scoring()
 
-    print('Loading dataset...')
-    dataset = config.dataset()
-    print('  %d sequences' % len(dataset))
-
-    print('Loaded estimator:')
+    print('\nLoading dataset...')
+    X, y = config.dataset()
+    print('  %d elements with%s labels' % (len(X), 'out' if y is None else ''))
+    print('Instantiated estimator:')
     print('  %r' % estimator)
-    
-    print(search_space)
+    print(searchspace)
+    print('\n')
 
     for i in range(args.n_iters):
-        print('='*78)
+        print('----------------------------')
+        print('Beginning iteration %8d' % i)
+        print('----------------------------')
 
         # requery the history ever iteration, because another worker
         # process may have written to it in the mean time
         history = [[t.parameters, t.mean_cv_score]
                    for t in session.query(Trial).all()]
-        print('History contains:\n  %d trials' % len(history))
-
-        params = engine(history, bounds, seed)
+        print('History contains: %d trials' % len(history))
+        print('Choosing next hyperparameters...')
+        params = engine(history, searchspace, seed)
 
         run_single_trial(
-            estimator=estimator, scoring=scoring, dataset=dataset,
+            estimator=estimator, scoring=scoring, X=X, y=y,
             params=params, cv=cv, config_sha1=config_sha1, session=session)
 
 
-def run_single_trial(estimator, scoring, dataset, params, cv, config_sha1,
+def run_single_trial(estimator, scoring, X, y, params, cv, config_sha1,
                      session):
     from sklearn.base import clone, BaseEstimator
     from sklearn.grid_search import GridSearchCV
@@ -71,7 +82,7 @@ def run_single_trial(estimator, scoring, dataset, params, cv, config_sha1,
     params = clone(estimator).set_params(**params).get_params()
     params = dict((k, v) for k, v in iteritems(params)
                   if not isinstance(v, BaseEstimator))
-    print('Running parameters:\n  %r\n' % params)
+    print('  %r\n' % params)
 
     t = Trial(status='PENDING', parameters=params, host=gethostname(),
               user=getuser(), started=datetime.now(),
@@ -83,14 +94,14 @@ def run_single_trial(estimator, scoring, dataset, params, cv, config_sha1,
         grid = GridSearchCV(
             estimator, param_grid={k: [v] for k, v in iteritems(params)},
             scoring=scoring, cv=cv, verbose=1, refit=False)
-        grid.fit(dataset)
+        grid.fit(X, y)
         score = grid.grid_scores_[0]
 
         t.mean_cv_score = score.mean_validation_score
         t.cv_scores = score.cv_validation_scores.tolist()
         t.status = 'SUCCEEDED'
         print('Success! Score=%f' % t.mean_cv_score)
-    except Exception:
+    except (Exception, KeyboardInterrupt, SystemExit):
         buf = cStringIO()
         traceback.print_exc(file=buf)
 

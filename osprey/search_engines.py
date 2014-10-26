@@ -108,7 +108,7 @@ def hyperopt_tpe(history, searchspace, random_state=None):
 
     def mock_fn(x):
         # http://stackoverflow.com/a/3190783/1079728
-        # no nonlocal keywork in python2
+        # to get around no nonlocal keywork in python2
         chosen_params_container.append(x)
         return 0
 

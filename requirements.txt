@@ -1,3 +1,4 @@
+setuptools
 six
 pyyaml
 nose

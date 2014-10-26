@@ -1,10 +1,15 @@
 Osprey [![Build Status](https://travis-ci.org/rmcgibbo/osprey.svg?branch=master)](https://travis-ci.org/rmcgibbo/osprey)
 ======
 
-osprey is an easy-to-use tool for hyperparameter optimization for machine learning algorithims in scikit-learn,
-(or using scikit-learn compatible APIs).
+osprey is an easy-to-use tool for hyperparameter optimization for machine
+learning algorithms in python using scikit-learn (or using scikit-learn
+compatible APIs).
 
-Example (with [mixtape](https://github.com/rmcgibbo/mixtape))
+Each osprey experiment combines an dataset, an estimator, a search space
+(and engine), cross validation and asynchronous serialization for distributed
+parallel optimization of model hyperparameters.
+
+Example (with [mixtape](https://github.com/rmcgibbo/mixtape) models/datasets)
 -------------------------------------------------------------
 ```
 $ cat config.yaml
@@ -58,7 +63,7 @@ Instantiated estimator:
         verbose=0)), ('msm', MarkovStateModel(ergodic_cutoff=1, lag_time=1, n_timescales=5, prior_counts=0,
          reversible_type='mle', verbose=False))])
 Hyperparameter search space:
-  featurizer__types	(enum)    choices = (['phi', 'psi'], ['phi', 'psi', 'chi1'])
+  featurizer__types	    (enum)    choices = (['phi', 'psi'], ['phi', 'psi', 'chi1'])
   cluster__n_clusters	(int)         10 <= x <= 100
 
 ----------------------------------------------------------------------
@@ -79,11 +84,14 @@ Success! Model score = 4.370210
 1/1 models fit successfully.
 osprey-worker exiting.
 ```
+You can dump the database to JSON or CSV with `osprey dump`.
 
 
 Installation
 ------------
-`$ python setup.py install`
+```
+$ python setup.py install
+```
 
 Dependencies
 ------------
@@ -91,6 +99,6 @@ Dependencies
 - numpy
 - scikit-learn
 - sqlalchemy
-- hyperopt (recommended, for `engine=hyperopt_tpe`)
+- hyperopt (recommended, required for `engine=hyperopt_tpe`)
 - scipy (optional, for testing)
 - nose (optional, for testing)

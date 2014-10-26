@@ -10,7 +10,7 @@ try:
 except ImportError:
     pass
 
-from osprey.searchspace import SearchSpace
+from osprey.search_space import SearchSpace
 
 
 def test_1():
@@ -54,7 +54,8 @@ def test_2_1():
 def test_2_2():
     s = SearchSpace()
     s.add_int('a', 0, 3)
-    values = [pyll.stochastic.sample(s['a'].to_hyperopt()) for _ in xrange(200)]
+    values = [pyll.stochastic.sample(s['a'].to_hyperopt())
+              for _ in xrange(200)]
     _run_chi2_test(values, bin_edges=range(5))
 
 
@@ -72,7 +73,8 @@ def test_3_2():
     s = SearchSpace()
     s.add_float('b', -2, 2)
 
-    values = [pyll.stochastic.sample(s['b'].to_hyperopt()) for _ in xrange(100)]
+    values = [pyll.stochastic.sample(s['b'].to_hyperopt())
+              for _ in xrange(100)]
     assert all(-2 < v < 2 for v in values)
     _run_chi2_test(values, bin_edges=np.linspace(-2, 2, 10))
 
@@ -91,7 +93,8 @@ def test_4_2():
     s = SearchSpace()
     s.add_enum('c', [True, False])
 
-    values = [pyll.stochastic.sample(s['c'].to_hyperopt()) for _ in xrange(100)]
+    values = [pyll.stochastic.sample(s['c'].to_hyperopt())
+              for _ in xrange(100)]
     assert all(v in [True, False] for v in values)
     _run_chi2_test(np.array(values, dtype=int), bin_edges=range(3))
 

@@ -77,7 +77,7 @@ class SearchSpace(object):
         return dict((param.name, param.rvs(random)) for param in self)
 
     def to_hyperopt(self):
-        return dict((v.name, v.to_hyperopt) for v in self)
+        return dict((v.name, v.to_hyperopt()) for v in self)
 
     def __repr__(self):
         lines = (['Hyperparameter search space:'] +

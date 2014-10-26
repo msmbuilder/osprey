@@ -40,8 +40,8 @@ from .trials import make_session
 from .entry_point import load_entry_point
 from .rcfile import load_rcfile
 from .utils import dict_merge, in_directory
-from .searchspace import SearchSpace
-from . import search
+from .search_space import SearchSpace
+from . import search_engines
 
 
 FIELDS = {
@@ -50,9 +50,8 @@ FIELDS = {
 
     'trials':      ['uri', 'table_name'],
     'search':      ['engine', 'space', 'seed'],
-    'param_grid':  dict,
     'cv':          int,
-    'scoring':     str,
+    'scoring':     (str, types.NoneType),
 }
 
 
@@ -101,6 +100,12 @@ class Config(object):
                     raise RuntimeError("%s should be a %s, but is a %s." % (
                         section, FIELDS[section].__name__,
                         type(submeta).__name__))
+            elif isinstance(FIELDS[section], tuple):
+                if not any(isinstance(submeta, t) for t in FIELDS[section]):
+                    raise RuntimeError(
+                        "The %s field should be one of %s, not %s" % (
+                            section, [e.__name__ for e in FIELDS[section]],
+                            type(submeta).__name__))
             else:
                 for key in submeta:
                     if key not in FIELDS[section]:
@@ -251,10 +256,10 @@ class Config(object):
 
     def search_engine(self):
         engine = self.get_value('search/engine')
-        if engine not in search.__all__:
+        if engine not in search_engines.__all__:
             raise RuntimeError('search/engine "%s" not supported. available'
-                               'engines are: %r' % (engine, search.__all__))
-        return getattr(search, engine)
+                               'engines are: %r' % (engine, search_engines.__all__))
+        return getattr(search_engines, engine)
 
     def dataset(self):
         loader = load_entry_point(self.get_value('dataset/__loader__'))
@@ -277,8 +282,6 @@ class Config(object):
 
     def scoring(self):
         scoring = self.get_section('scoring')
-        if scoring == {}:
-            scoring = None
         assert isinstance(scoring, (str, types.NoneType))
         return scoring
 
@@ -307,6 +310,13 @@ def parse(f):
                 except ValueError:
                     raise RuntimeError("key %r couldn't be converted to %s" % (
                         field, spec.__name__))
+            elif isinstance(spec, tuple):
+                if not any(isinstance(res[field], item) for item in spec):
+                    raise RuntimeError(
+                        "The %s field should be one of %s, not %s" % (
+                            field, [e.__name__ for e in spec],
+                            res[field].__class__.__name__))
+
             elif not isinstance(res[field], dict):
                 raise RuntimeError("The %s field should be a dict, not %s" % (
                     field, res[field].__class__.__name__))

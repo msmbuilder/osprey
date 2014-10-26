@@ -6,3 +6,5 @@ dataset:
 
 trials:
     table_name: trials
+
+scoring: !!null

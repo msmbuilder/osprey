@@ -9,7 +9,7 @@ estimator:
                 ('msm', MarkovStateModel(n_timescales=5, verbose=False)),
         ])
 
-# scoring: roc_auc
+
     
 cv: 5
 

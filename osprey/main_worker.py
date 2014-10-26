@@ -8,6 +8,7 @@ from datetime import datetime
 
 from six import iteritems
 from six.moves import cStringIO
+from sqlalchemy import func
 
 from .config import Config
 from .trials import Trial
@@ -18,7 +19,7 @@ def configure_parser(sub_parsers):
     p = sub_parsers.add_parser('worker', description=help, help=help,
                                formatter_class=ArgumentDefaultsHelpFormatter)
     p.add_argument('config', help='Path to worker config file (yaml)')
-    p.add_argument('--n-iters', default=1, type=int, help='Number of '
+    p.add_argument('-n', '--n-iters', default=1, type=int, help='Number of '
                    'trials to run sequentially.')
 
     p.set_defaults(func=execute)
@@ -52,24 +53,31 @@ def execute(args, parser):
     print('Instantiated estimator:')
     print('  %r' % estimator)
     print(searchspace)
-    print('\n')
 
+    statuses = []
     for i in range(args.n_iters):
-        print('----------------------------')
-        print('Beginning iteration %8d' % i)
-        print('----------------------------')
+        print('\n' + '-'*70)
+        print('Beginning iteration %50s' % ('%d / %d' % (i+1, args.n_iters)))
+        print('-'*70)
 
         # requery the history ever iteration, because another worker
         # process may have written to it in the mean time
-        history = [[t.parameters, t.mean_cv_score]
+        history = [[t.parameters, t.mean_cv_score, t.status]
                    for t in session.query(Trial).all()]
         print('History contains: %d trials' % len(history))
-        print('Choosing next hyperparameters...')
+        print('Choosing next hyperparameters with %s...' % engine.__name__)
         params = engine(history, searchspace, seed)
+        print('  %r\n' % params)
+        assert len(params) == searchspace.n_dims
 
-        run_single_trial(
+        s = run_single_trial(
             estimator=estimator, scoring=scoring, X=X, y=y,
             params=params, cv=cv, config_sha1=config_sha1, session=session)
+        statuses.append(s)
+
+    print('\n%d/%d models fit successfully.' % (
+        sum(s == 'SUCCEEDED' for s in statuses), len(statuses)))
+    print('osprey-worker exiting.')
 
 
 def run_single_trial(estimator, scoring, X, y, params, cv, config_sha1,
@@ -78,11 +86,10 @@ def run_single_trial(estimator, scoring, X, y, params, cv, config_sha1,
     from sklearn.grid_search import GridSearchCV
 
     # make sure we get _all_ the parameters, including defaults on the
-    # estimator class
+    # estimator class, to save in the database
     params = clone(estimator).set_params(**params).get_params()
     params = dict((k, v) for k, v in iteritems(params)
                   if not isinstance(v, BaseEstimator))
-    print('  %r\n' % params)
 
     t = Trial(status='PENDING', parameters=params, host=gethostname(),
               user=getuser(), started=datetime.now(),
@@ -100,8 +107,12 @@ def run_single_trial(estimator, scoring, X, y, params, cv, config_sha1,
         t.mean_cv_score = score.mean_validation_score
         t.cv_scores = score.cv_validation_scores.tolist()
         t.status = 'SUCCEEDED'
-        print('Success! Score=%f' % t.mean_cv_score)
-    except (Exception, KeyboardInterrupt, SystemExit):
+        best_so_far = session.query(func.max(Trial.mean_cv_score)).first()[0]
+        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+        print('Success! Model score = %f' % t.mean_cv_score)
+        print('(best score so far   = %f)' % max(t.mean_cv_score, best_so_far))
+        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+    except (Exception, KeyboardInterrupt, SystemExit) as e:
         buf = cStringIO()
         traceback.print_exc(file=buf)
 
@@ -111,6 +122,8 @@ def run_single_trial(estimator, scoring, X, y, params, cv, config_sha1,
         print('Exception encountered while fitting model')
         print('-'*78, file=sys.stderr)
         traceback.print_exc(file=sys.stderr)
+        if isinstance(e, (KeyboardInterrupt, SystemExit)):
+            sys.exit(1)
         print('-'*78, file=sys.stderr)
     finally:
         t.completed = datetime.now()

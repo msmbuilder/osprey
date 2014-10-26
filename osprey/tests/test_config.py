@@ -5,8 +5,8 @@ from six.moves import cPickle
 from sklearn.cluster import KMeans
 
 from osprey.config import Config
-from osprey.searchspace import IntVariable, FloatVariable, EnumVariable
-from osprey import search
+from osprey.search_space import IntVariable, FloatVariable, EnumVariable
+from osprey import search_engines
 
 
 os.environ['OSPREYRC'] = ' '
@@ -20,7 +20,9 @@ def test_estimator_pickle():
     with tempfile.NamedTemporaryFile(bufsize=0) as f:
         cPickle.dump(KMeans(), f)
 
-        config = Config.fromdict({'estimator': {'pickle': f.name}}, check_fields=False)
+        config = Config.fromdict({
+            'estimator': {'pickle': f.name}
+        }, check_fields=False)
         assert isinstance(config.estimator(), KMeans)
 
 
@@ -62,14 +64,14 @@ def test_search_engine_random():
     config = Config.fromdict({
         'search': {'engine': 'random'}
     }, check_fields=False)
-    assert config.search_engine() is search.random
+    assert config.search_engine() is search_engines.random
 
 
 def test_search_engine_hyperopt_tpe():
     config = Config.fromdict({
         'search': {'engine': 'hyperopt_tpe'}
     }, check_fields=False)
-    assert config.search_engine() is search.hyperopt_tpe
+    assert config.search_engine() is search_engines.hyperopt_tpe
 
 
 def test_scoring():

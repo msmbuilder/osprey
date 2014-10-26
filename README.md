@@ -96,6 +96,7 @@ $ python setup.py install
 Dependencies
 ------------
 - six
+- pyyaml
 - numpy
 - scikit-learn
 - sqlalchemy

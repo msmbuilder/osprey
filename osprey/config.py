@@ -26,7 +26,6 @@ Dataset __loader__
 from __future__ import print_function, absolute_import, division
 import sys
 import yaml
-import types
 import hashlib
 import traceback
 from os.path import join, isfile, dirname, abspath
@@ -51,7 +50,7 @@ FIELDS = {
     'trials':      ['uri', 'table_name'],
     'search':      ['engine', 'space', 'seed'],
     'cv':          int,
-    'scoring':     (str, types.NoneType),
+    'scoring':     (str, type(None)),
 }
 
 
@@ -62,7 +61,7 @@ class Config(object):
         self.verbose = verbose
         if not isfile(self.path):
             raise RuntimeError('%s does not exist' % self.path)
-        with open(self.path) as f:
+        with open(self.path, 'rb') as f:
             config = parse(f)
         self.config = self._merge_defaults_and_rc(config)
         self._check_fields()
@@ -202,7 +201,7 @@ class Config(object):
             path = join(dirname(abspath(self.path)), pkl)
             if not isfile(path):
                 raise RuntimeError('estimator/pickle %s is not a file' % pkl)
-            with open(path) as f:
+            with open(path, 'rb') as f:
                 estimator = cPickle.load(f)
                 if not isinstance(estimator, sklearn.base.BaseEstimator):
                     raise RuntimeError('estimator/pickle must load a '
@@ -282,7 +281,7 @@ class Config(object):
 
     def scoring(self):
         scoring = self.get_section('scoring')
-        assert isinstance(scoring, (str, types.NoneType))
+        assert isinstance(scoring, (str, type(None)))
         return scoring
 
     def search_seed(self):
@@ -293,7 +292,7 @@ class Config(object):
 
     def sha1(self):
         """SHA1 hash of the config file itself."""
-        with open(self.path) as f:
+        with open(self.path, 'rb') as f:
             return hashlib.sha1(f.read()).hexdigest()
 
 

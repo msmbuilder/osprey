@@ -14,13 +14,27 @@ install:
   # install requirements file in python
   - conda create --yes -n test python=$python `cat requirements.txt | xargs`
   - source activate test
+
   # install extra dependency for style checking
   - conda install --yes flake8
+
   # instal hyperopt dependencies
-  - '[ "$hyperopt" != "none" ] && conda install --yes pymongo networkx || echo ""'
+  - '[ "$hyperopt" != "none" ]
+      && conda install --yes pymongo networkx
+      || echo ""'
+
   # install hyperopt
-  - '[ "$hyperopt" = "0.0.2" ] && conda install --yes pip && pip install hyperopt || echo ""'
-  - '[ "$hyperopt" = "dev" ]   && git clone https://github.com/hyperopt/hyperopt.git && cd hyperopt && python setup.py -q install && cd - || echo ""'
+  - '[ "$hyperopt" = "0.0.2" ]
+      && conda install --yes pip
+      && pip install hyperopt
+      || echo ""'
+  - '[ "$hyperopt" = "dev" ]
+      && git clone https://github.com/hyperopt/hyperopt.git
+      && cd hyperopt
+      && python setup.py -q install
+      && cd -
+      && rm -rf hyperopt
+      || echo ""'
 
 
 script:

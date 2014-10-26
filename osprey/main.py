@@ -7,6 +7,7 @@ from . import __version__
 from . import main_worker
 from . import main_dump
 from . import main_createrc
+from . import main_skeleton
 
 
 def main():
@@ -25,6 +26,7 @@ def main():
     main_worker.configure_parser(sub_parsers)
     main_dump.configure_parser(sub_parsers)
     main_createrc.configure_parser(sub_parsers)
+    main_skeleton.configure_parser(sub_parsers)
 
     if len(sys.argv) == 1:
         sys.argv.append('-h')

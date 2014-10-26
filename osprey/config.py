@@ -29,7 +29,7 @@ import yaml
 import types
 import hashlib
 import traceback
-from os.path import join, isfile, dirname
+from os.path import join, isfile, dirname, abspath
 
 from six.moves import cPickle
 from six import iteritems
@@ -158,19 +158,6 @@ class Config(object):
         """
         import sklearn.base
 
-        # load estimator from pickle field
-        pkl = self.get_value('estimator/pickle')
-        if pkl is not None:
-            path = join(dirname(self.path), pkl)
-            if not isfile(path):
-                raise RuntimeError('estimator/pickle %s is not a file' % pkl)
-            with open(path) as f:
-                estimator = cPickle.load(f)
-                if not isinstance(estimator, sklearn.base.BaseEstimator):
-                    raise RuntimeError('estimator/pickle must load a '
-                                       'sklearn-derived Estimator')
-                return estimator
-
         evalstring = self.get_value('estimator/eval')
         if evalstring is not None:
             eval_globals_str = self.get_value('estimator/__eval_globals__')
@@ -208,6 +195,19 @@ class Config(object):
                 raise RuntimeError('estimator/pickle must load a '
                                    'sklearn-derived Estimator')
             return estimator
+
+        # load estimator from pickle field
+        pkl = self.get_value('estimator/pickle')
+        if pkl is not None:
+            path = join(dirname(abspath(self.path)), pkl)
+            if not isfile(path):
+                raise RuntimeError('estimator/pickle %s is not a file' % pkl)
+            with open(path) as f:
+                estimator = cPickle.load(f)
+                if not isinstance(estimator, sklearn.base.BaseEstimator):
+                    raise RuntimeError('estimator/pickle must load a '
+                                       'sklearn-derived Estimator')
+                return estimator
 
         raise RuntimeError('no estimator field')
 
@@ -264,7 +264,7 @@ class Config(object):
     def dataset(self):
         loader = load_entry_point(self.get_value('dataset/__loader__'))
 
-        with in_directory(dirname(self.path)):
+        with in_directory(dirname(abspath(self.path))):
             X, y = loader(**self.get_section('dataset'))
 
         return X, y
@@ -276,7 +276,7 @@ class Config(object):
             print('Loading trials database from %s (table = "%s")...' % (
                   uri, table_name))
 
-        with in_directory(dirname(self.path)):
+        with in_directory(dirname(abspath(self.path))):
             value = make_session(uri, table_name)
         return value
 

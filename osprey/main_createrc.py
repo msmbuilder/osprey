@@ -8,8 +8,12 @@ from .rcfile import USER_RC_PATH, CURDIR_RC_PATH
 
 
 def configure_parser(sub_parsers):
-    help = 'Initialize .ospreyrc file'
-    p = sub_parsers.add_parser('createrc', description=help, help=help,
+    help = 'create .ospreyrc file'
+    description = '''The .ospreyrc file is read and used together with the
+config.yaml file to initialize the osprey worker. Options from the config.yaml
+file will always override the .ospreyrc file.
+'''
+    p = sub_parsers.add_parser('createrc', description=description, help=help,
                                formatter_class=ArgumentDefaultsHelpFormatter)
     p.add_argument('-l', '--loc', help='Location for .ospreyrc file',
                    choices=['user', 'curdir'], default='user')

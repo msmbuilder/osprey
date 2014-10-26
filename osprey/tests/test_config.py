@@ -49,13 +49,13 @@ def test_search_space():
     config = Config.fromdict({
         'search': {'space': {
             'intvar': {'type': 'int', 'min': 1, 'max': 2},
-            'floatvar': {'type': 'float', 'min': 1, 'max': 3.5},
+            'fvar': {'type': 'float', 'min': 1, 'max': 3.5},
             'logvar': {'type': 'float', 'min': 1, 'max': 2.5, 'warp': 'log'},
             'enumvar': {'type': 'enum', 'choices': [1, False]},
         }}}, check_fields=False)
     searchspace = config.search_space()
     assert searchspace['intvar'] == IntVariable('intvar', 1, 2)
-    assert searchspace['floatvar'] == FloatVariable('floatvar', 1, 3.5, warp=None)
+    assert searchspace['fvar'] == FloatVariable('fvar', 1, 3.5, warp=None)
     assert searchspace['logvar'] == FloatVariable('logvar', 1, 2.5, warp='log')
     assert searchspace['enumvar'] == EnumVariable('enumvar', [1, False])
 

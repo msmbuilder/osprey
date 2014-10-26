@@ -32,7 +32,7 @@ def main(**kwargs):
         version=versioneer.get_version(),
         cmdclass=versioneer.get_cmdclass(),
         packages=find_packages(),
-        zip_safe=False,
+        zip_safe=True,
         package_data={'osprey': ['data/*']},
         entry_points={
             'console_scripts': [

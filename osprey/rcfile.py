@@ -22,9 +22,9 @@ def load_rcfile(verbose=True):
 
     path = get_rc_path()
     if not path:
-        return {}
+        return dict()
     if verbose:
         print('Loading .ospreyrc from %s...' % path)
 
     with open(path) as f:
-        return yaml.load(f) or {}
+        return yaml.load(f) or dict()

@@ -98,21 +98,30 @@ class Config(object):
                 raise RuntimeError("unknown section: %s" % section)
             if isinstance(FIELDS[section], type):
                 if not isinstance(submeta, FIELDS[section]):
-                    raise RuntimeError("in section %d" % section)
+                    raise RuntimeError("%s should be a %s, but is a %s." % (
+                        section, FIELDS[section].__name__,
+                        type(submeta).__name__))
             else:
                 for key in submeta:
                     if key not in FIELDS[section]:
                         raise RuntimeError("in section %r: unknown key %r" % (
                             section, key))
 
+        missing_fields = set(FIELDS.keys()).difference(self.config.keys())
+        if len(missing_fields) > 0:
+            raise RuntimeError('The following required fields are missing from'
+                               'the config file (%s): %s' % (
+                                   ', '.join(missing_fields), self.path))
+
     @classmethod
-    def fromdict(cls, config):
+    def fromdict(cls, config, check_fields=True):
         """Create a Config object from config dict directly."""
         m = super(Config, cls).__new__(cls)
         m.path = '.'
         m.verbose = False
         m.config = m._merge_defaults_and_rc(config)
-        m._check_fields()
+        if check_fields:
+            m._check_fields()
         return m
 
     def get_section(self, section):
@@ -277,7 +286,7 @@ class Config(object):
         return self.get_value('search/seed')
 
     def cv(self):
-        return int(self.get_section('cv'))
+        return self.get_section('cv')
 
     def sha1(self):
         """SHA1 hash of the config file itself."""

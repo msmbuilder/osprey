@@ -68,7 +68,7 @@ class Config(object):
         self._check_fields()
 
         if self.verbose:
-            print('Loading config file from %s...' % path)
+            print('Loading config file:     %s...' % path)
 
     def _merge_defaults_and_rc(self, config):
         """The config object loads its values from three sources, with the
@@ -272,7 +272,7 @@ class Config(object):
         uri = self.get_value('trials/uri')
         table_name = self.get_value('trials/table_name')
         if self.verbose:
-            print('Loading trials database from %s (table = "%s")...' % (
+            print('Loading trials database: %s (table = "%s")...' % (
                   uri, table_name))
 
         with in_directory(dirname(abspath(self.path))):

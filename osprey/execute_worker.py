@@ -1,5 +1,6 @@
 from __future__ import print_function, absolute_import, division
 
+import os
 import sys
 import traceback
 from socket import gethostname
@@ -12,10 +13,10 @@ from sqlalchemy import func
 from sklearn.base import clone, BaseEstimator
 from sklearn.grid_search import GridSearchCV
 
+from . import __version__
 from .config import Config
 from .trials import Trial
-from .utils import Unbuffered
-from .utils import format_timedelta
+from .utils import Unbuffered, format_timedelta, current_pretty_time
 
 
 def execute(args, parser):
@@ -62,10 +63,7 @@ def execute(args, parser):
             params=params, cv=cv, config_sha1=config_sha1, session=session)
         statuses.append(s)
 
-    print('\n%d/%d models fit successfully.' % (
-        sum(s == 'SUCCEEDED' for s in statuses), len(statuses)))
-    print('elapsed time: %s.' % format_timedelta(datetime.now() - start_time))
-    print('osprey-worker exiting.')
+    print_footer(statuses, start_time)
 
 
 def run_single_trial(estimator, scoring, X, y, params, cv, config_sha1,
@@ -124,3 +122,20 @@ def print_header():
           'hyperparameter optimization. =')
     print('='*70)
     print()
+    print('osprey version:  %s' % __version__)
+    print('time:            %s' % current_pretty_time())
+    print('hostname:        %s' % gethostname())
+    print('cwd:             %s' % os.path.abspath(os.curdir))
+    print('pid:             %s' % os.getpid())
+    print()
+
+
+def print_footer(statuses, start_time):
+    n_successes = sum(s == 'SUCCEEDED' for s in statuses)
+    elapsed = format_timedelta(datetime.now() - start_time)
+
+    print()
+    print('%d/%d models fit successfully.' % (n_successes, len(statuses)))
+    print('time:         %s' % current_pretty_time())
+    print('elapsed:      %s.' % elapsed)
+    print('osprey worker exiting.')

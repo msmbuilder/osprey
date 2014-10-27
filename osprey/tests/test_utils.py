@@ -3,9 +3,8 @@ import os.path
 from os.path import samefile, abspath
 import tempfile
 import datetime
-from osprey.utils import dict_merge
-from osprey.utils import in_directory
-from osprey.utils import format_timedelta
+from osprey.utils import dict_merge, in_directory
+from osprey.utils import format_timedelta, current_pretty_time
 
 
 def test_dict_merge_1():
@@ -45,3 +44,7 @@ def test_in_directory_1():
 
 def test_format_timedelta():
     print(format_timedelta(datetime.timedelta(seconds=413302.33)))
+
+
+def test_current_pretty_time():
+    print(current_pretty_time())

@@ -1,6 +1,7 @@
 from __future__ import print_function, absolute_import, division
 import os.path
 import contextlib
+from datetime import datetime
 
 __all__ = ['dict_merge']
 
@@ -75,6 +76,10 @@ def format_timedelta(td_object):
                 strings.append("%s %ss" % (period_value, period_name))
 
     return ", ".join(strings)
+
+
+def current_pretty_time():
+    return datetime.now().strftime("%B %d, %Y %l:%M %p")
 
 
 def mock_module(name):

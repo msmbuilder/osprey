@@ -28,7 +28,7 @@ def dict_merge(base, top):
 def dict_is_subset(sub, sup):
     if isinstance(sup, dict):
         return isinstance(sub, dict) and \
-            all(dict_is_subset(sub[k], sup[k]) for k in sub)
+            all(k in sup and dict_is_subset(sub[k], sup[k]) for k in sub)
     else:
         return sub == sup
 

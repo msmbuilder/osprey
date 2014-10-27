@@ -3,7 +3,9 @@ import sys
 import json
 import inspect
 
-from six.moves import urllib
+from six.moves.urllib.request import urlopen
+from six.moves.urllib.parse import urljoin
+
 from sklearn.utils import check_random_state
 try:
     from hyperopt import (Trials, tpe, fmin, STATUS_OK, STATUS_RUNNING,
@@ -176,7 +178,7 @@ def moe_rest(history, searchspace, random_state=None, moe_url=None):
     # configurable
     noise_variance = 0.1
 
-    endpoint = '%s/%s' % (moe_url, '/gp/next_points/epi')
+    endpoint = urljoin(moe_url, '/gp/next_points/epi')
 
     points_sampled = []
     points_being_sampled = []
@@ -201,21 +203,21 @@ def moe_rest(history, searchspace, random_state=None, moe_url=None):
     data = {
         'num_to_sample': 1,
         'domain_info': {
-            'dim' : searchspace.n_dims,
+            'dim': searchspace.n_dims,
             'domain_bounds': [var.domain_to_moe() for var in searchspace],
-        }, 'gp_historical_info' : {
-            'points_sampled' : points_sampled
+        }, 'gp_historical_info': {
+            'points_sampled': points_sampled
         },
-        'points_being_sampled' : points_being_sampled
+        'points_being_sampled': points_being_sampled
     }
 
     # call MOE
-    resp = urllib.request.urlopen(endpoint, json.dumps(data))
+    resp = urlopen(endpoint, json.dumps(data))
     result = json.loads(resp.read())
 
     # check erro field
-    expected = {u'optimizer_success':
-        {u'gradient_descent_tensor_product_domain_found_update': True}}
+    expected = {u'optimizer_success': {
+        u'gradient_descent_tensor_product_domain_found_update': True}}
     if not dict_is_subset(expected, result['status']):
         raise ValueError('failure from MOE. received %s' % result)
 
@@ -228,4 +230,3 @@ def moe_rest(history, searchspace, random_state=None, moe_url=None):
         out[var.name] = var.point_from_moe(float(moevalue))
 
     return out
-

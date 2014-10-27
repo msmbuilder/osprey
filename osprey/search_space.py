@@ -164,7 +164,6 @@ class FloatVariable(namedtuple('FloatVariable',
         raise ValueError('unknown warp: %s' % self.warp)
 
 
-
 class EnumVariable(namedtuple('EnumVariable', ('name', 'choices'))):
     __slots__ = ()
 
@@ -190,4 +189,3 @@ class EnumVariable(namedtuple('EnumVariable', ('name', 'choices'))):
 
     def point_from_moe(self, moevalue):
         return self.choices[int(np.round(moevalue))]
-

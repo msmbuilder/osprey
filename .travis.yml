@@ -2,7 +2,7 @@ language: c
 
 env:
     global:
-        - MOE_API_URL=http://yelpmoe-latest-1.65795cc2-rmcgibbo.node.tutum.io:49154/
+        - secure: "HUPlNlwRV9ZvcZA6xIpewe6on9lgSctXjI2EnOwtuRn20DKScIsPYtz+RBX7+uKVVyQLXfT+s2Q/bmvq2eG0MHujbsGZV+mn7bx+24/Lu4gtNqpy0+eSpA3ivRCRswj7FYYSKuudpz11KvEL8BPxO3Ipthz/cy/d+dUFdhZ4MQE="
     matrix:
         - hyperopt=0.0.2   python=2.6
         - hyperopt=dev     python=2.7

@@ -1,4 +1,5 @@
 from __future__ import print_function, absolute_import, division
+import os
 import sys
 import json
 import inspect
@@ -177,6 +178,13 @@ def moe_rest(history, searchspace, random_state=None, moe_url=None):
     """
     # configurable
     noise_variance = 0.1
+
+    if moe_url is None:
+        try:
+            moe_url = os.environ['MOE_API_URL']
+        except KeyError:
+            raise RuntimeError('moe_rest: must specify moe_url or set '
+                               'MOE_API_URL env var')
 
     endpoint = urljoin(moe_url, '/gp/next_points/epi')
 

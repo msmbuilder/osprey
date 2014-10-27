@@ -15,6 +15,10 @@ install:
   # install requirements file in python
   - conda create --yes -n test python=$python `cat requirements.txt | xargs`
   - source activate test
+  # instal python2.6 backports
+  - '[ "$python" == "2.6" ]
+      && conda install --yes importlib argparse
+      || echo ""'
 
   # install extra dependency for style checking
   - conda install --yes flake8

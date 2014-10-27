@@ -35,6 +35,8 @@ def main(**kwargs):
         url='https://github.com/rmcgibbo/osprey',
         classifiers=[e.strip() for e in classifiers.splitlines()],
         platforms=["Windows", "Linux", "Mac OS-X", "Unix"],
+        license='Apache Software License',
+        download_url='https://pypi.python.org/pypi/osprey/',
         version=versioneer.get_version(),
         cmdclass=versioneer.get_cmdclass(),
         packages=find_packages(),

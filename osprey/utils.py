@@ -25,6 +25,14 @@ def dict_merge(base, top):
     return out
 
 
+def dict_is_subset(sub, sup):
+    if isinstance(sup, dict):
+        return isinstance(sub, dict) and \
+            all(dict_is_subset(sub[k], sup[k]) for k in sub)
+    else:
+        return sub == sup
+
+
 @contextlib.contextmanager
 def in_directory(path):
     """Context manager (with statement) that changes the current directory

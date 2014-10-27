@@ -110,6 +110,15 @@ class IntVariable(namedtuple('IntVariable', ('name', 'min', 'max'))):
     def to_hyperopt(self):
         return pyll.scope.int(hp.uniform(self.name, self.min, self.max+1))
 
+    def domain_to_moe(self):
+        return {'min': self.min - 0.5, 'max': self.max + 0.5}
+
+    def point_to_moe(self, value):
+        return float(value)
+
+    def point_from_moe(self, moevalue):
+        return int(np.round(moevalue))
+
 
 class FloatVariable(namedtuple('FloatVariable',
                                ('name', 'min', 'max', 'warp'))):
@@ -133,6 +142,28 @@ class FloatVariable(namedtuple('FloatVariable',
             return hp.loguniform(self.name, np.log(self.min), np.log(self.max))
         raise ValueError('unknown warp: %s' % self.warp)
 
+    def domain_to_moe(self):
+        if self.warp is None:
+            return {'min': self.min, 'max': self.max}
+        elif self.warp == 'log':
+            return {'min': np.log(self.min), 'max': np.log(self.max)}
+        raise ValueError('unknown warp: %s' % self.warp)
+
+    def point_to_moe(self, value):
+        if self.warp is None:
+            return value
+        elif self.warp == 'log':
+            return np.log(value)
+        raise ValueError('unknown warp: %s' % self.warp)
+
+    def point_from_moe(self, moevalue):
+        if self.warp is None:
+            return moevalue
+        elif self.warp == 'log':
+            return np.exp(moevalue)
+        raise ValueError('unknown warp: %s' % self.warp)
+
+
 
 class EnumVariable(namedtuple('EnumVariable', ('name', 'choices'))):
     __slots__ = ()
@@ -147,3 +178,16 @@ class EnumVariable(namedtuple('EnumVariable', ('name', 'choices'))):
 
     def to_hyperopt(self):
         return hp.choice(self.name, self.choices)
+
+    def domain_to_moe(self):
+        return {'min': - 0.5, 'max': len(self.choices) - 0.5}
+
+    def point_to_moe(self, value):
+        try:
+            return next(i for i, c in enumerate(self.choices) if c == value)
+        except StopIteration:
+            raise ValueError('%s not in %s' % (value, self.choices))
+
+    def point_from_moe(self, moevalue):
+        return self.choices[int(np.round(moevalue))]
+

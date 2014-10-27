@@ -19,6 +19,7 @@ def mock_eval_globals():
 
 def test_estimator_pickle():
     with tempfile.NamedTemporaryFile('w+b', 0) as f:
+
         cPickle.dump(KMeans(), f)
 
         config = Config.fromdict({

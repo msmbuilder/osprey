@@ -10,6 +10,7 @@ USER_RC_PATH = os.path.abspath(os.path.expanduser('~/.ospreyrc'))
 
 
 def load_rcfile(verbose=True):
+
     def get_rc_path():
         path = os.getenv('OSPREYRC')
         if path == ' ':

@@ -1,6 +1,13 @@
 from __future__ import print_function, absolute_import, division
+import sys
 import inspect
 from sklearn.utils import check_random_state
+try:
+    from hyperopt import (Trials, tpe, fmin, STATUS_OK, STATUS_RUNNING,
+                          STATUS_FAIL)
+except ImportError:
+    # hyperopt is optional required for hyperopt_tpe()
+    pass
 
 from .search_space import EnumVariable
 
@@ -52,9 +59,8 @@ def hyperopt_tpe(history, searchspace, random_state=None):
     # the code -- most of this comes from reverse engineering it, by running
     # fmin() on a simple function and then inspecting the form of the
     # resulting trials object.
-
-    from hyperopt import (Trials, tpe, fmin, STATUS_OK, STATUS_RUNNING,
-                          STATUS_FAIL)
+    if 'hyperopt' not in sys.modules:
+        raise ImportError('No module named hyperopt')
 
     random = check_random_state(random_state)
     hp_searchspace = searchspace.to_hyperopt()
@@ -122,7 +128,6 @@ def hyperopt_tpe(history, searchspace, random_state=None):
 
 
 def _hyperopt_fmin_random_kwarg(random):
-    from hyperopt import fmin
     if 'rstate' in inspect.getargspec(fmin).args:
         # 0.0.3-dev version uses this argument
         kwargs = {'rstate': random}

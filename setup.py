@@ -36,7 +36,7 @@ def main(**kwargs):
         package_data={'osprey': ['data/*']},
         entry_points={
             'console_scripts': [
-                'osprey = osprey.main:main',
+                'osprey = osprey.cli.main:main',
             ],
         },
         **kwargs

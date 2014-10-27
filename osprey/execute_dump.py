@@ -2,27 +2,13 @@ from __future__ import print_function, absolute_import, division
 
 import csv
 import json
-from argparse import ArgumentDefaultsHelpFormatter
-
 from six.moves import cStringIO
-
 from .config import Config
 from .trials import Trial
 
 
-def configure_parser(sub_parsers):
-    help = 'Dump history SQL database to CSV or JSON'
-    p = sub_parsers.add_parser('dump', description=help, help=help,
-                               formatter_class=ArgumentDefaultsHelpFormatter)
-    p.add_argument('config', help='Path to worker config file (yaml)')
-    p.add_argument('-o', '--output', choices=['csv', 'json'], default='json',
-                   help='output format')
-
-    p.set_defaults(func=execute)
-
-
 def execute(args, parser):
-    config = Config(args.config)
+    config = Config(args.config, verbose=False)
 
     session = config.trials()
     columns = Trial.__mapper__.columns

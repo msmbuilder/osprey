@@ -1,9 +1,11 @@
 from __future__ import print_function, absolute_import, division
-
-import shutil
-from os.path import join, exists
-from pkg_resources import resource_filename
 from argparse import ArgumentDefaultsHelpFormatter
+
+
+def func(args, parser):
+    # delay import of the rest of the module to improve `osprey -h` performance
+    from ..execute_skeleton import execute
+    execute(args, parser)
 
 
 def configure_parser(sub_parsers):
@@ -16,18 +18,4 @@ def configure_parser(sub_parsers):
         "projects."), choices=['mixtape'], default='mixtape',)
     p.add_argument('-f', '--filename', help='config filename to create',
                    default='config.yaml')
-    p.set_defaults(func=execute)
-
-
-def execute(args, parser):
-    if args.template == 'mixtape':
-        fn = resource_filename('osprey', join('data',
-                               'mixape_skeleton_config.yaml'))
-    else:
-        raise RuntimeError('unknown template: %s' % args.template)
-
-    if exists(args.filename):
-        raise RuntimeError('file already exists: %s' % args.filename)
-
-    print("\033[92mcreate\033[0m  {:s}".format(args.filename))
-    shutil.copy(fn, args.filename)
+    p.set_defaults(func=func)

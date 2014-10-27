@@ -220,8 +220,8 @@ def moe_rest(history, searchspace, random_state=None, moe_url=None):
     }
 
     # call MOE
-    resp = urlopen(endpoint, json.dumps(data))
-    result = json.loads(resp.read())
+    resp = urlopen(endpoint, json.dumps(data).encode('utf-8'))
+    result = json.loads(resp.read().decode('utf-8'))
 
     # check erro field
     expected = {u'optimizer_success': {

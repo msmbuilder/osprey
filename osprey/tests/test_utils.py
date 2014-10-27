@@ -2,8 +2,10 @@ from __future__ import print_function, absolute_import, division
 import os.path
 from os.path import samefile, abspath
 import tempfile
+import datetime
 from osprey.utils import dict_merge
 from osprey.utils import in_directory
+from osprey.utils import format_timedelta
 
 
 def test_dict_merge_1():
@@ -39,3 +41,7 @@ def test_in_directory_1():
         assert samefile(abspath(os.curdir), initialdir)
     finally:
         os.rmdir(tempdir)
+
+
+def test_format_timedelta():
+    print(format_timedelta(datetime.timedelta(seconds=413302.33)))

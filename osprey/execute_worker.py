@@ -13,11 +13,13 @@ from sklearn.base import clone, BaseEstimator
 from sklearn.grid_search import GridSearchCV
 
 from .config import Config
-from .utils import Unbuffered
 from .trials import Trial
+from .utils import Unbuffered
+from .utils import format_timedelta
 
 
 def execute(args, parser):
+    start_time = datetime.now()
     sys.stdout = Unbuffered(sys.stdout)
     # Load the config file and extract the fields
     print_header()
@@ -62,6 +64,7 @@ def execute(args, parser):
 
     print('\n%d/%d models fit successfully.' % (
         sum(s == 'SUCCEEDED' for s in statuses), len(statuses)))
+    print('elapsed time: %s.' % format_timedelta(datetime.now() - start_time))
     print('osprey-worker exiting.')
 
 

@@ -110,3 +110,5 @@ Dependencies
 - `hyperopt` (recommended, required for `engine=hyperopt_tpe`)
 - `scipy` (optional, for testing)
 - `nose` (optional, for testing)
+
+On python2.6, the `argparse` and `importlib` backports are also required

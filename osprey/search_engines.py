@@ -1,6 +1,9 @@
 from __future__ import print_function, absolute_import, division
 import sys
+import json
 import inspect
+
+from six.moves import urllib
 from sklearn.utils import check_random_state
 try:
     from hyperopt import (Trials, tpe, fmin, STATUS_OK, STATUS_RUNNING,
@@ -9,6 +12,7 @@ except ImportError:
     # hyperopt is optional, but required for hyperopt_tpe()
     pass
 
+from .utils import dict_is_subset
 from .search_space import EnumVariable
 
 __all__ = ['random', 'hyperopt_tpe']
@@ -157,3 +161,71 @@ def _hyperopt_fmin_random_kwarg(random):
         # 0.0.2 version uses different argument
         kwargs = {'rseed': random.randint(2**32-1)}
     return kwargs
+
+
+def moe_rest(history, searchspace, random_state=None, moe_url=None):
+    """Suggest params to maximize an objective function based on the
+    function evaluation history using a Gaussian Process Expected Improvement
+    (GPEI) algorithm, as implemented by MOE [1].
+
+    This function connects to a MOE REST API over the internet -- the
+    base URL for the MOE service must be passed in `moe_url`.
+
+    .. [1] http://yelp.github.io/MOE/index.html
+    """
+    # configurable
+    noise_variance = 0.1
+
+    endpoint = '%s/%s' % (moe_url, '/gp/next_points/epi')
+
+    points_sampled = []
+    points_being_sampled = []
+    for param_dict, score, status in history:
+        # transform points into the MOE domain. This invloves bringing
+        # int and enum variables to floating point, etc.
+        point = [var.point_to_moe(param_dict[var.name]) for var in searchspace]
+        if status == 'SUCCEEDED':
+            points_sampled.append({
+                'point': point,
+                'value': -score,
+                'value_var': noise_variance,
+            })
+        elif status == 'PENDING':
+            points_being_sampled.append(point)
+        elif status == 'FAILED':
+            pass
+            # not sure how to deal with these yet
+        else:
+            raise RuntimeError('unrecognized status: %s' % status)
+
+    data = {
+        'num_to_sample': 1,
+        'domain_info': {
+            'dim' : searchspace.n_dims,
+            'domain_bounds': [var.domain_to_moe() for var in searchspace],
+        }, 'gp_historical_info' : {
+            'points_sampled' : points_sampled
+        },
+        'points_being_sampled' : points_being_sampled
+    }
+
+    # call MOE
+    resp = urllib.request.urlopen(endpoint, json.dumps(data))
+    result = json.loads(resp.read())
+
+    # check erro field
+    expected = {u'optimizer_success':
+        {u'gradient_descent_tensor_product_domain_found_update': True}}
+    if not dict_is_subset(expected, result['status']):
+        raise ValueError('failure from MOE. received %s' % result)
+
+    # Note that MOE only deals with float-valued variables, so we have
+    # a transform step on either side, where int and enum valued variables
+    # are transformed before calling moe, and then the result suggested by
+    # MOE needs to be reverse-transformed.
+    out = {}
+    for moevalue, var in zip(result['points_to_sample'][0], searchspace):
+        out[var.name] = var.point_from_moe(float(moevalue))
+
+    return out
+

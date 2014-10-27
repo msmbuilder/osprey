@@ -1,12 +1,13 @@
 #!/bin/bash
+cd "$(git rev-parse --show-toplevel)"
 ref_header="from __future__ import print_function, absolute_import, division"
 files=$(find . -name '*.py'  ! -name build ! -path './build/*' ! \
             -name versioneer.py ! -name _version.py ! -name __init__.py | xargs)
 
+exit_status=0
 for file in $files; do
     header=$(head -n 1 $file)
-    [ "$header" != "$ref_header" ] && echo "missing __future__ on $file"
+    msg="missing proper __future__ import on $file"
+    [ "$header" != "$ref_header" ] && echo $msg && exit_status=1
 done;
-
-echo
-echo $ref_header
+exit $exit_status

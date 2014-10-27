@@ -1,0 +1,22 @@
+#!/bin/bash
+set -e
+
+
+function this_dir {
+    # From: Can a Bash script tell what directory it's stored in?
+    # http://stackoverflow.com/a/246128/1079728
+    SOURCE="${BASH_SOURCE[0]}"
+    while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+      local DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+      local SOURCE="$(readlink "$SOURCE")"
+      [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+    done
+    local DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+    echo $DIR
+}
+
+DIR=$(this_dir)
+
+$DIR/verify-future-imports-hook
+$DIR/remove-trailing-whitepace-hook
+$DIR/flake8-hook

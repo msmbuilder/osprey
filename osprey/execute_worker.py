@@ -82,7 +82,7 @@ def run_single_trial(estimator, scoring, X, y, params, cv, config_sha1,
 
     try:
         grid = GridSearchCV(
-            estimator, param_grid={k: [v] for k, v in iteritems(params)},
+            estimator, param_grid=dict((k, [v]) for k, v in iteritems(params)),
             scoring=scoring, cv=cv, verbose=1, refit=False)
         grid.fit(X, y)
         score = grid.grid_scores_[0]

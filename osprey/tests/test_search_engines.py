@@ -1,17 +1,22 @@
 from __future__ import print_function, absolute_import, division
+
+import os
 import sys
+import nose
 from six import iteritems
+from six.moves.urllib import request, error
 import numpy as np
 from numpy.testing.decorators import skipif
+
+from osprey.search_space import SearchSpace
+from osprey.search_space import IntVariable, EnumVariable, FloatVariable
+from osprey.search_engines import moe_rest
+from osprey.search_engines import hyperopt_tpe, _hyperopt_fmin_random_kwarg
+
 try:
     from hyperopt import hp, fmin, tpe, Trials
 except:
     pass
-
-from osprey.search_space import (SearchSpace, EnumVariable, FloatVariable,
-                                 IntVariable)
-from osprey.search_engines import hyperopt_tpe, _hyperopt_fmin_random_kwarg
-from osprey.search_engines import moe_rest
 
 
 def hyperopt_x2_iterates(n_iters=100):
@@ -55,8 +60,16 @@ def test_1():
 
     np.testing.assert_array_equal(ref, ours)
 
+
 def test_moe_rest_1():
-    moe_url = 'http://vspm9.stanford.edu/'
+    moe_url = os.environ.get('MOE_REST_ENDPOINT', 'http://sdfsddfs')
+    try:
+        request.urlopen(moe_url)
+    except error.URLError:
+        raise nose.SkipTest(
+            'No available MOE REST API endpoint (set with '
+            'MOE_REST_ENDPOINT environment variable)')
+
     searchspace = SearchSpace()
     searchspace.add_float('x', -10, 10)
     searchspace.add_float('y', 1, 10, warp='log')
@@ -77,5 +90,3 @@ def test_moe_rest_1():
                 assert searchspace[k].min <= v <= searchspace[k].max
             else:
                 assert False
-
-

@@ -50,7 +50,7 @@ def test_current_pretty_time():
     print(current_pretty_time())
 
 
-def dict_is_subset():
+def test_dict_is_subset():
     assert dict_is_subset({'one': 1}, {'one': 1, 'two': 2})
     assert dict_is_subset({'one': 1, 'two': 2}, {'one': 1, 'two': 2})
     assert not dict_is_subset({'three': 3}, {'one': 1, 'two': 2})
@@ -59,4 +59,3 @@ def dict_is_subset():
     assert dict_is_subset({'one': {'two': 2}}, {'one': {'two': 2}})
     assert dict_is_subset({'one': {'two': 2}}, {'one': {'two': 2, 'three': 3}})
     assert not dict_is_subset({'one': {'three': 3}}, {'one': {'two': 2}})
-

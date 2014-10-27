@@ -15,5 +15,5 @@ def execute(args, parser):
     if exists(args.filename):
         raise RuntimeError('file already exists: %s' % args.filename)
 
-    print("\033[92mcreate\033[0m  {:s}".format(args.filename))
+    print("\033[92mcreate\033[0m  {0:s}".format(args.filename))
     shutil.copy(fn, args.filename)

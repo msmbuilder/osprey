@@ -19,8 +19,7 @@ def test_3():
 
 
 def test_4():
-    with assert_raises(RuntimeError):
-        load_entry_point('sklearn')
-
-    with assert_raises(RuntimeError):
-        load_entry_point('sklearn.sdsdfjhgdsf')
+    assert_raises(RuntimeError,
+                  lambda: load_entry_point('sklearn'))
+    assert_raises(RuntimeError,
+                  lambda: load_entry_point('sklearn.sdsdfjhgdsf'))

@@ -22,6 +22,6 @@ def execute(args, parser):
     if os.path.exists(path):
         raise RuntimeError('%s already exists' % path)
 
-    print("\033[92mcreate\033[0m  {:s}".format(path))
+    print("\033[92mcreate\033[0m  {0:s}".format(path))
     with open(path, 'w') as f:
         yaml.dump(options, f, default_flow_style=False)

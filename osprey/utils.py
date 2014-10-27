@@ -58,7 +58,12 @@ def format_timedelta(td_object):
     -------
     str
     """
-    seconds = int(td_object.total_seconds())
+    def get_total_seconds(td):
+        # timedelta.total_seconds not in py2.6
+        return (td.microseconds +
+                (td.seconds + td.days * 24 * 3600) * 1e6) / 1e6
+
+    seconds = int(get_total_seconds(td_object))
     periods = [('year',    60*60*24*365),
                ('month',   60*60*24*30),
                ('day',     60*60*24),

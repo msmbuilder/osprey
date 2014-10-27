@@ -2,9 +2,10 @@ language: c
 
 env:
     matrix:
-        - hyperopt=dev     python=2
-        - hyperopt=0.0.2   python=2
-        - hyperopt=none    python=3
+        - hyperopt=0.0.2   python=2.6
+        - hyperopt=dev     python=2.7
+        - hyperopt=0.0.2   python=2.7
+        - hyperopt=none    python=3.4
 
 install:
   - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh

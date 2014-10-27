@@ -1,6 +1,6 @@
-from __future__ import print_function
+from __future__ import print_function, absolute_import, division
+
 import sys
-from argparse import ArgumentDefaultsHelpFormatter
 import traceback
 from socket import gethostname
 from getpass import getuser
@@ -9,29 +9,12 @@ from datetime import datetime
 from six import iteritems
 from six.moves import cStringIO
 from sqlalchemy import func
+from sklearn.base import clone, BaseEstimator
+from sklearn.grid_search import GridSearchCV
 
 from .config import Config
-from .trials import Trial
 from .utils import Unbuffered
-
-
-def configure_parser(sub_parsers):
-    help = 'Run a worker process (hyperparameter optimization)'
-    p = sub_parsers.add_parser('worker', description=help, help=help,
-                               formatter_class=ArgumentDefaultsHelpFormatter)
-    p.add_argument('config', help='Path to worker config file (yaml)')
-    p.add_argument('-n', '--n-iters', default=1, type=int, help='Number of '
-                   'trials to run sequentially.')
-
-    p.set_defaults(func=execute)
-
-
-def print_header():
-    print('='*70)
-    print('= osprey is a tool for machine learning '
-          'hyperparameter optimization. =')
-    print('='*70)
-    print()
+from .trials import Trial
 
 
 def execute(args, parser):
@@ -84,9 +67,6 @@ def execute(args, parser):
 
 def run_single_trial(estimator, scoring, X, y, params, cv, config_sha1,
                      session):
-    from sklearn.base import clone, BaseEstimator
-    from sklearn.grid_search import GridSearchCV
-
     # make sure we get _all_ the parameters, including defaults on the
     # estimator class, to save in the database
     params = clone(estimator).set_params(**params).get_params()
@@ -133,3 +113,11 @@ def run_single_trial(estimator, scoring, X, y, params, cv, config_sha1,
         session.commit()
 
     return t.status
+
+
+def print_header():
+    print('='*70)
+    print('= osprey is a tool for machine learning '
+          'hyperparameter optimization. =')
+    print('='*70)
+    print()

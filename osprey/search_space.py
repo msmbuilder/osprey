@@ -13,6 +13,12 @@ from collections import namedtuple, Iterable
 
 import numpy as np
 from sklearn.utils import check_random_state
+try:
+    from hyperopt import hp, pyll
+except ImportError:
+    from .utils import mock_module
+    hp = mock_module('hyperopt')
+    pyll = mock_module('hyperopt')
 
 
 class SearchSpace(object):
@@ -101,7 +107,6 @@ class IntVariable(namedtuple('IntVariable', ('name', 'min', 'max'))):
         return random.randint(self.min, self.max + 1)
 
     def to_hyperopt(self):
-        from hyperopt import hp, pyll
         return pyll.scope.int(hp.uniform(self.name, self.min, self.max+1))
 
 
@@ -121,7 +126,6 @@ class FloatVariable(namedtuple('FloatVariable',
         raise ValueError('unknown warp: %s' % self.warp)
 
     def to_hyperopt(self):
-        from hyperopt import hp
         if self.warp is None:
             return hp.uniform(self.name, self.min, self.max)
         elif self.warp == 'log':
@@ -141,5 +145,4 @@ class EnumVariable(namedtuple('EnumVariable', ('name', 'choices'))):
         return self.choices[random.randint(len(self.choices))]
 
     def to_hyperopt(self):
-        from hyperopt import hp
         return hp.choice(self.name, self.choices)

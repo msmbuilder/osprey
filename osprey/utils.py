@@ -47,3 +47,15 @@ class Unbuffered(object):
 
     def __getattr__(self, attr):
         return getattr(self.stream, attr)
+
+
+def mock_module(name):
+
+    class MockModule(object):
+        def __cal__(self, *args, **kwargs):
+            raise ImportError('no module named %s' % name)
+
+        def __getattr__(self, *args, **kwargs):
+            raise ImportError('no module named %s' % name)
+
+    return MockModule()

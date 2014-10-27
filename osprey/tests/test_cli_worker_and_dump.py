@@ -1,4 +1,5 @@
 import os
+import json
 import shutil
 import subprocess
 import tempfile
@@ -26,6 +27,9 @@ def test_1():
                               '-f', 'config.yaml'])
         subprocess.check_call([OSPREY_BIN, 'worker', 'config.yaml', '-n', '1'])
         assert os.path.exists('osprey-trials.db')
+        out = subprocess.check_output([OSPREY_BIN, 'dump', 'config.yaml',
+                                       '-o', 'json'])
+        json.loads(out)
 
     finally:
         os.chdir(cwd)

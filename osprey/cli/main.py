@@ -3,11 +3,11 @@ from __future__ import print_function
 import sys
 import argparse
 
-from . import __version__
-from . import main_worker
-from . import main_dump
-from . import main_createrc
-from . import main_skeleton
+from .. import __version__
+from . import parser_createrc
+from . import parser_dump
+from . import parser_skeleton
+from . import parser_worker
 
 
 def main():
@@ -23,10 +23,10 @@ def main():
         dest='cmd',
     )
 
-    main_worker.configure_parser(sub_parsers)
-    main_dump.configure_parser(sub_parsers)
-    main_createrc.configure_parser(sub_parsers)
-    main_skeleton.configure_parser(sub_parsers)
+    parser_dump.configure_parser(sub_parsers)
+    parser_createrc.configure_parser(sub_parsers)
+    parser_skeleton.configure_parser(sub_parsers)
+    parser_worker.configure_parser(sub_parsers)
 
     if len(sys.argv) == 1:
         sys.argv.append('-h')

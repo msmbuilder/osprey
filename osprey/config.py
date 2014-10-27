@@ -25,22 +25,23 @@ Dataset __loader__
 
 from __future__ import print_function, absolute_import, division
 import sys
-import yaml
 import hashlib
 import traceback
 from os.path import join, isfile, dirname, abspath
 
+import yaml
+import sklearn.base
 from six.moves import cPickle
 from six import iteritems
 from six.moves import reduce
 from pkg_resources import resource_filename
 
-from .trials import make_session
 from .entry_point import load_entry_point
 from .rcfile import load_rcfile
 from .utils import dict_merge, in_directory
 from .search_space import SearchSpace
 from . import search_engines
+from .trials import make_session
 
 
 FIELDS = {
@@ -155,8 +156,6 @@ class Config(object):
             eval: "Pipeline([('cluster': KMeans())])"
             entry_point: sklearn.linear_model.LogisticRegression
         """
-        import sklearn.base
-
         evalstring = self.get_value('estimator/eval')
         if evalstring is not None:
             eval_globals_str = self.get_value('estimator/__eval_globals__')

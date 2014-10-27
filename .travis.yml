@@ -17,9 +17,9 @@ install:
   - source activate test
 
   # instal python2.6 backports
-  - '[ "$python" == "2.6" ]
+  - '[ "$python" = "2.6" ]
       && conda install --yes pip
-      && pip install importlib argparse   # importlib is not in conda
+      && pip install importlib argparse
       || echo ""'
 
   # install extra dependency for style checking

@@ -62,13 +62,13 @@ def test_1():
 
 
 def test_moe_rest_1():
-    moe_url = os.environ.get('MOE_REST_ENDPOINT', 'http://sdfsddfs')
+    moe_url = os.environ.get('MOE_API_URL', 'http://ERROR-sdjssfssdbsdf.com')
     try:
         request.urlopen(moe_url)
     except error.URLError:
         raise nose.SkipTest(
             'No available MOE REST API endpoint (set with '
-            'MOE_REST_ENDPOINT environment variable)')
+            'MOE_API_URL environment variable)')
 
     searchspace = SearchSpace()
     searchspace.add_float('x', -10, 10)
@@ -76,17 +76,16 @@ def test_moe_rest_1():
     searchspace.add_int('z', -10, 10)
     searchspace.add_enum('w', ['opt1', 'opt2'])
 
-    for i in range(10):
-        history = [(searchspace.rvs(), np.random.random(), 'SUCCEEDED')
-                   for _ in range(4)]
-        params = moe_rest(history, searchspace, moe_url=moe_url)
-        for k, v in iteritems(params):
-            assert k in searchspace.variables
-            if isinstance(searchspace[k], EnumVariable):
-                assert v in searchspace[k].choices
-            elif isinstance(searchspace[k], FloatVariable):
-                assert searchspace[k].min <= v < searchspace[k].max
-            elif isinstance(searchspace[k], IntVariable):
-                assert searchspace[k].min <= v <= searchspace[k].max
-            else:
-                assert False
+    history = [(searchspace.rvs(), np.random.random(), 'SUCCEEDED')
+               for _ in range(4)]
+    params = moe_rest(history, searchspace, moe_url=moe_url)
+    for k, v in iteritems(params):
+        assert k in searchspace.variables
+        if isinstance(searchspace[k], EnumVariable):
+            assert v in searchspace[k].choices
+        elif isinstance(searchspace[k], FloatVariable):
+            assert searchspace[k].min <= v < searchspace[k].max
+        elif isinstance(searchspace[k], IntVariable):
+            assert searchspace[k].min <= v <= searchspace[k].max
+        else:
+            assert False

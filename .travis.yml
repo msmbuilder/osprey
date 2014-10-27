@@ -1,6 +1,8 @@
 language: c
 
 env:
+    global:
+        - MOE_API_URL=http://yelpmoe-latest-1.65795cc2-rmcgibbo.node.tutum.io:49154/
     matrix:
         - hyperopt=0.0.2   python=2.6
         - hyperopt=dev     python=2.7

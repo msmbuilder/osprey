@@ -2,6 +2,7 @@ from __future__ import print_function, absolute_import, division
 
 import os
 import sys
+import signal
 import traceback
 from socket import gethostname
 from getpass import getuser
@@ -42,7 +43,15 @@ def execute(args, parser):
     print('  %r' % estimator)
     print(searchspace)
 
-    statuses = []
+    statuses = [None for _ in range(args.n_iters)]
+
+    # install a signal handler to print the footer before exiting
+    # from sigterm (e.g. PBS job kill)
+    def signal_hander(signum, frame):
+        print_footer(statuses, start_time, signum)
+        sys.exit(1)
+    signal.signal(signal.SIGTERM, signal_hander)
+
     for i in range(args.n_iters):
         print('\n' + '-'*70)
         print('Beginning iteration %50s' % ('%d / %d' % (i+1, args.n_iters)))
@@ -61,7 +70,7 @@ def execute(args, parser):
         s = run_single_trial(
             estimator=estimator, scoring=scoring, X=X, y=y,
             params=params, cv=cv, config_sha1=config_sha1, session=session)
-        statuses.append(s)
+        statuses[i] = s
 
     print_footer(statuses, start_time)
 
@@ -95,7 +104,7 @@ def run_single_trial(estimator, scoring, X, y, params, cv, config_sha1,
         print('Success! Model score = %f' % t.mean_cv_score)
         print('(best score so far   = %f)' % max(t.mean_cv_score, best_so_far))
         print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-    except (Exception, KeyboardInterrupt, SystemExit) as e:
+    except Exception:
         buf = cStringIO()
         traceback.print_exc(file=buf)
 
@@ -105,9 +114,10 @@ def run_single_trial(estimator, scoring, X, y, params, cv, config_sha1,
         print('Exception encountered while fitting model')
         print('-'*78, file=sys.stderr)
         traceback.print_exc(file=sys.stderr)
-        if isinstance(e, (KeyboardInterrupt, SystemExit)):
-            sys.exit(1)
         print('-'*78, file=sys.stderr)
+    except (KeyboardInterrupt, SystemExit):
+        t.status = 'FAILED'
+        sys.exit(1)
     finally:
         t.completed = datetime.now()
         t.elapsed = t.completed - t.started
@@ -130,11 +140,18 @@ def print_header():
     print()
 
 
-def print_footer(statuses, start_time):
+def print_footer(statuses, start_time, signum=None):
     n_successes = sum(s == 'SUCCEEDED' for s in statuses)
     elapsed = format_timedelta(datetime.now() - start_time)
-
     print()
+
+    if signum is not None:
+        sigmap = dict((k, v) for v, k in signal.__dict__.iteritems()
+                      if v.startswith('SIG'))
+        signame = sigmap.get(signum, 'Unknown')
+        print('== osprey worker received signal %s!' % signame)
+        print('== exiting immediately.')
+
     print('%d/%d models fit successfully.' % (n_successes, len(statuses)))
     print('time:         %s' % current_pretty_time())
     print('elapsed:      %s.' % elapsed)

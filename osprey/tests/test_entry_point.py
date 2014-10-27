@@ -1,3 +1,4 @@
+from __future__ import print_function, absolute_import, division
 from osprey.entry_point import load_entry_point
 from nose.tools import assert_raises
 

@@ -6,7 +6,7 @@ try:
     from hyperopt import (Trials, tpe, fmin, STATUS_OK, STATUS_RUNNING,
                           STATUS_FAIL)
 except ImportError:
-    # hyperopt is optional required for hyperopt_tpe()
+    # hyperopt is optional, but required for hyperopt_tpe()
     pass
 
 from .search_space import EnumVariable
@@ -16,6 +16,23 @@ __all__ = ['random', 'hyperopt_tpe']
 
 def random(history, searchspace, random_state=None):
     """Randomly suggest params from searchspace.
+
+    Parameters
+    ----------
+    history : list of 3-tuples
+        History of past function evaluations. Each element in history should
+        be a tuple `(params, score, status)`, where `params` is a dict mapping
+        parameter names to values
+    searchspace : SearchSpace
+        Instance of search_space.SearchSpace
+    random_state :i nteger or numpy.RandomState, optional
+        The random seed for sampling. If an integer is given, it fixes the
+        seed. Defaults to the global numpy random number generator.
+
+    Notes
+    -----
+    `history` is not used by this function, but present so that we have a
+    common interface between all of the search engines.
 
     Returns
     -------
@@ -30,6 +47,8 @@ def hyperopt_tpe(history, searchspace, random_state=None):
     function evaluation history using a tree of Parzen estimators (TPE),
     as implemented in the hyperopt package.
 
+    Use of this function requires that hyperopt be installed.
+
     Parameters
     ----------
     history : list of 3-tuples
@@ -38,6 +57,9 @@ def hyperopt_tpe(history, searchspace, random_state=None):
         parameter names to values
     searchspace : SearchSpace
         Instance of search_space.SearchSpace
+    random_state :i nteger or numpy.RandomState, optional
+        The random seed for sampling. If an integer is given, it fixes the
+        seed. Defaults to the global numpy random number generator.
 
     Returns
     -------

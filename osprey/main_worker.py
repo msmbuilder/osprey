@@ -12,6 +12,7 @@ from sqlalchemy import func
 
 from .config import Config
 from .trials import Trial
+from .utils import Unbuffered
 
 
 def configure_parser(sub_parsers):
@@ -34,9 +35,9 @@ def print_header():
 
 
 def execute(args, parser):
+    sys.stdout = Unbuffered(sys.stdout)
     # Load the config file and extract the fields
     print_header()
-    raise ValueError()
 
     config = Config(args.config)
     estimator = config.estimator()

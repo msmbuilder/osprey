@@ -1,3 +1,4 @@
+from __future__ import print_function, absolute_import, division
 """config.py
 
 This module contains the parser and in-memory representation of the config
@@ -23,7 +24,6 @@ inside the eval() context.
 Dataset __loader__
 """
 
-from __future__ import print_function, absolute_import, division
 import sys
 import hashlib
 import traceback

@@ -1,4 +1,4 @@
-Osprey [![Build Status](https://travis-ci.org/rmcgibbo/osprey.svg?branch=master)](https://travis-ci.org/rmcgibbo/osprey)
+Osprey [![Build Status](https://travis-ci.org/rmcgibbo/osprey.svg?branch=master)](https://travis-ci.org/rmcgibbo/osprey) [![PyPi version](https://pypip.in/v/osprey/badge.png)](https://pypi.python.org/pypi/osprey/) [![Supported Python versions](https://pypip.in/py_versions/osprey/badge.svg)](https://pypi.python.org/pypi/osprey/) [![License](https://pypip.in/license/osprey/badge.svg)](https://pypi.python.org/pypi/osprey/)
 ======
 
 osprey is an easy-to-use tool for hyperparameter optimization for machine

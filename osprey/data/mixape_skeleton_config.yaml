@@ -1,7 +1,7 @@
 # osprey configuration file.
 #---------------------------
 # usage:
-#  osprey worker condif.yaml
+#  osprey worker config.yaml
 
 estimator:
     # The model/estimator to be fit.

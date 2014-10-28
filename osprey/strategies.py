@@ -2,10 +2,14 @@ from __future__ import print_function, absolute_import, division
 import sys
 import json
 import inspect
+import socket
 from argparse import Namespace
 
+from six.moves.urllib.error import HTTPError, URLError
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.parse import urlparse
+DEFAULT_TIMEOUT = socket._GLOBAL_DEFAULT_TIMEOUT
+
 
 from sklearn.utils import check_random_state
 try:
@@ -262,7 +266,8 @@ class MOE(BaseStrategy):
             raise RuntimeError('moe url "%s" is not a valid endpoint' %
                                endpoint)
 
-        resp = urlopen(endpoint, json.dumps(request).encode('utf-8'))
+        jdata = json.dumps(request).encode('utf-8')
+        resp = urlopen_with_retries(endpoint, jdata)
         result = json.loads(resp.read().decode('utf-8'))
         return result
 
@@ -273,3 +278,12 @@ class MOE(BaseStrategy):
         gp_next_points_epi = GpNextPointsEpi(mock_object)
         result = gp_next_points_epi.gp_next_points_epi_view()
         return result
+
+
+def urlopen_with_retries(url, data=None, timeout=DEFAULT_TIMEOUT, n_retries=3):
+    for i in range(n_retries):
+        try:
+            return urlopen(url=url, data=data, timeout=timeout)
+        except (URLError, HTTPError) as e:
+            continue
+    raise e

@@ -1,6 +1,5 @@
 from __future__ import print_function, absolute_import, division
 
-import shutil
 from os.path import join, exists
 from pkg_resources import resource_filename
 
@@ -16,4 +15,7 @@ def execute(args, parser):
         raise RuntimeError('file already exists: %s' % args.filename)
 
     print("\033[92mcreate\033[0m  {0:s}".format(args.filename))
-    shutil.copy(fn, args.filename)
+
+    with open(args.filename, 'wb') as out:
+        with out(fn, 'rb') as inp:
+            out.write(inp.read())

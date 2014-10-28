@@ -1,9 +1,3 @@
-estimator:
-    __eval_globals__: osprey.plugins.mixtape.eval_globals
-  
-dataset:
-    __loader__: osprey.plugins.mixtape.trajectory_dataset
-
 trials:
     table_name: trials
 

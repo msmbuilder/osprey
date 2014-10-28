@@ -4,29 +4,22 @@ from __future__ import print_function, absolute_import, division
 This module contains the parser and in-memory representation of the config
 osprey job file file. The config file has four major sections:
 
- - estimator: the specification for the estimator/model to be fit, an instance
-              of sklearn.base.BaseEstimator.
- - search:    the specification of the hyperparameter search space and the
-              strategy for adaptive exploration of this space.
- - dataset:   the specification of the dataset to fit the models with.
- - trials:    as each hyperparameter setting is explored, the results are
-              serialized to a database specified in this section.
- - cv:        specification for cross-validation.
- - scoring:   the score function used in cross-validation. (optional)
-
-Notes
------
-If the eval option is used to load the estimator, a special variable in the
-section __eval_globals__ is read. This variable specifies an entry point for a
-function that returns a dict of pre-imported variables which can be referenced
-inside the eval() context.
-
-Dataset __loader__
+ - estimator:      the specification for the estimator/model to be fit, an
+                   instance of sklearn.base.BaseEstimator.
+ - search_space:   the specification of the hyperparameter search space
+ - strategy:       strategy for adaptive exploration of hyperparameters.
+ - dataset_lodaer: the specification of the dataset to fit the models with.
+ - trials:         as each hyperparameter setting is explored, the results are
+                   serialized to a database specified in this section.
+ - cv:             specification for cross-validation.
+ - scoring:        the score function used in cross-validation. (optional)
 """
 
 import sys
+import six
 import hashlib
 import traceback
+import importlib
 from os.path import join, isfile, dirname, abspath
 
 import yaml
@@ -37,21 +30,23 @@ from six.moves import reduce
 from pkg_resources import resource_filename
 
 from .entry_point import load_entry_point
-from .rcfile import load_rcfile
 from .utils import dict_merge, in_directory
 from .search_space import SearchSpace
-from . import search_engines
+from .strategies import BaseStrategy
+from .dataset_loaders import BaseDatasetLoader
 from .trials import make_session
+from .subclass_factory import init_subclass_by_name
+from . import eval_scopes
 
 
 FIELDS = {
-    'estimator':   ['pickle', 'eval', '__eval_globals__', 'entry_point'],
-    'dataset':     dict,
-
-    'trials':      ['uri', 'table_name'],
-    'search':      ['engine', 'space', 'seed'],
-    'cv':          int,
-    'scoring':     (str, type(None)),
+    'estimator':       ['pickle', 'eval', 'eval_scope', 'entry_point'],
+    'dataset_loader':  ['name', 'params'],
+    'trials':          ['uri', 'table_name'],
+    'search_space':    dict,
+    'strategy':        ['name', 'params'],
+    'cv':              int,
+    'scoring':         (str, type(None)),
 }
 
 
@@ -64,32 +59,26 @@ class Config(object):
             raise RuntimeError('%s does not exist' % self.path)
         with open(self.path, 'rb') as f:
             config = parse(f)
-        self.config = self._merge_defaults_and_rc(config)
+        self.config = self._merge_defaults(config)
         self._check_fields()
 
         if self.verbose:
             print('Loading config file:     %s...' % path)
 
-    def _merge_defaults_and_rc(self, config):
-        """The config object loads its values from three sources, with the
+    def _merge_defaults(self, config):
+        """The config object loads its values from two sources, with the
         following precedence:
 
             1. data/default_config.yaml
-            2. the .ospreyrc file, which can be located in the user's home
-               directory, the current directory, or specified with the OSPREYRC
-               variable (see rcfile.py)
-            3. The config file itself, passed in to this object in the
+            2. The config file itself, passed in to this object in the
                constructor as `path`.
 
-        Values specified in files with higher precedence (later in the above
-        list) always supersede values from lower in the list, in the case
-        of a conflict.
+        in case of conflict, the config file dominates.
         """
         fn = resource_filename('osprey', join('data', 'default_config.yaml'))
         with open(fn) as f:
             default = parse(f)
-        rc = load_rcfile(self.verbose)
-        return reduce(dict_merge, [default, rc, config])
+        return reduce(dict_merge, [default, config])
 
     def _check_fields(self):
         for section, submeta in iteritems(self.config):
@@ -124,7 +113,7 @@ class Config(object):
         m = super(Config, cls).__new__(cls)
         m.path = '.'
         m.verbose = False
-        m.config = m._merge_defaults_and_rc(config)
+        m.config = m._merge_defaults(config)
         if check_fields:
             m._check_fields()
         return m
@@ -158,19 +147,27 @@ class Config(object):
         """
         evalstring = self.get_value('estimator/eval')
         if evalstring is not None:
-            eval_globals_str = self.get_value('estimator/__eval_globals__')
-            try:
-                eval_globals = load_entry_point(eval_globals_str)()
-            except:
-                print('ERROR! Failed to load estimator/__eval_globals__',
-                      file=sys.stderr)
-                raise
-            if not isinstance(eval_globals, dict):
-                raise RuntimeError('__eval__globals__ must resolve to a '
-                                   'callable that returns a dict')
+            got = self.get_value('estimator/eval_scope')
+            if isinstance(got, six.string_types):
+                got = [got]
+            elif isinstance(got, list):
+                pass
+            else:
+                raise RuntimeError('unexpected type for estimator/eval_scope')
+
+            scope = {}
+            for pkg_name in got:
+                if pkg_name in eval_scopes.__all__:
+                    scope.update(getattr(eval_scopes, pkg_name)())
+                else:
+                    try:
+                        pkg = importlib.import_module(pkg_name)
+                    except ImportError as e:
+                        raise RuntimeError(str(e))
+                    scope.update(eval_scopes.import_all_estimators(pkg))
 
             try:
-                estimator = eval(evalstring, {}, eval_globals)
+                estimator = eval(evalstring, {}, scope)
                 if not isinstance(estimator, sklearn.base.BaseEstimator):
                     raise RuntimeError('estimator/pickle must load a '
                                        'sklearn-derived Estimator')
@@ -210,7 +207,7 @@ class Config(object):
         raise RuntimeError('no estimator field')
 
     def search_space(self):
-        ss = self.get_value('search/space')
+        ss = self.get_section('search_space')
 
         searchspace = SearchSpace()
         for param_name, info in iteritems(ss):
@@ -252,19 +249,23 @@ class Config(object):
 
         return searchspace
 
-    def search_engine(self):
-        engine = self.get_value('search/engine')
-        if engine not in search_engines.__all__:
-            raise RuntimeError('search/engine "%s" not supported. available'
-                               'engines are: %r' % (engine,
-                                                    search_engines.__all__))
-        return getattr(search_engines, engine)
+    def strategy(self):
+        strategy_name = self.get_value('strategy/name')
+        strategy_params = self.get_value('strategy/params', default={})
+
+        strat = init_subclass_by_name(BaseStrategy, strategy_name,
+                                      strategy_params)
+        return strat
 
     def dataset(self):
-        loader = load_entry_point(self.get_value('dataset/__loader__'))
+        loader_name = self.get_value('dataset_loader/name')
+        loader_params = self.get_value('dataset_loader/params', default={})
+
+        loader = init_subclass_by_name(
+            BaseDatasetLoader, loader_name, loader_params)
 
         with in_directory(dirname(abspath(self.path))):
-            X, y = loader(**self.get_section('dataset'))
+            X, y = loader.load()
 
         return X, y
 
@@ -283,9 +284,6 @@ class Config(object):
         scoring = self.get_section('scoring')
         assert isinstance(scoring, (str, type(None)))
         return scoring
-
-    def search_seed(self):
-        return self.get_value('search/seed')
 
     def cv(self):
         return self.get_section('cv')

@@ -25,14 +25,6 @@ def dict_merge(base, top):
     return out
 
 
-def dict_is_subset(sub, sup):
-    if isinstance(sup, dict):
-        return isinstance(sub, dict) and \
-            all(k in sup and dict_is_subset(sub[k], sup[k]) for k in sub)
-    else:
-        return sub == sup
-
-
 @contextlib.contextmanager
 def in_directory(path):
     """Context manager (with statement) that changes the current directory
@@ -105,3 +97,14 @@ def mock_module(name):
             raise ImportError('no module named %s' % name)
 
     return MockModule()
+
+
+def join_quoted(values, quote="'"):
+    return ', '.join("%s%s%s" % (quote, e, quote) for e in values)
+
+
+def expand_path(path, base='.'):
+    path = os.path.expanduser(path)
+    if not os.path.isabs(path):
+        path = os.path.join(base, path)
+    return path

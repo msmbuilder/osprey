@@ -5,6 +5,17 @@ from .utils import join_quoted
 
 
 def init_subclass_by_name(baseclass, short_name, params):
+    """
+    Find the subclass, `kls` of baseclass with class attribute `short_name`
+    that matches the supplied `short_name`, and then instantiate and return
+    that class with:
+
+        return kls(**params)
+
+    This function also tries its best to catch any possible TypeErrors due
+    to binding of the arguments, and rethrows them as nicely formatted
+    RuntimeErrors that are suitable for showing to users.
+    """
     sc = baseclass.__subclasses__()
     for kls in sc:
         if kls.short_name == short_name:

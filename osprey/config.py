@@ -197,6 +197,7 @@ class Config(object):
             path = join(dirname(abspath(self.path)), pkl)
             if not isfile(path):
                 raise RuntimeError('estimator/pickle %s is not a file' % pkl)
+            sys.path.insert(0, dirname(abspath(self.path)))
             with open(path, 'rb') as f:
                 estimator = cPickle.load(f)
                 if not isinstance(estimator, sklearn.base.BaseEstimator):

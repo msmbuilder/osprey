@@ -17,5 +17,5 @@ def execute(args, parser):
     print("\033[92mcreate\033[0m  {0:s}".format(args.filename))
 
     with open(args.filename, 'wb') as out:
-        with out(fn, 'rb') as inp:
+        with open(fn, 'rb') as inp:
             out.write(inp.read())

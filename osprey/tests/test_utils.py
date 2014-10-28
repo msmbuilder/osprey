@@ -1,5 +1,5 @@
 from __future__ import print_function, absolute_import, division
-import os.path
+import os
 from os.path import samefile, abspath
 import tempfile
 import datetime

@@ -45,9 +45,10 @@ install:
       && rm -rf hyperopt
       || echo ""'
 
+  - python setup.py install
+
 
 script:
-  - python setup.py install
   - nosetests -v
   # exclude versioneer.py and _version.py from style checking, since we don't
   # write/maintain them

@@ -10,13 +10,19 @@ from numpy.testing.decorators import skipif
 
 from osprey.search_space import SearchSpace
 from osprey.search_space import IntVariable, EnumVariable, FloatVariable
-from osprey.search_engines import moe_rest
-from osprey.search_engines import hyperopt_tpe, _hyperopt_fmin_random_kwarg
+from osprey.strategies import RandomSearch, HyperoptTPE, MOE
 
 try:
     from hyperopt import hp, fmin, tpe, Trials
 except:
     pass
+
+
+def test_random():
+    searchspace = SearchSpace()
+    searchspace.add_float('x', -10, 10)
+    random = np.random.RandomState(0)
+    RandomSearch(seed=random).suggest([], searchspace)
 
 
 def hyperopt_x2_iterates(n_iters=100):
@@ -31,7 +37,7 @@ def hyperopt_x2_iterates(n_iters=100):
     for i in range(n_iters):
         fmin(fn=fn, algo=tpe.suggest, max_evals=i+1, trials=trials,
              space={'x': hp.uniform('x', -10, 10)},
-             **_hyperopt_fmin_random_kwarg(random))
+             **HyperoptTPE._hyperopt_fmin_random_kwarg(random))
 
     return np.array(iterates)
 
@@ -47,7 +53,7 @@ def our_x2_iterates(n_iters=100):
     fn = lambda params: -params['x']**2
 
     for i in range(n_iters):
-        params = hyperopt_tpe(history, searchspace, random)
+        params = HyperoptTPE(seed=random).suggest(history, searchspace)
         history.append((params, fn(params), 'SUCCEEDED'))
 
     return np.array([h[0]['x'] for h in history])
@@ -78,7 +84,7 @@ def test_moe_rest_1():
 
     history = [(searchspace.rvs(), np.random.random(), 'SUCCEEDED')
                for _ in range(4)]
-    params = moe_rest(history, searchspace, moe_url=moe_url)
+    params = MOE(url=moe_url).suggest(history, searchspace)
     for k, v in iteritems(params):
         assert k in searchspace.variables
         if isinstance(searchspace[k], EnumVariable):

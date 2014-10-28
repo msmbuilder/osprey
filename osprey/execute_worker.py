@@ -31,8 +31,7 @@ def execute(args, parser):
     session = config.trials()
     cv = config.cv()
     searchspace = config.search_space()
-    engine = config.search_engine()
-    seed = config.search_seed()
+    strategy = config.strategy()
     config_sha1 = config.sha1()
     scoring = config.scoring()
 
@@ -62,8 +61,8 @@ def execute(args, parser):
         history = [[t.parameters, t.mean_cv_score, t.status]
                    for t in session.query(Trial).all()]
         print('History contains: %d trials' % len(history))
-        print('Choosing next hyperparameters with %s...' % engine.__name__)
-        params = engine(history, searchspace, seed)
+        print('Choosing next hyperparameters with %s...' % strategy.short_name)
+        params = strategy.suggest(history, searchspace)
         print('  %r\n' % params)
         assert len(params) == searchspace.n_dims
 

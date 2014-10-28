@@ -1,6 +1,7 @@
 from __future__ import print_function, absolute_import, division
 
 import glob
+import os
 from .utils import expand_path
 
 
@@ -29,3 +30,22 @@ class MDTrajDatasetLoader(BaseDatasetLoader):
         y = None
 
         return X, y
+
+
+class FilenameDatasetLoader(BaseDatasetLoader):
+    """Just pass a bunch of filenames to the first step of the pipeline
+
+    The pipeline will do the loading.
+    """
+    short_name = 'filename'
+
+    def __init__(self, trajectories, abs_path=True):
+        self.traj_glob = trajectories
+        self.abs_path = abs_path
+
+    def load(self):
+        filenames = glob.glob(expand_path(self.traj_glob))
+        if self.abs_path:
+            filenames = [os.path.abspath(fn) for fn in filenames]
+        return filenames, None
+

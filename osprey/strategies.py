@@ -287,9 +287,11 @@ class MOE(BaseStrategy):
 
 
 def urlopen_with_retries(url, data=None, timeout=DEFAULT_TIMEOUT, n_retries=3):
+    error = None
     for i in range(n_retries):
         try:
             return urlopen(url=url, data=data, timeout=timeout)
         except (URLError, HTTPError) as e:
+            error = e
             continue
-    raise e
+    raise error

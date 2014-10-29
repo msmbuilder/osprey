@@ -29,7 +29,7 @@ class JSONEncoded(TypeDecorator):
 
 
 class Trial(Base):
-    __tablename__ = 'trails'
+    __tablename__ = 'trials'
 
     id = Column(Integer, primary_key=True)
     status = Column(Enum('PENDING', 'SUCCEEDED', 'FAILED'))

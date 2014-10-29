@@ -48,4 +48,3 @@ class FilenameDatasetLoader(BaseDatasetLoader):
         if self.abs_path:
             filenames = [os.path.abspath(fn) for fn in filenames]
         return filenames, None
-

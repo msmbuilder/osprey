@@ -1,9 +1,12 @@
 from __future__ import print_function, absolute_import, division
 import json
+import time
+import random
 from datetime import datetime, timedelta
 
 from six import iteritems
 
+from sqlalchemy.exc import OperationalError
 from sqlalchemy import Column, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.types import (TypeDecorator, Text, Float, Integer, Enum,
@@ -70,6 +73,19 @@ class Trial(Base):
 def make_session(uri, project_name, echo=False):
     Trial.set_default_project_name(project_name)
     engine = create_engine(uri, echo=echo)
-    Base.metadata.create_all(engine)
+    _create_all(Base, engine)
     session = Session(engine)
     return session
+
+
+def _create_all(base, engine):
+    # when multiple workers start up at the same time, they
+    # can have a race condition in creating the DB.
+    error = None
+    for i in range(3):
+        try:
+            return base.metadata.create_all(engine)
+        except OperationalError as e:
+            time.sleep(random.random())
+            error = e
+    raise error

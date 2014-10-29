@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 
 from six import iteritems
 
+from sqlalchemy.pool import NullPool
 from sqlalchemy.exc import OperationalError
 from sqlalchemy import Column, create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -72,7 +73,7 @@ class Trial(Base):
 
 def make_session(uri, project_name, echo=False):
     Trial.set_default_project_name(project_name)
-    engine = create_engine(uri, echo=echo)
+    engine = create_engine(uri, echo=echo, poolclass=NullPool)
     _create_all(Base, engine)
     session = Session(engine)
     return session

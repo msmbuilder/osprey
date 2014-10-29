@@ -263,7 +263,10 @@ class MOE(BaseStrategy):
         return out
 
     def _call_moe_rest_api(self, request):
-        endpoint = self.url + '/gp/next_points/epi'
+        base = self.url
+        if base.endswith('/'):
+            base = base[:-1]
+        endpoint = base + '/gp/next_points/epi'
         parsed = urlparse(endpoint)
         if parsed.netloc == '':
             endpoint = 'http://' + endpoint

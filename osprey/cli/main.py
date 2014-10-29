@@ -7,6 +7,7 @@ from .. import __version__
 from . import parser_dump
 from . import parser_skeleton
 from . import parser_worker
+from . import parser_plot
 
 
 def main():
@@ -25,6 +26,7 @@ def main():
     parser_dump.configure_parser(sub_parsers)
     parser_skeleton.configure_parser(sub_parsers)
     parser_worker.configure_parser(sub_parsers)
+    parser_plot.configure_parser(sub_parsers)
 
     if len(sys.argv) == 1:
         sys.argv.append('-h')

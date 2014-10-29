@@ -5,7 +5,7 @@ import sqlite3
 import shutil
 import tempfile
 
-from osprey.trials import make_session
+from osprey.trials import make_session, Trial
 
 
 def test_1():
@@ -13,12 +13,18 @@ def test_1():
     dirname = tempfile.mkdtemp()
     try:
         os.chdir(dirname)
-        make_session('sqlite:///osprey-trials.db')
+        session = make_session('sqlite:///db', project_name='abc123')
+        session.add(Trial())
+        session.commit()
 
-        con = sqlite3.connect('osprey-trials.db')
+        con = sqlite3.connect('db')
         table_names = con.execute("SELECT name FROM sqlite_master "
                                   "WHERE type='table'").fetchone()
-        assert table_names == (u'trials', )
+        assert table_names == (u'trials_v1',)
+
+        table_names = con.execute(
+            "SELECT project_name FROM trials_v1").fetchone()
+        assert table_names == (u'abc123',)
 
     finally:
         os.chdir(cwd)

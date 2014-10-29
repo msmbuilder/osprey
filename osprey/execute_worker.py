@@ -145,7 +145,7 @@ def print_footer(statuses, start_time, signum=None):
     print()
 
     if signum is not None:
-        sigmap = dict((k, v) for v, k in signal.__dict__.iteritems()
+        sigmap = dict((k, v) for v, k in iteritems(signal.__dict__)
                       if v.startswith('SIG'))
         signame = sigmap.get(signum, 'Unknown')
         print('== osprey worker received signal %s!' % signame)

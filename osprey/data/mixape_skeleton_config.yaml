@@ -69,3 +69,6 @@ trials:
   # the string format for connecting to other database is described here:
   # http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html#database-urls
   uri: sqlite:///osprey-trials.db
+  # if you want to save n > 1 projects in the same DB file, you can set
+  # `project_name` to distringuish them:
+  # project_name: name

@@ -29,7 +29,7 @@ class JSONEncoded(TypeDecorator):
 
 
 class Trial(Base):
-    __tablename__ = 'trials-v1'
+    __tablename__ = 'trials_v1'
     default_project_name = None
 
     id = Column(Integer, primary_key=True)

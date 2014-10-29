@@ -20,9 +20,10 @@ def test_1():
         con = sqlite3.connect('db')
         table_names = con.execute("SELECT name FROM sqlite_master "
                                   "WHERE type='table'").fetchone()
-        assert table_names == (u'trials',)
+        assert table_names == (u'trials_v1',)
 
-        table_names = con.execute("SELECT project_name FROM trials").fetchone()
+        table_names = con.execute(
+            "SELECT project_name FROM trials_v1").fetchone()
         assert table_names == (u'abc123',)
 
     finally:

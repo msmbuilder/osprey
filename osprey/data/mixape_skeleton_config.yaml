@@ -28,7 +28,7 @@ strategy:
     # hyperopt's tree of parzen estimators http://hyperopt.github.io/hyperopt/
     # and random search are curently supported.
     name: random  # or moe, hyperopt_tpe
-    params: {}
+    # params: {}
 
 search_space:
   # the search space is specified by listing the variables you want to

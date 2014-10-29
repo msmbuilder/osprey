@@ -86,6 +86,9 @@ class SearchSpace(object):
     def to_hyperopt(self):
         return dict((v.name, v.to_hyperopt()) for v in self)
 
+    def point_to_moe(self, point_dict):
+        return [var.point_to_moe(point_dict[var.name]) for var in self]
+
     def __repr__(self):
         lines = (['Hyperparameter search space:'] +
                  ['  ' + repr(var) for var in self])

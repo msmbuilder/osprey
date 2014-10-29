@@ -148,8 +148,9 @@ def print_footer(statuses, start_time, signum=None):
         sigmap = dict((k, v) for v, k in iteritems(signal.__dict__)
                       if v.startswith('SIG'))
         signame = sigmap.get(signum, 'Unknown')
-        print('== osprey worker received signal %s!' % signame)
-        print('== exiting immediately.')
+        print('== osprey worker received signal %s!' % signame,
+              file=sys.stderr)
+        print('== exiting immediately.', file=sys.stderr)
 
     print('%d/%d models fit successfully.' % (n_successes, len(statuses)))
     print('time:         %s' % current_pretty_time())

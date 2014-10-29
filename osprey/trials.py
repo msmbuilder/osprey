@@ -30,8 +30,10 @@ class JSONEncoded(TypeDecorator):
 
 class Trial(Base):
     __tablename__ = 'trials'
+    default_project_name = None
 
     id = Column(Integer, primary_key=True)
+    project_name = Column(Text())
     status = Column(Enum('PENDING', 'SUCCEEDED', 'FAILED'))
     parameters = Column(JSONEncoded())
     mean_cv_score = Column(Float)
@@ -45,6 +47,15 @@ class Trial(Base):
     traceback = Column(Text())
     config_sha1 = Column(String(40))
 
+    @classmethod
+    def set_default_project_name(cls, name):
+        cls.default_project_name = name
+
+    def __init__(self, **kwargs):
+        if 'project_name' not in kwargs:
+            kwargs['project_name'] = self.default_project_name
+        Base.__init__(self, **kwargs)
+
     def to_dict(self):
         item = {}
         for k, v in iteritems(self.__dict__):
@@ -56,7 +67,8 @@ class Trial(Base):
         return item
 
 
-def make_session(uri, echo=False):
+def make_session(uri, project_name, echo=False):
+    Trial.set_default_project_name(project_name)
     engine = create_engine(uri, echo=echo)
     Base.metadata.create_all(engine)
     session = Session(engine)

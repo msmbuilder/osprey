@@ -28,7 +28,6 @@ def execute(args, parser):
 
     config = Config(args.config)
     estimator = config.estimator()
-    session = config.trials()
     cv = config.cv()
     searchspace = config.search_space()
     strategy = config.strategy()
@@ -56,73 +55,103 @@ def execute(args, parser):
         print('Beginning iteration %50s' % ('%d / %d' % (i+1, args.n_iters)))
         print('-'*70)
 
+        trial_id, params = initialize_trial(
+            strategy, searchspace, estimator, config_sha1=config_sha1,
+            sessionbuilder=config.trialscontext)
+        s = run_single_trial(
+            estimator=estimator, params=params, trial_id=trial_id,
+            scoring=scoring, X=X, y=y, cv=cv,
+            sessionbuilder=config.trialscontext)
+
+        statuses[i] = s
+
+    print_footer(statuses, start_time)
+
+
+def initialize_trial(strategy, searchspace, estimator, config_sha1,
+                     sessionbuilder):
+
+    with sessionbuilder() as session:
         # requery the history ever iteration, because another worker
         # process may have written to it in the mean time
         history = [[t.parameters, t.mean_cv_score, t.status]
                    for t in session.query(Trial).all()]
+
         print('History contains: %d trials' % len(history))
         print('Choosing next hyperparameters with %s...' % strategy.short_name)
         params = strategy.suggest(history, searchspace)
         print('  %r\n' % params)
         assert len(params) == searchspace.n_dims
 
-        s = run_single_trial(
-            estimator=estimator, scoring=scoring, X=X, y=y,
-            params=params, cv=cv, config_sha1=config_sha1, session=session)
-        statuses[i] = s
+        # make sure we get _all_ the parameters, including defaults on the
+        # estimator class, to save in the database
+        params = clone(estimator).set_params(**params).get_params()
+        params = dict((k, v) for k, v in iteritems(params)
+                      if not isinstance(v, BaseEstimator))
 
-    print_footer(statuses, start_time)
+        t = Trial(status='PENDING', parameters=params, host=gethostname(),
+                  user=getuser(), started=datetime.now(),
+                  config_sha1=config_sha1)
+        session.add(t)
+        session.commit()
+        trial_id = t.id
+
+    return trial_id, params
 
 
-def run_single_trial(estimator, scoring, X, y, params, cv, config_sha1,
-                     session):
-    # make sure we get _all_ the parameters, including defaults on the
-    # estimator class, to save in the database
-    params = clone(estimator).set_params(**params).get_params()
-    params = dict((k, v) for k, v in iteritems(params)
-                  if not isinstance(v, BaseEstimator))
+def run_single_trial(estimator, params, trial_id, scoring, X, y, cv,
+                     sessionbuilder):
 
-    t = Trial(status='PENDING', parameters=params, host=gethostname(),
-              user=getuser(), started=datetime.now(),
-              config_sha1=config_sha1)
-    session.add(t)
-    session.commit()
+    status = None
 
     try:
+        param_grid = dict((k, [v]) for k, v in iteritems(params))
         grid = GridSearchCV(
-            estimator, param_grid=dict((k, [v]) for k, v in iteritems(params)),
+            estimator, param_grid=param_grid,
             scoring=scoring, cv=cv, verbose=1, refit=False)
         grid.fit(X, y)
         score = grid.grid_scores_[0]
 
-        t.mean_cv_score = score.mean_validation_score
-        t.cv_scores = score.cv_validation_scores.tolist()
-        t.status = 'SUCCEEDED'
-        best_so_far = session.query(func.max(Trial.mean_cv_score)).first()[0]
-        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-        print('Success! Model score = %f' % t.mean_cv_score)
-        print('(best score so far   = %f)' % max(t.mean_cv_score, best_so_far))
-        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+        with sessionbuilder() as session:
+            trial = session.query(Trial).get(trial_id)
+            trial.mean_cv_score = score.mean_validation_score
+            trial.cv_scores = score.cv_validation_scores.tolist()
+            trial.status = 'SUCCEEDED'
+            best_so_far = session.query(func.max(Trial.mean_cv_score)).first()
+            print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+            print('Success! Model score = %f' % trial.mean_cv_score)
+            print('(best score so far   = %f)' %
+                  max(trial.mean_cv_score, best_so_far[0]))
+            print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+            trial.completed = datetime.now()
+            trial.elapsed = trial.completed - trial.started
+            session.commit()
+            status = trial.status
+
     except Exception:
         buf = cStringIO()
         traceback.print_exc(file=buf)
 
-        t.traceback = buf.getvalue()
-        t.status = 'FAILED'
-        print('-'*78, file=sys.stderr)
-        print('Exception encountered while fitting model')
-        print('-'*78, file=sys.stderr)
-        traceback.print_exc(file=sys.stderr)
-        print('-'*78, file=sys.stderr)
-    except (KeyboardInterrupt, SystemExit):
-        t.status = 'FAILED'
-        sys.exit(1)
-    finally:
-        t.completed = datetime.now()
-        t.elapsed = t.completed - t.started
-        session.commit()
+        with sessionbuilder() as session:
+            trial = session.query(Trial).get(trial_id)
+            trial.traceback = buf.getvalue()
+            trial.status = 'FAILED'
+            print('-'*78, file=sys.stderr)
+            print('Exception encountered while fitting model')
+            print('-'*78, file=sys.stderr)
+            traceback.print_exc(file=sys.stderr)
+            print('-'*78, file=sys.stderr)
+            session.commit()
+            status = trial.status
 
-    return t.status
+    except (KeyboardInterrupt, SystemExit):
+        with sessionbuilder() as session:
+            trial = session.query(Trial).get(trial_id)
+            trial.status = 'FAILED'
+            session.commit()
+            sys.exit(1)
+
+    return status
 
 
 def print_header():

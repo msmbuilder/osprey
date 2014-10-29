@@ -20,6 +20,7 @@ import six
 import hashlib
 import traceback
 import importlib
+import contextlib
 from os.path import join, isfile, dirname, abspath
 
 import yaml
@@ -280,6 +281,12 @@ class Config(object):
         with in_directory(dirname(abspath(self.path))):
             value = make_session(uri, project_name=project_name)
         return value
+
+    @contextlib.contextmanager
+    def trialscontext(self):
+        session = self.trials()
+        yield session
+        session.close()
 
     def scoring(self):
         scoring = self.get_section('scoring')

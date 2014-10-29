@@ -1,5 +1,6 @@
 from __future__ import print_function, absolute_import, division
 import os.path
+import sys
 import contextlib
 from datetime import datetime
 
@@ -34,6 +35,14 @@ def in_directory(path):
     os.chdir(path)
     yield
     os.chdir(curdir)
+
+
+@contextlib.contextmanager
+def prepend_syspath(path):
+    """Contect manager (with statement) that prepends path to sys.path"""
+    sys.path.insert(0, path)
+    yield
+    sys.path.pop(0)
 
 
 class Unbuffered(object):

@@ -30,7 +30,7 @@ from six.moves import reduce
 from pkg_resources import resource_filename
 
 from .entry_point import load_entry_point
-from .utils import dict_merge, in_directory
+from .utils import dict_merge, in_directory, prepend_syspath
 from .search_space import SearchSpace
 from .strategies import BaseStrategy
 from .dataset_loaders import BaseDatasetLoader
@@ -194,11 +194,13 @@ class Config(object):
         # load estimator from pickle field
         pkl = self.get_value('estimator/pickle')
         if pkl is not None:
-            path = join(dirname(abspath(self.path)), pkl)
+            pickl_dir = dirname(abspath(self.path))
+            path = join(pickl_dir, pkl)
             if not isfile(path):
                 raise RuntimeError('estimator/pickle %s is not a file' % pkl)
             with open(path, 'rb') as f:
-                estimator = cPickle.load(f)
+                with prepend_syspath(pickl_dir):
+                    estimator = cPickle.load(f)
                 if not isinstance(estimator, sklearn.base.BaseEstimator):
                     raise RuntimeError('estimator/pickle must load a '
                                        'sklearn-derived Estimator')

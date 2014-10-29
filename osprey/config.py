@@ -42,7 +42,7 @@ from . import eval_scopes
 FIELDS = {
     'estimator':       ['pickle', 'eval', 'eval_scope', 'entry_point'],
     'dataset_loader':  ['name', 'params'],
-    'trials':          ['uri', 'table_name'],
+    'trials':          ['uri'],
     'search_space':    dict,
     'strategy':        ['name', 'params'],
     'cv':              int,
@@ -273,13 +273,11 @@ class Config(object):
 
     def trials(self):
         uri = self.get_value('trials/uri')
-        table_name = self.get_value('trials/table_name')
         if self.verbose:
-            print('Loading trials database: %s (table = "%s")...' % (
-                  uri, table_name))
+            print('Loading trials database: %s...' % uri)
 
         with in_directory(dirname(abspath(self.path))):
-            value = make_session(uri, table_name)
+            value = make_session(uri)
         return value
 
     def scoring(self):

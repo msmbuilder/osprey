@@ -69,4 +69,3 @@ trials:
   # the string format for connecting to other database is described here:
   # http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html#database-urls
   uri: sqlite:///osprey-trials.db
-  # table_name: trials  # (to change the name of the SQL table, if you want)

@@ -234,9 +234,9 @@ class MOE(BaseStrategy):
         # shift the 'score' to be zero mean, which is suggested
         # in the MOE docs
         # http://yelp.github.io/MOE/moe.views.schemas.html#moe.views.schemas.base_schemas.GpHistoricalInfo
-        mean = np.mean([p['score'] for p in points_sampled])
+        mean = np.mean([p['value'] for p in points_sampled])
         for p in points_sampled:
-            p['score'] = p['score'] - mean
+            p['value'] = p['value'] - mean
 
         return {
             'num_to_sample': 1,

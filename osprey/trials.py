@@ -56,8 +56,7 @@ class Trial(Base):
         return item
 
 
-def make_session(uri, table_name='trials', echo=False):
-    Trial.__tablename__ = table_name
+def make_session(uri, echo=False):
     engine = create_engine(uri, echo=echo)
     Base.metadata.create_all(engine)
     session = Session(engine)

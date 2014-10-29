@@ -214,8 +214,7 @@ class MOE(BaseStrategy):
         for param_dict, score, status in history:
             # transform points into the MOE domain. This invloves bringing
             # int and enum variables to floating point, etc.
-            point = [var.point_to_moe(param_dict[var.name])
-                     for var in searchspace]
+            point = searchspace.point_to_moe(param_dict)
 
             if status == 'SUCCEEDED':
                 points_sampled.append({

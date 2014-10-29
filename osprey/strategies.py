@@ -5,6 +5,7 @@ import inspect
 import socket
 from argparse import Namespace
 
+import numpy as np
 from six.moves.urllib.error import HTTPError, URLError
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.parse import urlparse
@@ -215,7 +216,6 @@ class MOE(BaseStrategy):
             # transform points into the MOE domain. This invloves bringing
             # int and enum variables to floating point, etc.
             point = searchspace.point_to_moe(param_dict)
-
             if status == 'SUCCEEDED':
                 points_sampled.append({
                     'point': point,
@@ -229,6 +229,13 @@ class MOE(BaseStrategy):
                 # not sure how to deal with these yet
             else:
                 raise RuntimeError('unrecognized status: %s' % status)
+
+        # shift the 'score' to be zero mean, which is suggested
+        # in the MOE docs
+        # http://yelp.github.io/MOE/moe.views.schemas.html#moe.views.schemas.base_schemas.GpHistoricalInfo
+        mean = np.mean([p['value'] for p in points_sampled])
+        for p in points_sampled:
+            p['value'] = p['value'] - mean
 
         return {
             'num_to_sample': 1,

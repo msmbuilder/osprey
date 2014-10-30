@@ -4,64 +4,50 @@ Osprey
 Osprey is a tool for practical hyperparameter optimization of machine learning
 algorithms. It's designed to provide a practical, **easy to use** way for
 application scientists to find parameters that maximize the cross-validation
-score of a model. Osprey is being developed by researchers at Stanford
-University with primary application areas in computations protein dynamics and
-drug design.
+score of a model on their dataset. Osprey is being developed by researchers at
+Stanford University with primary application areas in computations protein
+dynamics and drug design.
 
 Overview
 --------
-Osprey is a command line tool. It runs using a simple configuration file which
-sets up the problem by describing the :ref:`estimator <estimator>`,
-:ref:`search space <search_space>`, :ref:`strategy <strategies>`,
+``osprey`` is a command line tool. It runs using a simple :ref:`config file
+<config_file>` which sets up the problem by describing the :ref:`estimator
+<estimator>`, :ref:`search space <search_space>`, :ref:`strategy <strategy>`,
 :ref:`dataset <dataset_loader>`, :ref:`cross validation <cross_validation>`,
 and storage for the :ref:`results <trials>`.
 
 
-Related tools include and Spearmint, Hyperopt, MOE
+Related tools include and `spearmint <https://github.com/JasperSnoek/spearmint>`_,
+`hyperopt <http://hyperopt.github.io/hyperopt/>`_, and
+`MOE <http://yelp.github.io/MOE/>`_. Both hyperopt and MOE can serve as backend
+:ref:`search strategies <strategy>` for osprey.
 
 
-
-::
-
-    $ cat config.yaml
-    estimator:
-      entry_point: sklearn.linear_model.LogisticRegression
-
-    search_space:
-      penalty:
-        choices: ['l1', 'l2']
-        type: enum
-      C:
-        min: 1e-10
-        max: 10
-        warp: log
-        type: float
-
-    cv: 5
-
-    dataset_loader:
-      name: sklearn_dataset
-      params:
-        method: load_digits
-
-    trials:
-        uri: sqlite:///osprey-trials.db
+To get started, run ``osprey skeleton`` to create an example config file, and
+then boot up one or more parallel instances of ``osprey worker``.
 
 
+.. raw:: html
+
+   <div style="display:none">
 
 .. toctree::
    :maxdepth: 2
 
+   background
    installation
-   estimator
-   search_space
+   getting_started
+   config_file
    batch_submission
 
+.. raw:: html
 
-Indices and tables
-==================
+   </div>
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. Indices and tables
+.. ==================
+..
+.. * :ref:`genindex`
+.. * :ref:`modindex`
+.. * :ref:`search`
 

@@ -1,4 +1,0 @@
-.. _estimator:
-
-Estimator
-=========

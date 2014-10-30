@@ -33,6 +33,7 @@ def execute(args, parser):
 
     bk.output_file(args.filename, title='osprey')
 
+    plot_4(data)
     plot_1(data)
     plot_2(data)
     plot_3(data, config.search_space())
@@ -101,6 +102,27 @@ def plot_3(data, ss):
     yax.axis_label = 't-SNE coord 2'
 
 
+def plot_4(data):
+    """Scatter plot of score vs each param
+    """
+    params = nonconstant_parameters(data)
+    scores = np.array([d['mean_cv_score'] for d in data])
+    order = np.argsort(scores)
+
+    for key in params.keys():
+        xlabel = key
+
+        x = params[xlabel][order]
+        y = scores[order]
+        params = params.loc[order]
+        radius = (np.max(x) - np.min(x)) / 100
+
+        build_scatter_tooltip(
+            x=x, y=y, radius=radius, add_line=False, tt=params,
+            xlabel=xlabel, title='Score vs %s' % key)
+        # bk.line(x, y, line_width=2)
+
+
 def nonconstant_parameters(data):
     assert len(data) > 0
     df = pd.DataFrame([d['parameters'] for d in data])
@@ -109,12 +131,12 @@ def nonconstant_parameters(data):
     return filtered
 
 
-def build_scatter_tooltip(x, y, tt, add_line=True, title='My Plot',
+def build_scatter_tooltip(x, y, tt, add_line=True, radius=3, title='My Plot',
                           xlabel='Iteration number', ylabel='Score'):
     bk.figure(title=title)
     bk.hold()
     bk.circle(
-        x, y, radius=3, source=ColumnDataSource(tt),
+        x, y, radius=radius, source=ColumnDataSource(tt),
         fill_alpha=0.6, line_color=None, tools=TOOLS)
 
     if add_line:

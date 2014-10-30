@@ -53,4 +53,4 @@ script:
   # exclude versioneer.py and _version.py from style checking, since we don't
   # write/maintain them
   - flake8 `find . -name '*.py'  ! -name build ! -path './build/*' !
-            -name versioneer.py ! -name _version.py | xargs`
+            -path './docs*' ! -name versioneer.py ! -name _version.py | xargs`

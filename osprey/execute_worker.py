@@ -2,6 +2,7 @@ from __future__ import print_function, absolute_import, division
 
 import os
 import sys
+import time
 import signal
 import traceback
 from socket import gethostname
@@ -79,8 +80,11 @@ def initialize_trial(strategy, searchspace, estimator, config_sha1,
 
         print('History contains: %d trials' % len(history))
         print('Choosing next hyperparameters with %s...' % strategy.short_name)
+        start = time.time()
         params = strategy.suggest(history, searchspace)
-        print('  %r\n' % params)
+        print('  %r' % params)
+        print('(%s tooks %.3f s)\n' % (strategy.short_name,
+                                       time.time() - start))
         assert len(params) == searchspace.n_dims
 
         # make sure we get _all_ the parameters, including defaults on the

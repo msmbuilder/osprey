@@ -4,7 +4,6 @@ import numpy as np
 from matplotlib import cm
 from matplotlib.colors import rgb2hex
 from sklearn.manifold import TSNE
-from sklearn.preprocessing import MinMaxScaler
 from collections import OrderedDict
 
 from .trials import Trial
@@ -79,7 +78,9 @@ def plot_3(data, ss):
     # Embed into 2 dimensions with t-SNE
     X = TSNE(n_components=2).fit_transform(warped)
 
-    color = MinMaxScaler().fit_transform(np.exp(scores))
+    e_scores = np.exp(scores)
+    mine, maxe = np.min(e_scores), np.max(e_scores)
+    color = (e_scores - mine) / (maxe - mine)
     mapped_colors = map(rgb2hex, cm.get_cmap('RdBu_r')(color))
 
     bk.figure(title='t-SNE (unsupervised)')
@@ -87,7 +88,7 @@ def plot_3(data, ss):
     df_params = nonconstant_parameters(data)
     df_params['score'] = scores
     bk.circle(
-        X[:, 0], X[:, 1], color=mapped_colors, radius=3,
+        X[:, 0], X[:, 1], color=mapped_colors, radius=1,
         source=ColumnDataSource(df_params), fill_alpha=0.6,
         line_color=None, tools=TOOLS)
     cp = bk.curplot()
@@ -101,6 +102,7 @@ def plot_3(data, ss):
 
 
 def nonconstant_parameters(data):
+    assert len(data) > 0
     df = pd.DataFrame([d['parameters'] for d in data])
     # http://stackoverflow.com/a/20210048/1079728
     filtered = df.loc[:, (df != df.ix[0]).any()]

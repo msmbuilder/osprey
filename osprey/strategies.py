@@ -172,9 +172,19 @@ class HyperoptTPE(BaseStrategy):
 class MOE(BaseStrategy):
     short_name = 'moe'
 
-    def __init__(self, url=None, noise_variance=0.1):
+    def __init__(self, url=None, noise_variance=0.1, method='constant_liar',
+                 lie_method='constant_liar_min'):
         self.url = url
         self.noise_variance = noise_variance
+        self.method = method
+        if method not in ('epi', 'kriging', 'constant_liar'):
+            raise ValueError("method must be one of 'epi', 'kriging', "
+                             "'constant_liar'")
+
+        if lie_method not in ('constant_liar_min', 'constant_liar_max',
+                              'constant_liar_mean'):
+            raise ValueError("method lie_method be one of 'constant_liar_min',"
+                             " 'constant_liar_max', 'constant_liar_mean'")
 
         if self.url:
             self._use_local_moe = False
@@ -238,7 +248,7 @@ class MOE(BaseStrategy):
         for p in points_sampled:
             p['value'] = p['value'] - mean
 
-        return {
+        request = {
             'num_to_sample': 1,
             'domain_info': {
                 'dim': searchspace.n_dims,
@@ -248,6 +258,13 @@ class MOE(BaseStrategy):
             },
             'points_being_sampled': points_being_sampled
         }
+
+        if self.method == 'constant_liar':
+            request['lie_method'] = self.lie_method
+            request['lie_noise_variance'] = 1e-12
+        if self.method == 'kriging':
+            request['kriging_noise_variance'] = 1e-12
+        return request
 
     def _build_response(self, results, searchspace):
         if 'optimizer_success' not in results['status']:
@@ -267,7 +284,7 @@ class MOE(BaseStrategy):
         base = self.url
         if base.endswith('/'):
             base = base[:-1]
-        endpoint = base + '/gp/next_points/epi'
+        endpoint = base + '/gp/next_points/' + self.method
         parsed = urlparse(endpoint)
         if parsed.netloc == '':
             endpoint = 'http://' + endpoint
@@ -283,10 +300,23 @@ class MOE(BaseStrategy):
 
     def _call_moe_locally(self, request):
         from moe.views.rest.gp_next_points_epi import GpNextPointsEpi
+        from moe.views.rest.gp_next_points_kriging import GpNextPointsKriging
+        from moe.views.rest.gp_next_points_constant_liar import \
+            GpNextPointsConstantLiar
 
         mock_object = Namespace(json_body=request)
-        gp_next_points_epi = GpNextPointsEpi(mock_object)
-        result = gp_next_points_epi.gp_next_points_epi_view()
+        if self.method == 'epi':
+            gp_next_points_epi = GpNextPointsEpi(mock_object)
+            result = gp_next_points_epi.gp_next_points_epi_view()
+        elif self.method == 'kriging':
+            gp_next_points_kriging = GpNextPointsKriging(mock_object)
+            result = gp_next_points_kriging.gp_next_points_kriging_view()
+        elif self.method == 'constant_liar':
+            gp_next_points_cl = GpNextPointsConstantLiar(mock_object)
+            result = gp_next_points_cl.gp_next_points_constant_liar_view()
+        else:
+            raise ValueError('unrecognized method: %s' % self.method)
+
         return result
 
 
@@ -298,4 +328,5 @@ def urlopen_with_retries(url, data=None, timeout=DEFAULT_TIMEOUT, n_retries=3):
         except (URLError, HTTPError) as e:
             error = e
             continue
+    print("Error hitting url=%s" % url, file=sys.stderr)
     raise error

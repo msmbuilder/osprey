@@ -1,4 +1,5 @@
 import os
+import osprey._version
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 if not on_rtd:
@@ -22,9 +23,9 @@ project = u'osprey'
 copyright = u'2014, Stanford University'
 
 # The short X.Y version.
-version = '0.2'
+version = osprey._version.version_version
 # The full version, including alpha/beta/rc tags.
-release = '0.2'
+release = osprey._version.version_version
 
 # directories to ignore when looking for source files.
 exclude_patterns = ['_build']

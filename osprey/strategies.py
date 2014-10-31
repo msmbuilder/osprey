@@ -215,6 +215,10 @@ class MOE(BaseStrategy):
         for param_dict, score, status in history:
             # transform points into the MOE domain. This invloves bringing
             # int and enum variables to floating point, etc.
+            if status == 'FAILED':
+                # not sure how to deal with these yet
+                continue
+
             point = searchspace.point_to_moe(param_dict)
             if status == 'SUCCEEDED':
                 points_sampled.append({
@@ -224,9 +228,6 @@ class MOE(BaseStrategy):
                 })
             elif status == 'PENDING':
                 points_being_sampled.append(point)
-            elif status == 'FAILED':
-                pass
-                # not sure how to deal with these yet
             else:
                 raise RuntimeError('unrecognized status: %s' % status)
 

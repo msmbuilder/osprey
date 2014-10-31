@@ -11,7 +11,8 @@ Each osprey experiment combines an dataset, an estimator, a search space
 (and engine), cross validation and asynchronous serialization for distributed
 parallel optimization of model hyperparameters.
 
-[Full documentation](http://osprey.rtfd.org)
+
+->[Full documentation](http://osprey.rtfd.org)<-
 
 Example (with [mixtape](https://github.com/rmcgibbo/mixtape) models/datasets)
 -------------------------------------------------------------

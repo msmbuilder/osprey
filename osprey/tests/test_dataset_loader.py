@@ -23,8 +23,8 @@ def test_FilenameDatasetLoader_1():
         loader = FilenameDatasetLoader('filename-*')
         X, y = loader.load()
 
-        assert X == list(map(os.path.abspath, ['filename-1', 'filename-2']))
-        assert y is None
+        assert X == list(map(os.path.abspath, ['filename-1', 'filename-2'])), X
+        assert y is None, y
 
     finally:
         os.chdir(cwd)
@@ -59,8 +59,8 @@ def test_JoblibDatasetLoader_1():
         dump({'foo': 'baz', 'bar': 'qux'}, 'foobar.pkl')
         loader = JoblibDatasetLoader('foobar.pkl', x_name='foo', y_name='bar')
         X, y = loader.load()
-        assert X == 'baz'
-        assert y == 'qux'
+        assert X == 'baz', X
+        assert y == 'qux', y
 
     finally:
         os.chdir(cwd)

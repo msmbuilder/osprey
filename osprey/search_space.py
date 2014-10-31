@@ -21,8 +21,6 @@ except ImportError:
     hp = mock_module('hyperopt')
     pyll = mock_module('hyperopt')
 
-EPS = 1e-6
-
 
 class SearchSpace(object):
     def __init__(self):
@@ -116,13 +114,13 @@ class IntVariable(namedtuple('IntVariable', ('name', 'min', 'max'))):
         return pyll.scope.int(hp.uniform(self.name, self.min, self.max+1))
 
     def domain_to_moe(self):
-        return {'min': self.min - (0.5 - EPS), 'max': self.max + (0.5 - EPS)}
+        return {'min': self.min - 0.5, 'max': self.max + 0.5}
 
     def point_to_moe(self, value):
         return float(value)
 
     def point_from_moe(self, moevalue):
-        return int(np.round(moevalue))
+        return int(np.fix(moevalue))
 
 
 class FloatVariable(namedtuple('FloatVariable',
@@ -184,7 +182,7 @@ class EnumVariable(namedtuple('EnumVariable', ('name', 'choices'))):
         return hp.choice(self.name, self.choices)
 
     def domain_to_moe(self):
-        return {'min': - (0.5 - EPS), 'max': len(self.choices) - (0.5 + EPS)}
+        return {'min': -0.5, 'max': len(self.choices) - 0.5}
 
     def point_to_moe(self, value):
         try:
@@ -193,4 +191,4 @@ class EnumVariable(namedtuple('EnumVariable', ('name', 'choices'))):
             raise ValueError('%s not in %s' % (value, self.choices))
 
     def point_from_moe(self, moevalue):
-        return self.choices[int(np.round(moevalue))]
+        return self.choices[int(np.fix(moevalue))]

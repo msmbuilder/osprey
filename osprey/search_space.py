@@ -184,7 +184,7 @@ class EnumVariable(namedtuple('EnumVariable', ('name', 'choices'))):
         return hp.choice(self.name, self.choices)
 
     def domain_to_moe(self):
-        return {'min': - (0.5 - EPS), 'max': len(self.choices) - (0.5 - EPS)}
+        return {'min': - (0.5 - EPS), 'max': len(self.choices) - (0.5 + EPS)}
 
     def point_to_moe(self, value):
         try:

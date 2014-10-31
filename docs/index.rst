@@ -5,7 +5,7 @@ Osprey is a tool for practical hyperparameter optimization of machine learning
 algorithms. It's designed to provide a practical, **easy to use** way for
 application scientists to find parameters that maximize the cross-validation
 score of a model on their dataset. Osprey is being developed by researchers at
-Stanford University with primary application areas in computations protein
+Stanford University with primary application areas in computational protein
 dynamics and drug design.
 
 Overview

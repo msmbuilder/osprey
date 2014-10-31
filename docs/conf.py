@@ -23,9 +23,9 @@ project = u'osprey'
 copyright = u'2014, Stanford University'
 
 # The short X.Y version.
-version = osprey._version.version_version
+version = osprey._version.get_versions()['version']
 # The full version, including alpha/beta/rc tags.
-release = osprey._version.version_version
+release = osprey._version.get_versions()['version']
 
 # directories to ignore when looking for source files.
 exclude_patterns = ['_build']

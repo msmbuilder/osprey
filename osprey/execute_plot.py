@@ -24,12 +24,11 @@ TOOLS = "pan,wheel_zoom,box_zoom,reset,hover"
 
 def execute(args, parser):
     config = Config(args.config, verbose=False)
-    session = config.trials()
-
-    q = (session.query(Trial)
-         .filter(Trial.status == 'SUCCEEDED')
-         .order_by(Trial.started))
-    data = [curr.to_dict() for curr in q.all()]
+    with config.trialscontext() as session:
+        q = (session.query(Trial)
+             .filter(Trial.status == 'SUCCEEDED')
+             .order_by(Trial.started))
+        data = [curr.to_dict() for curr in q.all()]
 
     bk.output_file(args.filename, title='osprey')
 
@@ -110,20 +109,22 @@ def plot_4(data):
     order = np.argsort(scores)
 
     for key in params.keys():
-        xlabel = key
+        if params[key].dtype == np.dtype('bool'):
+            params[key] = params[key].astype(np.int)
 
-        x = params[xlabel][order]
+    for key in params.keys():
+        x = params[key][order]
         y = scores[order]
         params = params.loc[order]
         try:
-            radius = (np.max(x) - np.min(x)) / 100
+            radius = (np.max(x) - np.min(x)) / 100.0
         except:
             print("error making plot4 for '%s'" % key)
             continue
 
         build_scatter_tooltip(
             x=x, y=y, radius=radius, add_line=False, tt=params,
-            xlabel=xlabel, title='Score vs %s' % key)
+            xlabel=key, title='Score vs %s' % key)
         # bk.line(x, y, line_width=2)
 
 

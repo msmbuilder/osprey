@@ -172,7 +172,7 @@ class HyperoptTPE(BaseStrategy):
 class MOE(BaseStrategy):
     short_name = 'moe'
 
-    def __init__(self, url=None, noise_variance=0.1, method='kriging',
+    def __init__(self, url=None, noise_variance=0.1, method='constant_liar',
                  lie_method='constant_liar_min'):
         self.url = url
         self.noise_variance = noise_variance

@@ -83,7 +83,7 @@ def initialize_trial(strategy, searchspace, estimator, config_sha1,
         start = time.time()
         params = strategy.suggest(history, searchspace)
         print('  %r' % params)
-        print('(%s tooks %.3f s)\n' % (strategy.short_name,
+        print('(%s took %.3f s)\n' % (strategy.short_name,
                                        time.time() - start))
         assert len(params) == searchspace.n_dims
 

@@ -23,7 +23,8 @@ def test_FilenameDatasetLoader_1():
         loader = FilenameDatasetLoader('filename-*')
         X, y = loader.load()
 
-        assert X == list(map(os.path.abspath, ['filename-1', 'filename-2'])), X
+        X_ref = list(map(os.path.abspath, ['filename-1', 'filename-2']))
+        assert sorted(X) == X_ref, X
         assert y is None, y
 
     finally:

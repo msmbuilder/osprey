@@ -21,7 +21,7 @@ class MDTrajDatasetLoader(BaseDatasetLoader):
     def load(self):
         import mdtraj
 
-        filenames = glob.glob(expand_path(self.trajectories))
+        filenames = sorted(glob.glob(expand_path(self.trajectories)))
 
         top = self.topology
         if top is not None:
@@ -45,7 +45,7 @@ class FilenameDatasetLoader(BaseDatasetLoader):
         self.abs_path = abs_path
 
     def load(self):
-        filenames = glob.glob(expand_path(self.traj_glob))
+        filenames = sorted(glob.glob(expand_path(self.traj_glob)))
         if self.abs_path:
             filenames = [os.path.abspath(fn) for fn in filenames]
         return filenames, None
@@ -69,7 +69,7 @@ class JoblibDatasetLoader(BaseDatasetLoader):
 
         X, y = [], []
 
-        filenames = glob.iglob(expand_path(self.filenames))
+        filenames = sorted(glob.glob(expand_path(self.filenames)))
         for fn in filenames:
             obj = joblib.load(fn)
             if isinstance(obj, (list, np.ndarray)):

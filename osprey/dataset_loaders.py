@@ -2,6 +2,7 @@ from __future__ import print_function, absolute_import, division
 
 import glob
 import os
+import numpy as np
 from .utils import expand_path
 
 
@@ -20,7 +21,7 @@ class MDTrajDatasetLoader(BaseDatasetLoader):
     def load(self):
         import mdtraj
 
-        filenames = glob.glob(expand_path(self.trajectories))
+        filenames = sorted(glob.glob(expand_path(self.trajectories)))
 
         top = self.topology
         if top is not None:
@@ -44,7 +45,44 @@ class FilenameDatasetLoader(BaseDatasetLoader):
         self.abs_path = abs_path
 
     def load(self):
-        filenames = glob.glob(expand_path(self.traj_glob))
+        filenames = sorted(glob.glob(expand_path(self.traj_glob)))
         if self.abs_path:
             filenames = [os.path.abspath(fn) for fn in filenames]
         return filenames, None
+
+
+class JoblibDatasetLoader(BaseDatasetLoader):
+    short_name = 'joblib'
+
+    def __init__(self, filenames, x_name=None, y_name=None,
+                 system_joblib=False):
+        self.filenames = filenames
+        self.x_name = x_name
+        self.y_name = y_name
+        self.system_joblib = system_joblib
+
+    def load(self):
+        if self.system_joblib:
+            import joblib
+        else:
+            from sklearn.externals import joblib
+
+        X, y = [], []
+
+        filenames = sorted(glob.glob(expand_path(self.filenames)))
+        for fn in filenames:
+            obj = joblib.load(fn)
+            if isinstance(obj, (list, np.ndarray)):
+                X.append(obj)
+            else:
+                X.append(obj[self.x_name])
+                y.append(obj[self.y_name])
+
+        if len(X) == 1:
+            X = X[0]
+        if len(y) == 1:
+            y = y[0]
+        elif len(y) == 0:
+            y = None
+
+        return X, y

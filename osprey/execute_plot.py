@@ -115,7 +115,11 @@ def plot_4(data):
         x = params[xlabel][order]
         y = scores[order]
         params = params.loc[order]
-        radius = (np.max(x) - np.min(x)) / 100
+        try:
+            radius = (np.max(x) - np.min(x)) / 100
+        except:
+            print("error making plot4 for '%s'" % key)
+            continue
 
         build_scatter_tooltip(
             x=x, y=y, radius=radius, add_line=False, tt=params,

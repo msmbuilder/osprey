@@ -177,6 +177,7 @@ class MOE(BaseStrategy):
         self.url = url
         self.noise_variance = noise_variance
         self.method = method
+        self.lie_method = lie_method
         if method not in ('epi', 'kriging', 'constant_liar'):
             raise ValueError("method must be one of 'epi', 'kriging', "
                              "'constant_liar'")

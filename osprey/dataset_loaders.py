@@ -9,6 +9,9 @@ from .utils import expand_path
 class BaseDatasetLoader(object):
     short_name = None
 
+    def load(self):
+        raise NotImplementedError('should be implemented in subclass')
+
 
 class MDTrajDatasetLoader(BaseDatasetLoader):
     short_name = 'mdtraj'
@@ -84,5 +87,29 @@ class JoblibDatasetLoader(BaseDatasetLoader):
             y = y[0]
         elif len(y) == 0:
             y = None
+
+        return X, y
+
+
+class SklearnDatasetLoader(BaseDatasetLoader):
+    short_name = 'sklearn_dataset'
+
+    def __init__(self, method, x_name='data', y_name='target'):
+        self.method = method
+        self.x_name = x_name
+        self.y_name = y_name
+
+    def load(self):
+        import sklearn.datasets
+
+        try:
+            loader = getattr(sklearn.datasets, self.method)
+        except AttributeError:
+            raise RuntimeError('no %s in sklearn.datasets' % self.method)
+
+        bunch = loader()
+
+        X = bunch[self.x_name]
+        y = bunch[self.y_name]
 
         return X, y

@@ -4,10 +4,12 @@ import shutil
 import tempfile
 
 import numpy as np
+import sklearn.datasets
 from sklearn.externals.joblib import dump
 
 from osprey.dataset_loaders import FilenameDatasetLoader
 from osprey.dataset_loaders import JoblibDatasetLoader
+from osprey.dataset_loaders import SklearnDatasetLoader
 
 
 def test_FilenameDatasetLoader_1():
@@ -66,3 +68,11 @@ def test_JoblibDatasetLoader_1():
     finally:
         os.chdir(cwd)
         shutil.rmtree(dirname)
+
+
+def test_SklearnDatasetLoader_1():
+    assert SklearnDatasetLoader.short_name == 'sklearn_dataset'
+    X, y = SklearnDatasetLoader('load_iris').load()
+    iris = sklearn.datasets.load_iris()
+    assert np.all(X == iris['data'])
+    assert np.all(y == iris['target'])

@@ -1,0 +1,27 @@
+estimator:
+  entry_point: sklearn.svm.SVC
+
+strategy:
+  name: hyperopt_tpe
+
+search_space:
+  C:
+    min: 0.1
+    max: 10
+    type: float
+
+  gamma:
+    min: 1e-5
+    max: 1
+    warp: log
+    type: float
+
+cv: 5
+
+dataset_loader:
+  name: sklearn_dataset
+  params:
+    method: load_digits
+
+trials:
+    uri: sqlite:///osprey-trials.db

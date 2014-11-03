@@ -2,7 +2,9 @@ Batch Submission
 ================
 
 Multiple ``osprey worker`` processes can be run simultaneously and connect
-to the same trials database
+to the same trials database. The following scripts might be useful as templates
+for submitting multiple parallel ``osprey worker`` s to a cluster batch scheduling
+system.
 
 Example PBS/TORQUE Script
 -------------------------

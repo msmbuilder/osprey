@@ -90,7 +90,7 @@ def test_moe_rest_1():
         if isinstance(searchspace[k], EnumVariable):
             assert v in searchspace[k].choices
         elif isinstance(searchspace[k], FloatVariable):
-            assert searchspace[k].min <= v < searchspace[k].max
+            assert searchspace[k].min <= v <= searchspace[k].max
         elif isinstance(searchspace[k], IntVariable):
             assert searchspace[k].min <= v <= searchspace[k].max
         else:

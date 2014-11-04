@@ -114,13 +114,13 @@ class IntVariable(namedtuple('IntVariable', ('name', 'min', 'max'))):
         return pyll.scope.int(hp.uniform(self.name, self.min, self.max+1))
 
     def domain_to_moe(self):
-        return {'min': self.min - 0.5, 'max': self.max + 0.5}
+        return {'min': 0.0, 'max': 1.0}
 
     def point_to_moe(self, value):
-        return float(value)
+        return (value - self.min) / (self.max - self.min)
 
     def point_from_moe(self, moevalue):
-        return int(np.fix(moevalue))
+        return self.min + (moevalue * (self.max - self.min))
 
 
 class FloatVariable(namedtuple('FloatVariable',
@@ -146,25 +146,27 @@ class FloatVariable(namedtuple('FloatVariable',
         raise ValueError('unknown warp: %s' % self.warp)
 
     def domain_to_moe(self):
-        if self.warp is None:
-            return {'min': self.min, 'max': self.max}
-        elif self.warp == 'log':
-            return {'min': np.log(self.min), 'max': np.log(self.max)}
-        raise ValueError('unknown warp: %s' % self.warp)
+        return {'min': 0.0, 'max': 1.0}
 
     def point_to_moe(self, value):
         if self.warp is None:
-            return value
+            return (value - self.min) / (self.max - self.min)
         elif self.warp == 'log':
-            return np.log(value)
+            rng = np.log(self.max) - np.log(self.min)
+            return (np.log(value) - np.log(self.min)) / rng
+
         raise ValueError('unknown warp: %s' % self.warp)
 
     def point_from_moe(self, moevalue):
         if self.warp is None:
-            return moevalue
+            outvalue = self.min + (moevalue * (self.max - self.min))
         elif self.warp == 'log':
-            return np.exp(moevalue)
-        raise ValueError('unknown warp: %s' % self.warp)
+            rng = np.log(self.max) - np.log(self.min)
+            outvalue = np.exp(np.log(self.min) + moevalue * rng)
+        else:
+            raise ValueError('unknown warp: %s' % self.warp)
+
+        return np.clip(outvalue, self.min, self.max)
 
 
 class EnumVariable(namedtuple('EnumVariable', ('name', 'choices'))):
@@ -182,13 +184,14 @@ class EnumVariable(namedtuple('EnumVariable', ('name', 'choices'))):
         return hp.choice(self.name, self.choices)
 
     def domain_to_moe(self):
-        return {'min': -0.5, 'max': len(self.choices) - 0.5}
+        return {'min': 0.0, 'max': 1.0}
 
     def point_to_moe(self, value):
         try:
-            return next(i for i, c in enumerate(self.choices) if c == value)
+            index = next(i for i, c in enumerate(self.choices) if c == value)
         except StopIteration:
             raise ValueError('%s not in %s' % (value, self.choices))
+        return float(index) / (len(self.choices) - 1)
 
     def point_from_moe(self, moevalue):
-        return self.choices[int(np.fix(moevalue))]
+        return self.choices[int(np.round(moevalue * (len(self.choices) - 1)))]

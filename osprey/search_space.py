@@ -120,7 +120,7 @@ class IntVariable(namedtuple('IntVariable', ('name', 'min', 'max'))):
         return (value - self.min) / (self.max - self.min)
 
     def point_from_moe(self, moevalue):
-        return self.min + (moevalue * (self.max - self.min))
+        return int(self.min + (moevalue * (self.max - self.min)))
 
 
 class FloatVariable(namedtuple('FloatVariable',

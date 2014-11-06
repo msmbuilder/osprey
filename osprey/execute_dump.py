@@ -24,6 +24,6 @@ def execute(args, parser):
         for curr in session.query(Trial).all():
             row = [getattr(curr, column.name) for column in columns]
             outcsv.writerow(row)
-        value = buf.getvalue().encode('string_escape')
+        value = buf.getvalue()
 
     print(value)

@@ -116,7 +116,6 @@ $ git clone https://github.com/rmcgibbo/osprey.git
 $ cd osprey && python setup.py install
 ```
 
-
 Dependencies
 ------------
 - `six`

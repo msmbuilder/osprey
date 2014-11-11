@@ -302,8 +302,7 @@ class Config(object):
         else:
             cv_name = self.get_value('cv/name')
             cv_params = self.get_value('cv/params', default={})
-        return init_subclass_by_name(
-            BaseCrossValidator, cv_name, cv_params).create()
+        return init_subclass_by_name(BaseCrossValidator, cv_name, cv_params)
 
     def sha1(self):
         """SHA1 hash of the config file itself."""

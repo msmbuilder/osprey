@@ -12,7 +12,7 @@ class BaseCrossValidator(object):
 class ShuffleSplitValidator(BaseCrossValidator):
     short_name = 'shufflesplit'
 
-    def __init__(self, n_iter = 5, test_size=0.5, train_size=None,
+    def __init__(self, n_iter=5, test_size=0.5, train_size=None,
             random_state=None):
 
         self.n_iter = n_iter
@@ -26,3 +26,18 @@ class ShuffleSplitValidator(BaseCrossValidator):
         return lambda n : ShuffleSplit(n, n_iter = self.n_iter, test_size =
                 self.test_size, train_size = self.train_size, random_state =
                 self.random_state)
+
+class KFoldValidator(BaseCrossValidator):
+    short_name = 'kfold'
+
+    def __init__(self, n_folds=5, shuffle=False, random_state=None):
+
+        self.n_folds = n_folds
+        self.shuffle = shuffle
+        self.random_state = random_state
+
+    def create(self):
+        from sklearn.cross_validation import KFold
+
+        return lambda n : KFold(n, n_folds = self.n_folds, shuffle =
+                self.shuffle, random_state = self.random_state)

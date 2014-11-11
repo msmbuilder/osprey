@@ -48,7 +48,7 @@ def plot_1(data):
     df_all = pd.DataFrame(data)
     df_params = nonconstant_parameters(data)
     build_scatter_tooltip(
-        x=df_all['id'], y=df_all['mean_cv_score'], tt=df_params,
+        x=df_all['id'], y=df_all['mean_test_score'], tt=df_params,
         title='All Iterations')
 
 
@@ -57,12 +57,12 @@ def plot_2(data):
     df_all = pd.DataFrame(data)
     df_params = nonconstant_parameters(data)
     x = [df_all['id'][0]]
-    y = [df_all['mean_cv_score'][0]]
+    y = [df_all['mean_test_score'][0]]
     params = [df_params.loc[0]]
     for i in range(len(df_all)):
-        if df_all['mean_cv_score'][i] > y[-1]:
+        if df_all['mean_test_score'][i] > y[-1]:
             x.append(df_all['id'][i])
-            y.append(df_all['mean_cv_score'][i])
+            y.append(df_all['mean_test_score'][i])
             params.append(df_params.loc[i])
     build_scatter_tooltip(
         x=x, y=y, tt=pd.DataFrame(params), title='Running best')
@@ -71,7 +71,7 @@ def plot_2(data):
 def plot_3(data, ss):
     """t-SNE embedding of the parameters, colored by score
     """
-    scores = np.array([d['mean_cv_score'] for d in data])
+    scores = np.array([d['mean_test_score'] for d in data])
     # maps each parameters to a vector of floats
     warped = np.array([ss.point_to_moe(d['parameters']) for d in data])
 
@@ -105,7 +105,7 @@ def plot_4(data):
     """Scatter plot of score vs each param
     """
     params = nonconstant_parameters(data)
-    scores = np.array([d['mean_cv_score'] for d in data])
+    scores = np.array([d['mean_test_score'] for d in data])
     order = np.argsort(scores)
 
     for key in params.keys():

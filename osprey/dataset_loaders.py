@@ -29,8 +29,10 @@ class MDTrajDatasetLoader(BaseDatasetLoader):
         top = self.topology
         if top is not None:
             top = expand_path(self.topology)
-
-        X = [mdtraj.load(f, top=top, stride=self.stride) for f in filenames]
+            X = [mdtraj.load(f, top=top, stride=self.stride)
+                 for f in filenames]
+        else:
+            X = [mdtraj.load(f, stride=self.stride) for f in filenames]
         y = None
 
         return X, y

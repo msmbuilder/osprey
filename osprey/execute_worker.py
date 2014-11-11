@@ -37,7 +37,8 @@ def execute(args, parser):
 
     print('\nLoading dataset...')
     X, y = config.dataset()
-    print('  %d elements with%s labels' % (len(X), 'out' if y is None else ''))
+    print('  %d elements with %s labels'
+          % (len(X), 'out' if y is None else ''))
     print('Instantiated estimator:')
     print('  %r' % estimator)
     print(searchspace)

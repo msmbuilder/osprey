@@ -43,3 +43,15 @@ class KFoldValidator(BaseCrossValidator):
         return lambda n: KFold(n, n_folds=self.n_folds,
                                shuffle=self.shuffle,
                                random_state=self.random_state)
+
+
+class LeaveOneOutValidator(BaseCrossValidator):
+    short_name = 'LOO'
+
+    def __init__(self):
+        pass
+
+    def create(self):
+        from sklearn.cross_validation import LeaveOneOut
+
+        return lambda n: LeaveOneOut(n)

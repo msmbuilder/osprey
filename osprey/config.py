@@ -47,7 +47,7 @@ FIELDS = {
     'trials':          ['uri', 'project_name'],
     'search_space':    dict,
     'strategy':        ['name', 'params'],
-    'cv':              ['name', 'params'],
+    'cv':              (int, dict),
     'scoring':         (str, type(None)),
 }
 
@@ -295,9 +295,13 @@ class Config(object):
         return scoring
 
     def cv(self):
-        cv_name  = self.get_value('cv/name')
-        cv_params = self.get_value('cv/params', default={})
-
+        cv = self.get_section('cv')
+        if isinstance(cv,int):
+            cv_name = 'kfold'
+            cv_params = {'n_folds':cv}
+        else:
+            cv_name  = self.get_value('cv/name')
+            cv_params = self.get_value('cv/params', default={})
         return init_subclass_by_name(
                     BaseCrossValidator, cv_name, cv_params).create()
 

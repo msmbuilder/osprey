@@ -35,6 +35,7 @@ from .utils import dict_merge, in_directory, prepend_syspath
 from .search_space import SearchSpace
 from .strategies import BaseStrategy
 from .dataset_loaders import BaseDatasetLoader
+from .cross_validators import BaseCrossValidator
 from .trials import make_session
 from .subclass_factory import init_subclass_by_name
 from . import eval_scopes
@@ -46,7 +47,7 @@ FIELDS = {
     'trials':          ['uri', 'project_name'],
     'search_space':    dict,
     'strategy':        ['name', 'params'],
-    'cv':              int,
+    'cv':              ['name', 'params'],
     'scoring':         (str, type(None)),
 }
 
@@ -294,7 +295,11 @@ class Config(object):
         return scoring
 
     def cv(self):
-        return self.get_section('cv')
+        cv_name  = self.get_value('cv/name')
+        cv_params = self.get_value('cv/params', default={})
+
+        return init_subclass_by_name(
+                    BaseCrossValidator, cv_name, cv_params).create()
 
     def sha1(self):
         """SHA1 hash of the config file itself."""

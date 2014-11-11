@@ -20,6 +20,7 @@ from .config import Config
 from .trials import Trial
 from .utils import Unbuffered, format_timedelta, current_pretty_time
 
+from IPython import embed
 
 def execute(args, parser):
     start_time = datetime.now()
@@ -59,9 +60,10 @@ def execute(args, parser):
         trial_id, params = initialize_trial(
             strategy, searchspace, estimator, config_sha1=config_sha1,
             sessionbuilder=config.trialscontext)
+	#embed()
         s = run_single_trial(
             estimator=estimator, params=params, trial_id=trial_id,
-            scoring=scoring, X=X, y=y, cv=cv,
+            scoring=scoring, X=X, y=y, cv=cv(len(X)),
             sessionbuilder=config.trialscontext)
 
         statuses[i] = s

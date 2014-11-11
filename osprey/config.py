@@ -296,14 +296,14 @@ class Config(object):
 
     def cv(self):
         cv = self.get_section('cv')
-        if isinstance(cv,int):
+        if isinstance(cv, int):
             cv_name = 'kfold'
-            cv_params = {'n_folds':cv}
+            cv_params = {'n_folds': cv}
         else:
-            cv_name  = self.get_value('cv/name')
+            cv_name = self.get_value('cv/name')
             cv_params = self.get_value('cv/params', default={})
         return init_subclass_by_name(
-                    BaseCrossValidator, cv_name, cv_params).create()
+            BaseCrossValidator, cv_name, cv_params).create()
 
     def sha1(self):
         """SHA1 hash of the config file itself."""

@@ -46,7 +46,7 @@ class KFoldValidator(BaseCrossValidator):
 
 
 class LeaveOneOutValidator(BaseCrossValidator):
-    short_name = 'LOO'
+    short_name = 'loo'
 
     def __init__(self):
         pass

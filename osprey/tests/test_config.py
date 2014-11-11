@@ -106,7 +106,7 @@ def test_scoring():
 
 
 def test_cv():
-    from sklearn import ShuffleSplit
+    from sklearn.cross_validation import ShuffleSplit
     config = Config.fromdict({
         'cv': {'name':'shufflesplit', 'params':{'n_iter':10}}
     }, check_fields=False)

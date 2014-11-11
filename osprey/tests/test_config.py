@@ -106,7 +106,10 @@ def test_scoring():
 
 
 def test_cv():
+    from sklearn.cross_validation import ShuffleSplit
     config = Config.fromdict({
-        'cv': 2
+        'cv': {'name': 'shufflesplit', 'params': {'n_iter': 10}}
     }, check_fields=False)
-    assert config.cv() == 2
+    cv = config.cv()(100)
+    assert isinstance(cv, ShuffleSplit)
+    assert cv.n_iter == 10

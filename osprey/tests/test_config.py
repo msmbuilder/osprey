@@ -106,10 +106,10 @@ def test_scoring():
 
 
 def test_cv():
-    from types import LambdaType
+    from sklearn import ShuffleSplit
     config = Config.fromdict({
         'cv': {'name':'shufflesplit', 'params':{'n_iter':10}}
     }, check_fields=False)
-    cv = config.cv()
-    assert isinstance(cv,LambdaType)
-    assert cv.func_code.co_consts[2] == 10
+    cv = config.cv()(100)
+    assert isinstance(cv,ShuffleSplit)
+    assert cv.n_iter == 10

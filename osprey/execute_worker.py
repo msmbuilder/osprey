@@ -37,7 +37,8 @@ def execute(args, parser):
 
     print('\nLoading dataset...')
     X, y = config.dataset()
-    print('  %d elements with%s labels' % (len(X), 'out' if y is None else ''))
+    print('  %d elements with %s labels'
+          % (len(X), 'out' if y is None else ''))
     print('Instantiated estimator:')
     print('  %r' % estimator)
     print(searchspace)
@@ -59,9 +60,10 @@ def execute(args, parser):
         trial_id, params = initialize_trial(
             strategy, searchspace, estimator, config_sha1=config_sha1,
             sessionbuilder=config.trialscontext)
+
         s = run_single_trial(
             estimator=estimator, params=params, trial_id=trial_id,
-            scoring=scoring, X=X, y=y, cv=cv,
+            scoring=scoring, X=X, y=y, cv=cv(len(X)),
             sessionbuilder=config.trialscontext)
 
         statuses[i] = s

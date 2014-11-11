@@ -106,7 +106,10 @@ def test_scoring():
 
 
 def test_cv():
+    from types import LambdaType
     config = Config.fromdict({
-        'cv': 2
+        'cv': {'name':'shufflesplit', 'params':{'n_iter':10}}
     }, check_fields=False)
-    assert config.cv() == 2
+    cv = config.cv()
+    assert isinstance(cv,LambdaType)
+    assert cv.func_code.co_consts[2] == 10

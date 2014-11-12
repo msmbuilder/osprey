@@ -24,9 +24,10 @@ def fit_and_score_estimator(estimator, parameters, cv, X, y=None, scoring=None,
     set scores, which we want to save in the database, and because of the
     way it's written, you can't change it by subclassing or monkeypatching.
 
-    This function uses some undocumented internal APIs (non-public). It was
-    written against sklearn version 0.15.2, and tested against version
-    0.15.0b1, version 0.14 and before does not work.
+    This function uses some undocumented internal sklearn APIs (non-public).
+    It was written against sklearn version 0.15.2, and tested against version
+    0.15.0b1; version 0.14 and before fail, due to changes in the design of
+    the CV internals.
 
     Returns
     -------

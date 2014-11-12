@@ -1,21 +1,17 @@
 from __future__ import print_function, absolute_import, division
 
 
-class BaseCrossValidator(object):
+class BaseCVFactory(object):
     short_name = None
-    stratified = False
 
     def load(self):
         raise NotImplementedError('should be implemented in subclass')
 
-    def __call__(self, *args, **kwargs):
-        return self.create(*args, **kwargs)
-
-    def create(self, *args, **kwargs):
+    def create(self, X, y):
         raise NotImplementedError('should be implemented in subclass')
 
 
-class ShuffleSplitValidator(BaseCrossValidator):
+class ShuffleSplitFactory(BaseCVFactory):
     short_name = 'shufflesplit'
 
     def __init__(self, n_iter=10, test_size=0.1, train_size=None,
@@ -25,15 +21,16 @@ class ShuffleSplitValidator(BaseCrossValidator):
         self.train_size = train_size
         self.random_state = random_state
 
-    def create(self, n):
+    def create(self, X, y=None):
         from sklearn.cross_validation import ShuffleSplit
 
-        return ShuffleSplit(n, n_iter=self.n_iter, test_size=self.test_size,
+        return ShuffleSplit(len(X), n_iter=self.n_iter,
+                            test_size=self.test_size,
                             train_size=self.train_size,
                             random_state=self.random_state)
 
 
-class KFoldValidator(BaseCrossValidator):
+class KFoldFactory(BaseCVFactory):
     short_name = 'kfold'
 
     def __init__(self, n_folds=3, shuffle=False, random_state=None):
@@ -41,28 +38,27 @@ class KFoldValidator(BaseCrossValidator):
         self.shuffle = shuffle
         self.random_state = random_state
 
-    def create(self, n):
+    def create(self, X, y=None):
         from sklearn.cross_validation import KFold
 
-        return KFold(n, n_folds=self.n_folds, shuffle=self.shuffle,
+        return KFold(len(X), n_folds=self.n_folds, shuffle=self.shuffle,
                      random_state=self.random_state)
 
 
-class LeaveOneOutValidator(BaseCrossValidator):
+class LeaveOneOutFactory(BaseCVFactory):
     short_name = 'loo'
 
     def __init__(self):
         pass
 
-    def create(self, n):
+    def create(self, X, y=None):
         from sklearn.cross_validation import LeaveOneOut
 
-        return LeaveOneOut(n)
+        return LeaveOneOut(len(X))
 
 
-class StratifiedShuffleSplitValidator(BaseCrossValidator):
+class StratifiedShuffleSplitFactory(BaseCVFactory):
     short_name = 'stratifiedshufflesplit'
-    stratified = True
 
     def __init__(self, n_iter=10, test_size=0.1, train_size=None,
                  random_state=None):
@@ -71,7 +67,7 @@ class StratifiedShuffleSplitValidator(BaseCrossValidator):
         self.train_size = train_size
         self.random_state = random_state
 
-    def create(self, y):
+    def create(self, X, y):
         from sklearn.cross_validation import StratifiedShuffleSplit
 
         return StratifiedShuffleSplit(y, n_iter=self.n_iter,
@@ -80,16 +76,15 @@ class StratifiedShuffleSplitValidator(BaseCrossValidator):
                                       random_state=self.random_state)
 
 
-class StratifiedKFoldValidator(BaseCrossValidator):
+class StratifiedKFoldFactory(BaseCVFactory):
     short_name = 'stratifiedkfold'
-    stratified = True
 
     def __init__(self, n_folds=3, shuffle=False, random_state=None):
         self.n_folds = n_folds
         self.shuffle = shuffle
         self.random_state = random_state
 
-    def create(self, y):
+    def create(self, X, y):
         from sklearn.cross_validation import StratifiedKFold
 
         return StratifiedKFold(y, n_folds=self.n_folds, shuffle=self.shuffle,

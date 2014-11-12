@@ -43,11 +43,7 @@ def execute(args, parser):
     print(searchspace)
 
     # set up cross-validation
-    cv = config.cv()
-    if cv.stratified:
-        cv = cv(y)
-    else:
-        cv = cv(len(X))
+    cv = config.cv(X, y)
 
     statuses = [None for _ in range(args.n_iters)]
 

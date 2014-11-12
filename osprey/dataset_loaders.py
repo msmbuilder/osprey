@@ -96,10 +96,11 @@ class JoblibDatasetLoader(BaseDatasetLoader):
 class SklearnDatasetLoader(BaseDatasetLoader):
     short_name = 'sklearn_dataset'
 
-    def __init__(self, method, x_name='data', y_name='target'):
+    def __init__(self, method, x_name='data', y_name='target', **kwargs):
         self.method = method
         self.x_name = x_name
         self.y_name = y_name
+        self.kwargs = kwargs
 
     def load(self):
         import sklearn.datasets
@@ -109,7 +110,7 @@ class SklearnDatasetLoader(BaseDatasetLoader):
         except AttributeError:
             raise RuntimeError('no %s in sklearn.datasets' % self.method)
 
-        bunch = loader()
+        bunch = loader(**self.kwargs)
 
         X = bunch[self.x_name]
         y = bunch[self.y_name]

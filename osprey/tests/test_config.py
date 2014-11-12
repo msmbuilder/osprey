@@ -1,4 +1,5 @@
 from __future__ import print_function, absolute_import, division
+import numpy as np
 import os
 import tempfile
 
@@ -110,6 +111,16 @@ def test_cv():
     config = Config.fromdict({
         'cv': {'name': 'shufflesplit', 'params': {'n_iter': 10}}
     }, check_fields=False)
-    cv = config.cv()(100)
+    cv = config.cv(range(100))
     assert isinstance(cv, ShuffleSplit)
+    assert cv.n_iter == 10
+
+
+def test_stratified_cv():
+    from sklearn.cross_validation import StratifiedShuffleSplit
+    config = Config.fromdict({
+        'cv': {'name': 'stratifiedshufflesplit', 'params': {'n_iter': 10}}
+    }, check_fields=False)
+    cv = config.cv(range(100), np.random.randint(2, size=100))
+    assert isinstance(cv, StratifiedShuffleSplit)
     assert cv.n_iter == 10

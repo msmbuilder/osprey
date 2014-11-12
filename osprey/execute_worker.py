@@ -29,7 +29,6 @@ def execute(args, parser):
 
     config = Config(args.config)
     estimator = config.estimator()
-    cv = config.cv()
     searchspace = config.search_space()
     strategy = config.strategy()
     config_sha1 = config.sha1()
@@ -42,6 +41,9 @@ def execute(args, parser):
     print('Instantiated estimator:')
     print('  %r' % estimator)
     print(searchspace)
+
+    # set up cross-validation
+    cv = config.cv(X, y)
 
     statuses = [None for _ in range(args.n_iters)]
 
@@ -63,7 +65,7 @@ def execute(args, parser):
 
         s = run_single_trial(
             estimator=estimator, params=params, trial_id=trial_id,
-            scoring=scoring, X=X, y=y, cv=cv(len(X)),
+            scoring=scoring, X=X, y=y, cv=cv,
             sessionbuilder=config.trialscontext)
 
         statuses[i] = s

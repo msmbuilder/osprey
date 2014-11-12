@@ -35,7 +35,7 @@ from .utils import dict_merge, in_directory, prepend_syspath
 from .search_space import SearchSpace
 from .strategies import BaseStrategy
 from .dataset_loaders import BaseDatasetLoader
-from .cross_validators import BaseCrossValidator
+from .cross_validators import BaseCVFactory
 from .trials import make_session
 from .subclass_factory import init_subclass_by_name
 from . import eval_scopes
@@ -294,7 +294,7 @@ class Config(object):
         assert isinstance(scoring, (str, type(None)))
         return scoring
 
-    def cv(self):
+    def cv(self, X, y=None):
         cv = self.get_section('cv')
         if isinstance(cv, int):
             cv_name = 'kfold'
@@ -303,7 +303,7 @@ class Config(object):
             cv_name = self.get_value('cv/name')
             cv_params = self.get_value('cv/params', default={})
         return init_subclass_by_name(
-            BaseCrossValidator, cv_name, cv_params).create()
+            BaseCVFactory, cv_name, cv_params).create(X, y)
 
     def sha1(self):
         """SHA1 hash of the config file itself."""

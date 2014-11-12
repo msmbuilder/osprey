@@ -116,10 +116,27 @@ Example: ::
 Cross Validation
 ----------------
 
-Currently only K-fold cross validation, but we'll support the other
-sklearn CV objects soon. Example: ::
+Many types of cross-validation iterators are supported. The simplest 
+option is to simply pass an ``int``, which sets up k-fold cross validation.
+Example: ::
 
   cv: 5
+
+To access the other iterators, use the ``name`` and ``params`` keywords: ::
+
+  cv:
+    name: shufflesplit
+    params:
+      n_iter: 5
+      test_size: 0.5
+      
+Here's a complete list of supported iterators, along with their ``name`` mappings:
+
+* ``kfold``: `KFold <http://scikit-learn.org/stable/modules/generated/sklearn.cross_validation.KFold.html#sklearn.cross_validation.KFold>`_
+* ``shufflesplit``: `ShuffleSplit <http://scikit-learn.org/stable/modules/generated/sklearn.cross_validation.ShuffleSplit.html#sklearn.cross_validation.ShuffleSplit>`_
+* ``loo``: `LeaveOneOut <http://scikit-learn.org/stable/modules/generated/sklearn.cross_validation.LeaveOneOut.html#sklearn.cross_validation.LeaveOneOut>`_
+* ``stratifiedkfold``: `StratifiedKFold <http://scikit-learn.org/stable/modules/generated/sklearn.cross_validation.StratifiedKFold.html#sklearn.cross_validation.StratifiedKFold>`_
+* ``stratifiedshufflesplit``: `StratifiedShuffleSplit <http://scikit-learn.org/stable/modules/generated/sklearn.cross_validation.StratifiedShuffleSplit.html#sklearn.cross_validation.StratifiedShuffleSplit>`_
 
 .. _trials:
 

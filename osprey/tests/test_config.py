@@ -110,6 +110,6 @@ def test_cv():
     config = Config.fromdict({
         'cv': {'name': 'shufflesplit', 'params': {'n_iter': 10}}
     }, check_fields=False)
-    cv = config.cv()(100)
+    cv = config.cv(range(100))
     assert isinstance(cv, ShuffleSplit)
     assert cv.n_iter == 10

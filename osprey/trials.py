@@ -33,15 +33,17 @@ class JSONEncoded(TypeDecorator):
 
 
 class Trial(Base):
-    __tablename__ = 'trials_v1'
+    __tablename__ = 'trials_v2'
     default_project_name = None
 
     id = Column(Integer, primary_key=True)
     project_name = Column(Text())
     status = Column(Enum('PENDING', 'SUCCEEDED', 'FAILED'))
     parameters = Column(JSONEncoded())
-    mean_cv_score = Column(Float)
-    cv_scores = Column(JSONEncoded())
+
+    mean_test_score = Column(Float)
+    train_scores = Column(JSONEncoded())
+    test_scores = Column(JSONEncoded())
 
     started = Column(DateTime())
     completed = Column(DateTime())

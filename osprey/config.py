@@ -42,7 +42,8 @@ from . import eval_scopes
 
 
 FIELDS = {
-    'estimator':       ['pickle', 'eval', 'eval_scope', 'entry_point'],
+    'estimator':       ['pickle', 'eval', 'eval_scope', 'entry_point',
+                        'params'],
     'dataset_loader':  ['name', 'params'],
     'trials':          ['uri', 'project_name'],
     'search_space':    dict,
@@ -187,7 +188,8 @@ class Config(object):
         if entry_point is not None:
             estimator = load_entry_point(entry_point, 'estimator/entry_point')
             if issubclass(estimator, sklearn.base.BaseEstimator):
-                estimator = estimator()
+                estimator = estimator(
+                    **self.get_value('estimator/params', default={}))
             if not isinstance(estimator, sklearn.base.BaseEstimator):
                 raise RuntimeError('estimator/pickle must load a '
                                    'sklearn-derived Estimator')

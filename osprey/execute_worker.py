@@ -118,8 +118,12 @@ def run_single_trial(estimator, params, trial_id, scoring, X, y, cv,
         with sessionbuilder() as session:
             trial = session.query(Trial).get(trial_id)
             trial.mean_test_score = score['mean_test_score']
+            trial.mean_train_score = score['mean_train_score']
             trial.test_scores = score['test_scores']
             trial.train_scores = score['train_scores']
+            trial.n_test_samples = score['n_test_samples']
+            trial.n_train_samples = score['n_train_samples']
+
             trial.status = 'SUCCEEDED'
             best_so_far = session.query(
                 func.max(Trial.mean_test_score)).first()

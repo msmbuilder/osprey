@@ -5,6 +5,7 @@ from distutils.version import LooseVersion
 
 import numpy as np
 import sklearn
+from sklearn.pipeline import Pipeline
 from sklearn.base import is_classifier, clone
 from sklearn.metrics.scorer import check_scoring
 from sklearn.utils.validation import check_arrays
@@ -73,6 +74,8 @@ def fit_and_score_estimator(estimator, parameters, cv, X, y=None, scoring=None,
     if iid:
         if verbose > 0 and _is_mixtape_estimator(estimator):
             print('[CV] Using Mixtape API n_samples averaging')
+            print('[CV]   n_train_samples: %s' % str(n_train_samples))
+            print('[CV]   n_test_samples: %s' % str(n_test_samples))
         mean_test_score = np.average(test_scores, weights=n_test_samples)
         mean_train_score = np.average(train_scores, weights=n_train_samples)
     else:
@@ -143,7 +146,6 @@ def _num_samples(x, mixtape_api=False):
 
     if mixtape_api:
         assert isinstance(x, list)
-        assert all(isinstance(xx, np.ndarray) for xx in x)
         return sum(len(xx) for xx in x)
 
     return x.shape[0] if hasattr(x, 'shape') else len(x)
@@ -155,4 +157,9 @@ def _is_mixtape_estimator(estimator):
     except ImportError:
         return False
     mixtape_estimators = import_all_estimators(mixtape).values()
-    return estimator.__class__ in mixtape_estimators
+
+    out = estimator.__class__ in mixtape_estimators
+    if isinstance(estimator, Pipeline):
+        out = any(step.__class__ in mixtape_estimators
+                  for name, step in estimator.steps)
+    return out

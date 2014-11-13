@@ -16,10 +16,11 @@ class BaseDatasetLoader(object):
 class MDTrajDatasetLoader(BaseDatasetLoader):
     short_name = 'mdtraj'
 
-    def __init__(self, trajectories, topology=None, stride=1):
+    def __init__(self, trajectories, topology=None, stride=1, verbose=False):
         self.trajectories = trajectories
         self.topology = topology
         self.stride = stride
+        self.verbose = verbose
 
     def load(self):
         import mdtraj
@@ -27,13 +28,18 @@ class MDTrajDatasetLoader(BaseDatasetLoader):
         filenames = sorted(glob.glob(expand_path(self.trajectories)))
 
         top = self.topology
+        kwargs = {}
         if top is not None:
             top = expand_path(self.topology)
-            X = [mdtraj.load(f, top=top, stride=self.stride)
-                 for f in filenames]
-        else:
-            X = [mdtraj.load(f, stride=self.stride) for f in filenames]
+            kwargs = {'top': top}
+
+        X = []
         y = None
+
+        for fn in filenames:
+            if self.verbose:
+                print('[mdtraj] loading %s' % fn)
+            X.append(mdtraj.load(fn, stride=self.stride, **kwargs))
 
         return X, y
 

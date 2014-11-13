@@ -143,7 +143,7 @@ def _num_samples(x, mixtape_api=False):
 
     if mixtape_api:
         assert isinstance(x, list)
-        assert all(isinstance(xx, np.ndarray) for x in xx)
+        assert all(isinstance(xx, np.ndarray) for xx in x)
         return sum(len(xx) for xx in x)
 
     return x.shape[0] if hasattr(x, 'shape') else len(x)

@@ -54,6 +54,19 @@ def test_estimator_entry_point():
     assert isinstance(config.estimator(), KMeans)
 
 
+def test_estimator_entry_point_params():
+    config = Config.fromdict({
+        'estimator': {
+            'entry_point': 'sklearn.cluster.KMeans',
+            'params': {
+                'n_clusters': 15
+            }
+        }
+    }, check_fields=False)
+    assert isinstance(config.estimator(), KMeans)
+    assert config.estimator().n_clusters == 15
+
+
 def test_search_space():
     config = Config.fromdict({
         'search_space': {

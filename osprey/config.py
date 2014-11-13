@@ -42,7 +42,8 @@ from . import eval_scopes
 
 
 FIELDS = {
-    'estimator':       ['pickle', 'eval', 'eval_scope', 'entry_point'],
+    'estimator':       ['pickle', 'eval', 'eval_scope', 'entry_point',
+                        'params'],
     'dataset_loader':  ['name', 'params'],
     'trials':          ['uri', 'project_name'],
     'search_space':    dict,

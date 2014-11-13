@@ -71,7 +71,7 @@ def fit_and_score_estimator(estimator, parameters, cv, X, y=None, scoring=None,
         n_train_samples.append(n_train)
 
     if iid:
-        if verbose > 0 and is_mixtape_estimator(estimator):
+        if verbose > 0 and _is_mixtape_estimator(estimator):
             print('[CV] Using Mixtape API n_samples averaging')
         mean_test_score = np.average(test_scores, weights=n_test_samples)
         mean_train_score = np.average(train_scores, weights=n_train_samples)

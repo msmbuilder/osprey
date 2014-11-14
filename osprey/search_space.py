@@ -128,7 +128,7 @@ class FloatVariable(namedtuple('FloatVariable',
     __slots__ = ()
 
     def __repr__(self):
-        return '{1:<25s}\t(float) {2:8f} <= x <  {2:f}'.format(
+        return '{0:<25s}\t(float) {1:8f} <= x <  {2:f}'.format(
             self.name, self.min, self.max)
 
     def rvs(self, random):

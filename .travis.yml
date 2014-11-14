@@ -46,8 +46,8 @@ install:
       || echo ""'
 
   # install packages for pylearn2 plugin
+  - apt-get install libopenblas-dev
   - conda install --yes atlas theano
-  - export THEANO_FLAGS='blas.ldflags=-lblas -lgfortran'
   - 'git clone https://github.com/lisa-lab/pylearn2.git
       && cd pylearn2
       && echo install | python setup.py -q install

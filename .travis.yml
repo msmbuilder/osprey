@@ -47,6 +47,7 @@ install:
 
   # install packages for pylearn2 plugin
   - conda install --yes atlas theano
+  - echo '[blas]\nldflags = -lblas -lgfortran' >> .theanorc
   - 'git clone https://github.com/lisa-lab/pylearn2.git
       && cd pylearn2
       && echo install | python setup.py -q install

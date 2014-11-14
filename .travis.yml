@@ -58,6 +58,7 @@ install:
       && python setup.py -q develop
       && cd -
       || echo ""'
+  - cat /home/travis/.pip/pip.log
 
   - python setup.py install
 

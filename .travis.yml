@@ -23,9 +23,11 @@ install:
   - conda create --yes -n test python=$python `cat requirements.txt | xargs`
   - source activate test
 
+  # install pip
+  - conda install --yes pip
+
   # install python2.6 backports
   - '[ "$python" = "2.6" ]
-      && conda install --yes pip
       && pip install importlib argparse
       || echo ""'
 
@@ -39,7 +41,6 @@ install:
 
   # install hyperopt
   - '[ "$hyperopt" = "0.0.2" ]
-      && conda install --yes pip
       && pip install hyperopt
       || echo ""'
   - '[ "$hyperopt" = "dev" ]
@@ -55,8 +56,9 @@ install:
       && pip install -q --no-deps git+git://github.com/Theano/Theano.git
       && git clone https://github.com/lisa-lab/pylearn2.git
       && cd pylearn2
-      && python setup.py -q develop
+      && echo install | python setup.py -q install
       && cd -
+      && rm -rf pylearn2
       || echo ""'
   - cat /home/travis/.pip/pip.log
 
@@ -68,5 +70,4 @@ script:
   # exclude versioneer.py and _version.py from style checking, since we don't
   # write/maintain them
   - flake8 `find . -name '*.py'  ! -name build ! -path './build/*' !
-            -path './docs*' ! -path './pylearn2/*' ! -name versioneer.py !
-            -name _version.py | xargs`
+            -path './docs*' ! -name versioneer.py ! -name _version.py | xargs`

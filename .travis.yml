@@ -51,6 +51,7 @@ install:
       && cd pylearn2
       && echo install | python setup.py -q install
       && cd -
+      && rm -rf pylearn2
       || echo ""'
 
   - python setup.py install

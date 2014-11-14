@@ -114,7 +114,8 @@ class Pylearn2Estimator(BaseEstimator):
         self.trainer.dataset = self._get_dataset(X, y)
 
         # update monitoring dataset(s)
-        if hasattr(self.trainer.algorithm, 'monitoring_dataset'):
+        if (hasattr(self.trainer.algorithm, 'monitoring_dataset') and
+                self.trainer.algorithm.monitoring_dataset is not None):
             monitoring_dataset = self.trainer.algorithm.monitoring_dataset
             if len(monitoring_dataset) == 1 and '' in monitoring_dataset:
                 monitoring_dataset[''] = self.trainer.dataset
@@ -155,7 +156,7 @@ class Pylearn2Estimator(BaseEstimator):
         """
         X_sym = self.trainer.model.get_input_space().make_theano_batch()
         y_sym = getattr(self.trainer.model, method)(X_sym)
-        f = theano.function([X_sym], y_sym)
+        f = theano.function([X_sym], y_sym, allow_input_downcast=True)
         return f(X)
 
     def score(self, X, y):
@@ -188,9 +189,10 @@ class Pylearn2Classifier(Pylearn2Estimator):
         y = np.asarray(y)
         assert y.ndim == 1
         # convert to one-hot
-        oh = np.zeros((y.size, np.unique(y).size), dtype=float)
+        labels = np.unique(y).tolist()
+        oh = np.zeros((y.size, len(labels)), dtype=float)
         for i, label in enumerate(y):
-            oh[i, label] = 1.
+            oh[i, labels.index(label)] = 1.
         return oh
 
     def predict_proba(self, X):

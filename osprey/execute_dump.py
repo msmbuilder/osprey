@@ -27,3 +27,4 @@ def execute(args, parser):
         value = buf.getvalue()
 
     print(value)
+    return value

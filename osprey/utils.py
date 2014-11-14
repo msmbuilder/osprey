@@ -96,6 +96,25 @@ def current_pretty_time():
     return datetime.now().strftime("%B %d, %Y %l:%M %p")
 
 
+def _squeeze_time(t):
+    """Remove .1s to the time under Windows: this is the time it take to
+    stat files. This is needed to make results similar to timings under
+    Unix, for tests
+    """
+    if sys.platform.startswith('win'):
+        return max(0, t - .1)
+    else:
+        return t
+
+
+def short_format_time(t):
+    t = _squeeze_time(t)
+    if t > 60:
+        return "%4.1fmin" % (t / 60.)
+    else:
+        return " %5.1fs" % (t)
+
+
 def mock_module(name):
 
     class MockModule(object):

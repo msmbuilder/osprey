@@ -32,7 +32,7 @@ def main(**kwargs):
         name='osprey',
         author='Robert T. McGibbon',
         author_email='rmcgibbo@gmail.com',
-        url='https://github.com/rmcgibbo/osprey',
+        url='https://github.com/pandegroup/osprey',
         classifiers=[e.strip() for e in classifiers.splitlines()],
         platforms=["Windows", "Linux", "Mac OS-X", "Unix"],
         license='Apache Software License',

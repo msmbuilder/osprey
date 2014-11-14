@@ -9,6 +9,7 @@ import unittest
 
 try:
     import pylearn2
+    del pylearn2  # for flake8, since not used in tests
 except ImportError:
     pass
 

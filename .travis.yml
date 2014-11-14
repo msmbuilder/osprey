@@ -60,7 +60,6 @@ install:
       && cd -
       && rm -rf pylearn2
       || echo ""'
-  - cat /home/travis/.pip/pip.log
 
   - python setup.py install
 

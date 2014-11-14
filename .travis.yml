@@ -10,6 +10,9 @@ env:
         - hyperopt=none    python=3.4
 
 install:
+  # packages for pylearn2 plugin
+  - sudo apt-get install -qq libatlas3gf-base libopenblas-dev liblapack-dev gfortran
+
   - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
   - bash Miniconda-latest-Linux-x86_64.sh -b
   - export PATH=$HOME/miniconda/bin:$PATH
@@ -46,7 +49,6 @@ install:
       || echo ""'
 
   # install packages for pylearn2 plugin
-  - sudo apt-get install -qq libopenblas-dev
   - conda install --yes atlas theano
   - 'git clone https://github.com/lisa-lab/pylearn2.git
       && cd pylearn2

@@ -103,7 +103,7 @@ class IntVariable(namedtuple('IntVariable', ('name', 'min', 'max'))):
     __slots__ = ()
 
     def __repr__(self):
-        return '{:<25s}\t(int)   {:8d} <= x <= {:d}'.format(
+        return '{0:<25s}\t(int)   {1:8d} <= x <= {2:d}'.format(
             self.name, self.min, self.max)
 
     def rvs(self, random):
@@ -128,7 +128,7 @@ class FloatVariable(namedtuple('FloatVariable',
     __slots__ = ()
 
     def __repr__(self):
-        return '{:<25s}\t(float) {:8f} <= x <  {:f}'.format(
+        return '{0:<25s}\t(float) {1:8f} <= x <  {2:f}'.format(
             self.name, self.min, self.max)
 
     def rvs(self, random):
@@ -174,7 +174,7 @@ class EnumVariable(namedtuple('EnumVariable', ('name', 'choices'))):
 
     def __repr__(self):
         c = [str(e) for e in self.choices]
-        return '{:<25s}\t(enum)    choices = ({:s})'.format(
+        return '{0:<25s}\t(enum)    choices = ({1:s})'.format(
             self.name, ', '.join(c))
 
     def rvs(self, random):

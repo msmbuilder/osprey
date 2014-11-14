@@ -12,7 +12,7 @@ env:
 install:
   # install packages for pylearn2 plugin
   - '[ "$pylearn2" != "none" ]
-      && sudo apt-get install -qq libatlas3gf-base libopenblas-dev liblapack-dev gfortran
+      && sudo apt-get install -qq libatlas3gf-base liblapack-dev gfortran
       || echo ""'
 
   - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
@@ -55,8 +55,9 @@ install:
       && pip install -q --no-deps git+git://github.com/Theano/Theano.git
       && git clone https://github.com/lisa-lab/pylearn2.git
       && cd pylearn2
-      && python setup.py -q develop
+      && echo install | python setup.py -q install
       && cd -
+      && rm -rf pylearn2
       || echo ""'
 
   - python setup.py install
@@ -67,4 +68,4 @@ script:
   # exclude versioneer.py and _version.py from style checking, since we don't
   # write/maintain them
   - flake8 `find . -name '*.py'  ! -name build ! -path './build/*' !
-            -path './docs*' ! -path './pylearn2/*' ! -name versioneer.py ! -name _version.py | xargs`
+            -path './docs*' ! -name versioneer.py ! -name _version.py | xargs`

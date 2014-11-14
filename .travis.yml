@@ -55,9 +55,8 @@ install:
       && pip install -q --no-deps git+git://github.com/Theano/Theano.git
       && git clone https://github.com/lisa-lab/pylearn2.git
       && cd pylearn2
-      && echo install | python setup.py -q install
+      && python setup.py -q develop
       && cd -
-      && rm -rf pylearn2
       || echo ""'
 
   - python setup.py install
@@ -68,4 +67,4 @@ script:
   # exclude versioneer.py and _version.py from style checking, since we don't
   # write/maintain them
   - flake8 `find . -name '*.py'  ! -name build ! -path './build/*' !
-            -path './docs*' ! -name versioneer.py ! -name _version.py | xargs`
+            -path './docs*' ! -path './pylearn2' ! -name versioneer.py ! -name _version.py | xargs`

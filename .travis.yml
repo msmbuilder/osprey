@@ -23,9 +23,11 @@ install:
   - conda create --yes -n test python=$python `cat requirements.txt | xargs`
   - source activate test
 
+  # install pip
+  - conda install --yes pip
+
   # install python2.6 backports
   - '[ "$python" = "2.6" ]
-      && conda install --yes pip
       && pip install importlib argparse
       || echo ""'
 
@@ -39,7 +41,6 @@ install:
 
   # install hyperopt
   - '[ "$hyperopt" = "0.0.2" ]
-      && conda install --yes pip
       && pip install hyperopt
       || echo ""'
   - '[ "$hyperopt" = "dev" ]

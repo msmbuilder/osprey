@@ -5,14 +5,8 @@ import numpy as np
 import re
 from string import Template
 
-from pylearn2.config import yaml_parse
-from pylearn2.datasets import Dataset, DenseDesignMatrix
-from pylearn2.train import Train
-
 from sklearn.base import BaseEstimator
 from sklearn.metrics import accuracy_score, mean_squared_error
-
-import theano
 
 from osprey.dataset_loaders import BaseDatasetLoader
 
@@ -33,19 +27,8 @@ class Pylearn2Estimator(BaseEstimator):
     """
     def __init__(self, yaml_string, **kwargs):
         self.trainer = None
-        self.yaml_string = self.check_yaml_string(yaml_string)
+        self.yaml_string = yaml_string
         self.set_params(**kwargs)
-
-    def check_yaml_string(self, string):
-        """
-        Inspect a YAML string.
-
-        Parameters
-        ----------
-        string : str
-            YAML string.
-        """
-        return string
 
     def _get_param_names(self):
         """
@@ -70,6 +53,8 @@ class Pylearn2Estimator(BaseEstimator):
         y : array_like, optional
             Labels.
         """
+        from pylearn2.datasets import DenseDesignMatrix
+
         X = np.asarray(X)
         assert X.ndim > 1
         if y is not None:
@@ -104,6 +89,9 @@ class Pylearn2Estimator(BaseEstimator):
         y : array_like, optional
             Labels.
         """
+        from pylearn2.config import yaml_parse
+        from pylearn2.train import Train
+
         # build trainer
         params = self.get_params()
         yaml_string = Template(self.yaml_string).substitute(params)
@@ -135,7 +123,7 @@ class Pylearn2Estimator(BaseEstimator):
 
         Parameters
         ----------
-        X : pylearn2.datasets.Dataset
+        X : array_like
             Test dataset.
         """
         return self._predict(X)
@@ -154,6 +142,8 @@ class Pylearn2Estimator(BaseEstimator):
         method : str
             Model method to call for prediction.
         """
+        import theano
+
         X_sym = self.trainer.model.get_input_space().make_theano_batch()
         y_sym = getattr(self.trainer.model, method)(X_sym)
         f = theano.function([X_sym], y_sym, allow_input_downcast=True)
@@ -201,7 +191,7 @@ class Pylearn2Classifier(Pylearn2Estimator):
 
         Parameters
         ----------
-        X : pylearn2.datasets.Dataset
+        X : array_like
             Test dataset.
         """
         return self._predict(X)
@@ -212,7 +202,7 @@ class Pylearn2Classifier(Pylearn2Estimator):
 
         Parameters
         ----------
-        X : pylearn2.datasets.Dataset
+        X : array_like
             Test dataset.
         """
         return np.argmax(self._predict(X), axis=1)
@@ -291,6 +281,9 @@ class Pylearn2DatasetLoader(BaseDatasetLoader):
         """
         Load the dataset using pylearn2.config.yaml_parse.
         """
+        from pylearn2.config import yaml_parse
+        from pylearn2.datasets import Dataset
+
         dataset = yaml_parse.load(self.yaml_string)
         assert isinstance(dataset, Dataset)
         data = dataset.iterator(mode='sequential', num_batches=1,

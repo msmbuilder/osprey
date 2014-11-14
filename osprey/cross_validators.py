@@ -1,5 +1,7 @@
 from __future__ import print_function, absolute_import, division
 
+import numpy as np
+
 
 class BaseCVFactory(object):
     short_name = None
@@ -89,3 +91,26 @@ class StratifiedKFoldFactory(BaseCVFactory):
 
         return StratifiedKFold(y, n_folds=self.n_folds, shuffle=self.shuffle,
                                random_state=self.random_state)
+
+
+class FixedCVFactory(BaseCVFactory):
+    """
+    Cross-validator to use with a fixed, held-out validation set.
+
+    Parameters
+    ----------
+    start : int
+        Start index of validation set.
+    stop : int, optional
+        Stop index of validation set.
+    """
+    short_name = 'fixed'
+
+    def __init__(self, start, stop=None):
+        self.valid = slice(start, stop)
+
+    def create(self, X, y):
+        indices = np.arange(len(X))
+        valid = indices[self.valid]
+        train = np.setdiff1d(indices, valid)
+        return (train, valid),  # return a nested tuple

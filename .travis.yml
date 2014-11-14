@@ -48,11 +48,10 @@ install:
   # install packages for pylearn2 plugin
   - conda install --yes theano
   - 'git clone https://github.com/lisa-lab/pylearn2.git
-  && cd pylearn2
-  && python setup.py -q install
-  && cd -
-  && rm -rf pylearn2
-  || echo ""'
+      && cd pylearn2
+      && python setup.py -q develop
+      && cd -
+      || echo ""'
 
   - python setup.py install
 

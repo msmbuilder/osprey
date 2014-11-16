@@ -4,12 +4,17 @@ env:
     global:
         - secure: "VYtefbSblg3LfO6aHY92MSPhOlRIHFu3VffyJ9jys7r4/3s+xnXUs/5SMw+74RHMq4JLMF7jzfnGOyOxX4wcvckPLtgKzQC+Oa5yPXpsssQB/Pw3jlvN+2Oo3LgiTKTand23UYnxcjNQuY7rh/YnJBFZEnPB7BHfrqadfnKNJEI="
     matrix:
-        - hyperopt=0.0.2   python=2.6
-        - hyperopt=dev     python=2.7
-        - hyperopt=0.0.2   python=2.7
-        - hyperopt=none    python=3.4
+        - hyperopt=0.0.2   python=2.6   pylearn2=dev
+        - hyperopt=dev     python=2.7   pylearn2=dev
+        - hyperopt=0.0.2   python=2.7   pylearn2=dev
+        - hyperopt=none    python=3.4   pylearn2=none
 
 install:
+  # install packages for pylearn2 plugin
+  - '[ "$pylearn2" != "none" ]
+      && sudo apt-get install -qq libatlas3gf-base liblapack-dev gfortran
+      || echo ""'
+
   - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
   - bash Miniconda-latest-Linux-x86_64.sh -b
   - export PATH=$HOME/miniconda/bin:$PATH
@@ -18,9 +23,11 @@ install:
   - conda create --yes -n test python=$python `cat requirements.txt | xargs`
   - source activate test
 
-  # instal python2.6 backports
+  # install pip
+  - conda install --yes pip
+
+  # install python2.6 backports
   - '[ "$python" = "2.6" ]
-      && conda install --yes pip
       && pip install importlib argparse
       || echo ""'
 
@@ -34,7 +41,6 @@ install:
 
   # install hyperopt
   - '[ "$hyperopt" = "0.0.2" ]
-      && conda install --yes pip
       && pip install hyperopt
       || echo ""'
   - '[ "$hyperopt" = "dev" ]
@@ -43,6 +49,16 @@ install:
       && python setup.py -q install
       && cd -
       && rm -rf hyperopt
+      || echo ""'
+
+  # install packages for pylearn2 plugin
+  - '[ "$pylearn2" != "none" ]
+      && pip install -q --no-deps git+git://github.com/Theano/Theano.git
+      && git clone https://github.com/lisa-lab/pylearn2.git
+      && cd pylearn2
+      && echo install | python setup.py -q install
+      && cd -
+      && rm -rf pylearn2
       || echo ""'
 
   - python setup.py install

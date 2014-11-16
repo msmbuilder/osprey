@@ -13,11 +13,11 @@ from six import iteritems
 from six.moves import cStringIO
 from sqlalchemy import func
 from sklearn.base import clone, BaseEstimator
-from sklearn.grid_search import GridSearchCV
 
 from . import __version__
 from .config import Config
 from .trials import Trial
+from .fit_estimator import fit_and_score_estimator
 from .utils import Unbuffered, format_timedelta, current_pretty_time
 
 
@@ -29,7 +29,6 @@ def execute(args, parser):
 
     config = Config(args.config)
     estimator = config.estimator()
-    cv = config.cv()
     searchspace = config.search_space()
     strategy = config.strategy()
     config_sha1 = config.sha1()
@@ -42,6 +41,9 @@ def execute(args, parser):
     print('Instantiated estimator:')
     print('  %r' % estimator)
     print(searchspace)
+
+    # set up cross-validation
+    cv = config.cv(X, y)
 
     statuses = [None for _ in range(args.n_iters)]
 
@@ -63,7 +65,7 @@ def execute(args, parser):
 
         s = run_single_trial(
             estimator=estimator, params=params, trial_id=trial_id,
-            scoring=scoring, X=X, y=y, cv=cv(len(X)),
+            scoring=scoring, X=X, y=y, cv=cv,
             sessionbuilder=config.trialscontext)
 
         statuses[i] = s
@@ -77,7 +79,7 @@ def initialize_trial(strategy, searchspace, estimator, config_sha1,
     with sessionbuilder() as session:
         # requery the history ever iteration, because another worker
         # process may have written to it in the mean time
-        history = [[t.parameters, t.mean_cv_score, t.status]
+        history = [[t.parameters, t.mean_test_score, t.status]
                    for t in session.query(Trial).all()]
 
         print('History contains: %d trials' % len(history))
@@ -111,23 +113,24 @@ def run_single_trial(estimator, params, trial_id, scoring, X, y, cv,
     status = None
 
     try:
-        param_grid = dict((k, [v]) for k, v in iteritems(params))
-        grid = GridSearchCV(
-            estimator, param_grid=param_grid,
-            scoring=scoring, cv=cv, verbose=1, refit=False)
-        grid.fit(X, y)
-        score = grid.grid_scores_[0]
-
+        score = fit_and_score_estimator(
+            estimator, params, cv=cv, scoring=scoring, X=X, y=y, verbose=1)
         with sessionbuilder() as session:
             trial = session.query(Trial).get(trial_id)
-            trial.mean_cv_score = score.mean_validation_score
-            trial.cv_scores = score.cv_validation_scores.tolist()
+            trial.mean_test_score = score['mean_test_score']
+            trial.mean_train_score = score['mean_train_score']
+            trial.test_scores = score['test_scores']
+            trial.train_scores = score['train_scores']
+            trial.n_test_samples = score['n_test_samples']
+            trial.n_train_samples = score['n_train_samples']
+
             trial.status = 'SUCCEEDED'
-            best_so_far = session.query(func.max(Trial.mean_cv_score)).first()
+            best_so_far = session.query(
+                func.max(Trial.mean_test_score)).first()
             print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-            print('Success! Model score = %f' % trial.mean_cv_score)
+            print('Success! Model score = %f' % trial.mean_test_score)
             print('(best score so far   = %f)' %
-                  max(trial.mean_cv_score, best_so_far[0]))
+                  max(trial.mean_test_score, best_so_far[0]))
             print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
             trial.completed = datetime.now()
             trial.elapsed = trial.completed - trial.started

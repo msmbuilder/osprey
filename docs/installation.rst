@@ -11,12 +11,12 @@ Development Version
 .. code-block:: bash
 
   # grab the latest version from github
-  $ pip install git+git://github.com/rmcgibbo/osprey.git
+  $ pip install git+git://github.com/pandegroup/osprey.git
 
 .. code-block:: bash
 
   # or clone the repo yourself and run `setup.py`
-  $ git clone https://github.com/rmcgibbo/osprey.git
+  $ git clone https://github.com/pandegroup/osprey.git
   $ cd osprey && python setup.py install
 
 Release Version

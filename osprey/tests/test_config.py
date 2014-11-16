@@ -1,4 +1,5 @@
 from __future__ import print_function, absolute_import, division
+import numpy as np
 import os
 import tempfile
 
@@ -51,6 +52,19 @@ def test_estimator_entry_point():
         }
     }, check_fields=False)
     assert isinstance(config.estimator(), KMeans)
+
+
+def test_estimator_entry_point_params():
+    config = Config.fromdict({
+        'estimator': {
+            'entry_point': 'sklearn.cluster.KMeans',
+            'params': {
+                'n_clusters': 15
+            }
+        }
+    }, check_fields=False)
+    assert isinstance(config.estimator(), KMeans)
+    assert config.estimator().n_clusters == 15
 
 
 def test_search_space():
@@ -110,6 +124,16 @@ def test_cv():
     config = Config.fromdict({
         'cv': {'name': 'shufflesplit', 'params': {'n_iter': 10}}
     }, check_fields=False)
-    cv = config.cv()(100)
+    cv = config.cv(range(100))
     assert isinstance(cv, ShuffleSplit)
+    assert cv.n_iter == 10
+
+
+def test_stratified_cv():
+    from sklearn.cross_validation import StratifiedShuffleSplit
+    config = Config.fromdict({
+        'cv': {'name': 'stratifiedshufflesplit', 'params': {'n_iter': 10}}
+    }, check_fields=False)
+    cv = config.cv(range(100), np.random.randint(2, size=100))
+    assert isinstance(cv, StratifiedShuffleSplit)
     assert cv.n_iter == 10

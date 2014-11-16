@@ -35,14 +35,15 @@ from .utils import dict_merge, in_directory, prepend_syspath
 from .search_space import SearchSpace
 from .strategies import BaseStrategy
 from .dataset_loaders import BaseDatasetLoader
-from .cross_validators import BaseCrossValidator
+from .cross_validators import BaseCVFactory
 from .trials import make_session
 from .subclass_factory import init_subclass_by_name
 from . import eval_scopes
 
 
 FIELDS = {
-    'estimator':       ['pickle', 'eval', 'eval_scope', 'entry_point'],
+    'estimator':       ['pickle', 'eval', 'eval_scope', 'entry_point',
+                        'params'],
     'dataset_loader':  ['name', 'params'],
     'trials':          ['uri', 'project_name'],
     'search_space':    dict,
@@ -187,7 +188,8 @@ class Config(object):
         if entry_point is not None:
             estimator = load_entry_point(entry_point, 'estimator/entry_point')
             if issubclass(estimator, sklearn.base.BaseEstimator):
-                estimator = estimator()
+                estimator = estimator(
+                    **self.get_value('estimator/params', default={}))
             if not isinstance(estimator, sklearn.base.BaseEstimator):
                 raise RuntimeError('estimator/pickle must load a '
                                    'sklearn-derived Estimator')
@@ -294,7 +296,7 @@ class Config(object):
         assert isinstance(scoring, (str, type(None)))
         return scoring
 
-    def cv(self):
+    def cv(self, X, y=None):
         cv = self.get_section('cv')
         if isinstance(cv, int):
             cv_name = 'kfold'
@@ -303,7 +305,7 @@ class Config(object):
             cv_name = self.get_value('cv/name')
             cv_params = self.get_value('cv/params', default={})
         return init_subclass_by_name(
-            BaseCrossValidator, cv_name, cv_params).create()
+            BaseCVFactory, cv_name, cv_params).create(X, y)
 
     def sha1(self):
         """SHA1 hash of the config file itself."""

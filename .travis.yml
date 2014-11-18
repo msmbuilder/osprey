@@ -1,5 +1,9 @@
 language: c
 
+branches:
+  only:
+    - master
+
 env:
     global:
         - secure: "VYtefbSblg3LfO6aHY92MSPhOlRIHFu3VffyJ9jys7r4/3s+xnXUs/5SMw+74RHMq4JLMF7jzfnGOyOxX4wcvckPLtgKzQC+Oa5yPXpsssQB/Pw3jlvN+2Oo3LgiTKTand23UYnxcjNQuY7rh/YnJBFZEnPB7BHfrqadfnKNJEI="

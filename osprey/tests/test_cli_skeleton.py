@@ -18,7 +18,7 @@ def test_1():
 
     try:
         os.chdir(dirname)
-        subprocess.check_call([OSPREY_BIN, 'skeleton', '-t', 'mixtape',
+        subprocess.check_call([OSPREY_BIN, 'skeleton', '-t', 'msmbuilder',
                               '-f', 'config.yaml'])
         assert os.path.exists('config.yaml')
         with open('config.yaml', 'rb') as f:

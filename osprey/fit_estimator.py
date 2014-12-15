@@ -72,8 +72,8 @@ def fit_and_score_estimator(estimator, parameters, cv, X, y=None, scoring=None,
         n_train_samples.append(n_train)
 
     if iid:
-        if verbose > 0 and _is_mixtape_estimator(estimator):
-            print('[CV] Using Mixtape API n_samples averaging')
+        if verbose > 0 and _is_msmbuilder_estimator(estimator):
+            print('[CV] Using MSMBuilder API n_samples averaging')
             print('[CV]   n_train_samples: %s' % str(n_train_samples))
             print('[CV]   n_test_samples: %s' % str(n_test_samples))
         mean_test_score = np.average(test_scores, weights=n_test_samples)
@@ -123,9 +123,9 @@ def _fit_and_score(estimator, X, y, scorer, train, test, verbose, parameters,
 
     scoring_time = time.time() - start_time
 
-    mixtape_api = _is_mixtape_estimator(estimator)
-    n_samples_test = _num_samples(X_test, mixtape_api=mixtape_api)
-    n_samples_train = _num_samples(X_train, mixtape_api=mixtape_api)
+    msmbuilder_api = _is_msmbuilder_estimator(estimator)
+    n_samples_test = _num_samples(X_test, msmbuilder_api=msmbuilder_api)
+    n_samples_train = _num_samples(X_train, msmbuilder_api=msmbuilder_api)
     if verbose > 2:
         msg += ", score=%f" % test_score
     if verbose > 1:
@@ -136,7 +136,7 @@ def _fit_and_score(estimator, X, y, scorer, train, test, verbose, parameters,
             scoring_time)
 
 
-def _num_samples(x, mixtape_api=False):
+def _num_samples(x, msmbuilder_api=False):
     """Return number of samples in array-like x."""
     if not hasattr(x, '__len__') and not hasattr(x, 'shape'):
         if hasattr(x, '__array__'):
@@ -144,22 +144,22 @@ def _num_samples(x, mixtape_api=False):
         else:
             raise TypeError("Expected sequence or array-like, got %r" % x)
 
-    if mixtape_api:
+    if msmbuilder_api:
         assert isinstance(x, list)
         return sum(len(xx) for xx in x)
 
     return x.shape[0] if hasattr(x, 'shape') else len(x)
 
 
-def _is_mixtape_estimator(estimator):
+def _is_msmbuilder_estimator(estimator):
     try:
-        import mixtape
+        import msmbuilder
     except ImportError:
         return False
-    mixtape_estimators = import_all_estimators(mixtape).values()
+    msmbuilder_estimators = import_all_estimators(msmbuilder).values()
 
-    out = estimator.__class__ in mixtape_estimators
+    out = estimator.__class__ in msmbuilder_estimators
     if isinstance(estimator, Pipeline):
-        out = any(step.__class__ in mixtape_estimators
+        out = any(step.__class__ in msmbuilder_estimators
                   for name, step in estimator.steps)
     return out

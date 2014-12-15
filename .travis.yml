@@ -8,10 +8,10 @@ env:
     global:
         - secure: "VYtefbSblg3LfO6aHY92MSPhOlRIHFu3VffyJ9jys7r4/3s+xnXUs/5SMw+74RHMq4JLMF7jzfnGOyOxX4wcvckPLtgKzQC+Oa5yPXpsssQB/Pw3jlvN+2Oo3LgiTKTand23UYnxcjNQuY7rh/YnJBFZEnPB7BHfrqadfnKNJEI="
     matrix:
-        - hyperopt=0.0.2   python=2.6   pylearn2=dev
-        - hyperopt=dev     python=2.7   pylearn2=dev
-        - hyperopt=0.0.2   python=2.7   pylearn2=dev
-        - hyperopt=none    python=3.4   pylearn2=none
+        - hyperopt=0.0.2   python=2.6  pylearn2=dev
+        - hyperopt=dev     python=2.7  pylearn2=dev
+        - hyperopt=0.0.2   python=2.7  pylearn2=dev
+        - hyperopt=none    python=3.4  pylearn2=none
 
 install:
   # install packages for pylearn2 plugin
@@ -50,8 +50,10 @@ install:
   - '[ "$hyperopt" = "dev" ]
       && git clone https://github.com/hyperopt/hyperopt.git
       && cd hyperopt
-      && python setup.py -q install
-      && cd -
+      && git remote add rmcgibbo https://github.com/rmcgibbo/hyperopt.git
+      && git pull rmcgibbo no-distribute
+      && python setup.py install
+      && cd ..
       && rm -rf hyperopt
       || echo ""'
 

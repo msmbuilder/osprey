@@ -7,8 +7,10 @@ estimator:
     # The model/estimator to be fit.
 
     # pick one of these ways to specify
-    pickle: my-model.pkl            # path to a file
-    entry_point: mixtape.tica.tICA  # importable python class/instances
+      # path to a file
+    pickle: my-model.pkl
+      # importable python class/instances
+    entry_point: msmbuilder.decomposition.tICA
     eval: |
         Pipeline([
                 ('featurizer', DihedralFeaturizer(types=['phi', 'psi'])),
@@ -18,7 +20,7 @@ estimator:
         ])
 
     # for eval, a python package containing the estimator definitions
-    eval_scope: mixtape
+    eval_scope: msmbuilder
 
 
 strategy:

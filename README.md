@@ -15,12 +15,12 @@ parallel optimization of model hyperparameters.
   <a href='http://osprey.rtfd.org'>Full documentation</a>
 </p>
 
-Example (with [mixtape](https://github.com/rmcgibbo/mixtape) models/datasets)
+Example (with [MSMBuilder](https://github.com/msmbuilder/msmbuilder) models/datasets)
 -------------------------------------------------------------
 ```
 $ cat config.yaml
 estimator:
-  eval_scope: mixtape
+  eval_scope: msmbuilder
   eval: |
     Pipeline([
         ('featurizer', DihedralFeaturizer(types=['phi', 'psi'])),
@@ -53,7 +53,7 @@ trials:
 ```
 
 Then run `osprey worker`. You can run multiple parallel instances
-of `osprey worker` simultaniously on a cluster too.
+of `osprey worker` simultaneously on a cluster too.
 
 ```
 $ osprey worker config.yaml

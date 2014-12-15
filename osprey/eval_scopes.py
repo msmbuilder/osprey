@@ -8,13 +8,13 @@ import importlib
 from sklearn.base import BaseEstimator
 
 
-__all__ = ['mixtape', 'import_all_estimators']
+__all__ = ['msmbuilder', 'import_all_estimators']
 
 
-def mixtape():
-    import mixtape
+def msmbuilder():
+    import msmbuilder
     from sklearn.pipeline import Pipeline
-    scope = import_all_estimators(mixtape)
+    scope = import_all_estimators(msmbuilder)
     scope['Pipeline'] = Pipeline
     return scope
 

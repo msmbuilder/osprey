@@ -1,6 +1,4 @@
-"""
-pylearn2 plugin.
-"""
+from __future__ import print_function, absolute_import, division
 import numpy as np
 import re
 from string import Template

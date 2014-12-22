@@ -30,7 +30,7 @@ def test_1():
 
 def test_2():
     try:
-        from mixtape.markovstatemodel import MarkovStateModel
+        from msmbuilder.msm import MarkovStateModel
     except ImportError as e:
         raise SkipTest(e)
 

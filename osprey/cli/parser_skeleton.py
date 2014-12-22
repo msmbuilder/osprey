@@ -13,9 +13,9 @@ def configure_parser(sub_parsers):
     p = sub_parsers.add_parser('skeleton', description=help, help=help,
                                formatter_class=ArgumentDefaultsHelpFormatter)
     p.add_argument('-t', '--template', help=(
-        "which skeleton to create. 'mixtape' is a skeleton config file for"
-        "mixtape-based molecular dynamics / Markov state model based "
-        "projects."), choices=['mixtape'], default='mixtape',)
+        "which skeleton to create. 'msmbuilder' is a skeleton config file for"
+        "MSMBuilder molecular dynamics / Markov state model based "
+        "projects."), choices=['msmbuilder'], default='msmbuilder',)
     p.add_argument('-f', '--filename', help='config filename to create',
                    default='config.yaml')
     p.set_defaults(func=func)

@@ -5,9 +5,9 @@ from pkg_resources import resource_filename
 
 
 def execute(args, parser):
-    if args.template == 'mixtape':
+    if args.template == 'msmbuilder':
         fn = resource_filename('osprey', join('data',
-                               'mixape_skeleton_config.yaml'))
+                               'msmbuilder_skeleton_config.yaml'))
     else:
         raise RuntimeError('unknown template: %s' % args.template)
 

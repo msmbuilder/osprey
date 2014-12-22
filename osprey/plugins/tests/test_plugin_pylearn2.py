@@ -1,11 +1,12 @@
-from argparse import Namespace
+from __future__ import print_function, absolute_import, division
 import json
-import numpy as np
-from numpy.testing.decorators import skipif
 import shutil
 import sys
 import tempfile
 import unittest
+from argparse import Namespace
+import numpy as np
+from numpy.testing.decorators import skipif
 
 try:
     import pylearn2

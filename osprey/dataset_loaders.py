@@ -23,7 +23,7 @@ class MSMBuilderDatasetLoader(BaseDatasetLoader):
         from msmbuilder.dataset import dataset
         ds = dataset(self.path, mode='r', fmt=self.fmt, verbose=self.verbose)
         print(ds.provenance)
-        return ds
+        return ds, None
 
 class MDTrajDatasetLoader(BaseDatasetLoader):
     short_name = 'mdtraj'

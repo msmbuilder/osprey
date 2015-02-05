@@ -119,14 +119,15 @@ def test_scoring():
     assert config.scoring() is 'sdfsfsdf'
 
 
-def test_cv():
+def test_cv_1():
     from sklearn.cross_validation import ShuffleSplit
-    config = Config.fromdict({
-        'cv': {'name': 'shufflesplit', 'params': {'n_iter': 10}}
-    }, check_fields=False)
-    cv = config.cv(range(100))
-    assert isinstance(cv, ShuffleSplit)
-    assert cv.n_iter == 10
+    for name in ['shufflesplit', 'ShuffleSplit']:
+        config = Config.fromdict({
+            'cv': {'name': name, 'params': {'n_iter': 10}}
+        }, check_fields=False)
+        cv = config.cv(range(100))
+        assert isinstance(cv, ShuffleSplit)
+        assert cv.n_iter == 10
 
 
 def test_stratified_cv():

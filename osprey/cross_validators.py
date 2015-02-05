@@ -14,7 +14,7 @@ class BaseCVFactory(object):
 
 
 class ShuffleSplitFactory(BaseCVFactory):
-    short_name = 'shufflesplit'
+    short_name = ['shufflesplit', 'ShuffleSplit']
 
     def __init__(self, n_iter=10, test_size=0.1, train_size=None,
                  random_state=None):
@@ -33,7 +33,7 @@ class ShuffleSplitFactory(BaseCVFactory):
 
 
 class KFoldFactory(BaseCVFactory):
-    short_name = 'kfold'
+    short_name = ['kfold', 'KFold']
 
     def __init__(self, n_folds=3, shuffle=False, random_state=None):
         self.n_folds = n_folds
@@ -48,7 +48,7 @@ class KFoldFactory(BaseCVFactory):
 
 
 class LeaveOneOutFactory(BaseCVFactory):
-    short_name = 'loo'
+    short_name = ['loo', 'LeaveOneOut']
 
     def __init__(self):
         pass
@@ -60,7 +60,7 @@ class LeaveOneOutFactory(BaseCVFactory):
 
 
 class StratifiedShuffleSplitFactory(BaseCVFactory):
-    short_name = 'stratifiedshufflesplit'
+    short_name = ['stratifiedshufflesplit', 'StratifiedShuffleSplit']
 
     def __init__(self, n_iter=10, test_size=0.1, train_size=None,
                  random_state=None):
@@ -79,7 +79,7 @@ class StratifiedShuffleSplitFactory(BaseCVFactory):
 
 
 class StratifiedKFoldFactory(BaseCVFactory):
-    short_name = 'stratifiedkfold'
+    short_name = ['stratifiedkfold', 'StratifiedKFold']
 
     def __init__(self, n_folds=3, shuffle=False, random_state=None):
         self.n_folds = n_folds
@@ -104,7 +104,7 @@ class FixedCVFactory(BaseCVFactory):
     stop : int, optional
         Stop index of validation set.
     """
-    short_name = 'fixed'
+    short_name = ['fixed', 'Fixed']
 
     def __init__(self, start, stop=None):
         self.valid = slice(start, stop)

@@ -29,23 +29,23 @@ def init_subclass_by_name(baseclass, short_name, params):
                 if 'unexpected' in str(e):
                     avail = join_quoted(spec.args[1:])
                     raise RuntimeError(
-                        "%s's %s. Available params for this strategy are: %s."
+                        "%s's %s. Available params for this subclass are: %s."
                         % (kls.short_name, str(e), avail))
                 elif 'takes exactly' in str(e):
                     required = join_quoted(spec.args[1:-len(spec.defaults)])
                     raise RuntimeError(
-                        "%s's %s. Required params for this strategy are %s."
+                        "%s's %s. Required params for this subclass are %s."
                         % (kls.short_name, str(e), required))
                 elif 'takes at least' in str(e):
                     required = join_quoted(spec.args[1:-len(spec.defaults)])
                     optional = join_quoted(spec.args[-len(spec.defaults):])
                     raise RuntimeError(
-                        "%s's %s. Required params for this strategy are: %s. "
+                        "%s's %s. Required params for this subclass are: %s. "
                         "Optional params are: %s" % (
                             kls.short_name, str(e), required, optional))
                 # :(
                 raise
 
     avail_names = ', '.join(str(e.short_name) for e in sc)
-    raise ValueError('"%s" is not a recognized strategy. available strategies '
+    raise ValueError('"%s" is not a recognized subclass. available subclasses '
                      'are: %s' % (short_name, avail_names))

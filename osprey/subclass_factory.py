@@ -22,7 +22,8 @@ def init_subclass_by_name(baseclass, short_name, params):
     sc = baseclass.__subclasses__()
     for kls in sc:
         if kls.short_name == short_name or \
-            (_is_collection(kls.short_name) and short_name in kls.short_name):
+                (_is_collection(kls.short_name)
+                 and short_name in kls.short_name):
             try:
                 return kls(**params)
             except TypeError as e:
@@ -51,7 +52,8 @@ def init_subclass_by_name(baseclass, short_name, params):
                 raise
 
     chain = itertools.chain.from_iterable(
-        e.short_name if _is_collection(e.short_name) else [e.short_name] for e in sc)
+        e.short_name if _is_collection(e.short_name) else [e.short_name]
+        for e in sc)
     avail_names = ', '.join(str(n) for n in chain)
     raise ValueError('"%s" is not a recognized subclass. available names '
                      'are: %s' % (short_name, avail_names))

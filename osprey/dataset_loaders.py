@@ -12,8 +12,10 @@ class BaseDatasetLoader(object):
     def load(self):
         raise NotImplementedError('should be implemented in subclass')
 
+
 class MSMBuilderDatasetLoader(BaseDatasetLoader):
     short_name = 'msmbuilder'
+
     def __init__(self, path, fmt=None, verbose=False):
         self.path = path
         self.fmt = fmt
@@ -22,8 +24,12 @@ class MSMBuilderDatasetLoader(BaseDatasetLoader):
     def load(self):
         from msmbuilder.dataset import dataset
         ds = dataset(self.path, mode='r', fmt=self.fmt, verbose=self.verbose)
+        print('Provenance')
+        print('----------')
         print(ds.provenance)
+        print()
         return ds, None
+
 
 class MDTrajDatasetLoader(BaseDatasetLoader):
     short_name = 'mdtraj'

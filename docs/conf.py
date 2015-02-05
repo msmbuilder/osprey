@@ -20,7 +20,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'osprey'
-copyright = u'2014, Stanford University'
+copyright = u'2014-2015, Stanford University'
 
 # The short X.Y version.
 version = osprey._version.get_versions()['version']

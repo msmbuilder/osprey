@@ -35,8 +35,10 @@ Example SGE Script
     #
     #$ -cwd
     #$ -j y
+    #$ -o /dev/null
     #$ -S /bin/bash
     #$ -t 1-10
+    #$ -V
 
     # handle if we are or are not part of an array job
     if [ "$SGE_TASK_ID" = "undefined" ]; then

@@ -44,6 +44,8 @@ class MDTrajDatasetLoader(BaseDatasetLoader):
         import mdtraj
 
         filenames = sorted(glob.glob(expand_path(self.trajectories)))
+        if len(filenames) == 0:
+            raise RuntimeError('no filenames matched by pattern: %s' % self.filenames)
 
         top = self.topology
         kwargs = {}
@@ -75,6 +77,9 @@ class FilenameDatasetLoader(BaseDatasetLoader):
 
     def load(self):
         filenames = sorted(glob.glob(expand_path(self.traj_glob)))
+        if len(filenames) == 0:
+            raise RuntimeError('no filenames matched by pattern: %s' % self.filenames)
+
         if self.abs_path:
             filenames = [os.path.abspath(fn) for fn in filenames]
         return filenames, None
@@ -99,6 +104,9 @@ class JoblibDatasetLoader(BaseDatasetLoader):
         X, y = [], []
 
         filenames = sorted(glob.glob(expand_path(self.filenames)))
+        if len(filenames) == 0:
+            raise RuntimeError('no filenames matched by pattern: %s' % self.filenames)
+
         for fn in filenames:
             obj = joblib.load(fn)
             if isinstance(obj, (list, np.ndarray)):

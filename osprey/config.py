@@ -273,6 +273,9 @@ class Config(object):
         with in_directory(dirname(abspath(self.path))):
             X, y = loader.load()
 
+        if len(X) == 0:
+            raise RuntimeError('dataset not found.')
+
         return X, y
 
     def trials(self):

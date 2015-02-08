@@ -196,7 +196,8 @@ class MOE(BaseStrategy):
                 # force flake8 not to complain about unused import
                 bool(GpNextPointsEpi)
                 self._use_local_moe = True
-            except ImportError:
+            except ImportError as e:
+                print(e, file=sys.stderr)
                 msg = ('with strategy = "moe", either "url" parameter must be '
                        'set to point to an external MOE REST API, or you must '
                        'have a local copy of MOE installed and importable. '

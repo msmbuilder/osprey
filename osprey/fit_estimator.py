@@ -5,15 +5,13 @@ from distutils.version import LooseVersion
 
 import numpy as np
 import sklearn
-from sklearn.pipeline import Pipeline
 from sklearn.base import is_classifier, clone
 from sklearn.metrics.scorer import check_scoring
 from sklearn.utils.validation import check_arrays
 from sklearn.externals.joblib import Parallel, delayed
 from sklearn.cross_validation import _check_cv as check_cv, _safe_split, _score
 
-from .utils import short_format_time
-from .eval_scopes import import_all_estimators
+from .utils import short_format_time, is_msmbuilder_estimator
 
 
 if LooseVersion(sklearn.__version__) < LooseVersion('0.15.0'):
@@ -72,7 +70,7 @@ def fit_and_score_estimator(estimator, parameters, cv, X, y=None, scoring=None,
         n_train_samples.append(n_train)
 
     if iid:
-        if verbose > 0 and _is_msmbuilder_estimator(estimator):
+        if verbose > 0 and is_msmbuilder_estimator(estimator):
             print('[CV] Using MSMBuilder API n_samples averaging')
             print('[CV]   n_train_samples: %s' % str(n_train_samples))
             print('[CV]   n_test_samples: %s' % str(n_test_samples))
@@ -123,7 +121,7 @@ def _fit_and_score(estimator, X, y, scorer, train, test, verbose, parameters,
 
     scoring_time = time.time() - start_time
 
-    msmbuilder_api = _is_msmbuilder_estimator(estimator)
+    msmbuilder_api = is_msmbuilder_estimator(estimator)
     n_samples_test = _num_samples(X_test, msmbuilder_api=msmbuilder_api)
     n_samples_train = _num_samples(X_train, msmbuilder_api=msmbuilder_api)
     if verbose > 2:
@@ -149,17 +147,3 @@ def _num_samples(x, msmbuilder_api=False):
         return sum(len(xx) for xx in x)
 
     return x.shape[0] if hasattr(x, 'shape') else len(x)
-
-
-def _is_msmbuilder_estimator(estimator):
-    try:
-        import msmbuilder
-    except ImportError:
-        return False
-    msmbuilder_estimators = import_all_estimators(msmbuilder).values()
-
-    out = estimator.__class__ in msmbuilder_estimators
-    if isinstance(estimator, Pipeline):
-        out = any(step.__class__ in msmbuilder_estimators
-                  for name, step in estimator.steps)
-    return out

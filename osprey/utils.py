@@ -3,6 +3,9 @@ import os.path
 import sys
 import contextlib
 from datetime import datetime
+from sklearn.pipeline import Pipeline
+
+from .eval_scopes import import_all_estimators
 
 __all__ = ['dict_merge']
 
@@ -136,3 +139,17 @@ def expand_path(path, base='.'):
     if not os.path.isabs(path):
         path = os.path.join(base, path)
     return path
+
+
+def is_msmbuilder_estimator(estimator):
+    try:
+        import msmbuilder
+    except ImportError:
+        return False
+    msmbuilder_estimators = import_all_estimators(msmbuilder).values()
+
+    out = estimator.__class__ in msmbuilder_estimators
+    if isinstance(estimator, Pipeline):
+        out = any(step.__class__ in msmbuilder_estimators
+                  for name, step in estimator.steps)
+    return out

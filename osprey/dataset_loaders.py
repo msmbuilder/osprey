@@ -24,10 +24,8 @@ class MSMBuilderDatasetLoader(BaseDatasetLoader):
     def load(self):
         from msmbuilder.dataset import dataset
         ds = dataset(self.path, mode='r', fmt=self.fmt, verbose=self.verbose)
-        print('Provenance')
-        print('----------')
+        print('Dataset provenance:\n')
         print(ds.provenance)
-        print()
         return ds, None
 
 

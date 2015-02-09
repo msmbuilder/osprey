@@ -12,8 +12,11 @@ __all__ = ['msmbuilder', 'import_all_estimators']
 
 
 def msmbuilder():
-    import msmbuilder
-    from sklearn.pipeline import Pipeline
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
+        import msmbuilder
+        from sklearn.pipeline import Pipeline
+
     scope = import_all_estimators(msmbuilder)
     scope['Pipeline'] = Pipeline
     return scope
@@ -28,20 +31,19 @@ def import_all_estimators(pkg):
             if inspect.isclass(obj) and issubclass(obj, BaseEstimator):
                 yield obj
 
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", category=DeprecationWarning)
-
-        result = {}
-        for _, modname, ispkg in pkgutil.iter_modules(pkg.__path__):
-            c = '%s.%s' % (pkg.__name__, modname)
-            try:
+    result = {}
+    for _, modname, ispkg in pkgutil.iter_modules(pkg.__path__):
+        c = '%s.%s' % (pkg.__name__, modname)
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", category=DeprecationWarning)
                 mod = importlib.import_module(c)
-                if ispkg:
-                    result.update(import_all_estimators(mod))
-                for kls in estimator_in_module(mod):
-                    result[kls.__name__] = kls
-            except ImportError as e:
-                print('e', e)
-                continue
+            if ispkg:
+                result.update(import_all_estimators(mod))
+            for kls in estimator_in_module(mod):
+                result[kls.__name__] = kls
+        except ImportError as e:
+            print('e', e)
+            continue
 
-        return result
+    return result

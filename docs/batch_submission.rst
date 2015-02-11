@@ -38,6 +38,7 @@ Example SGE Script
     #$ -o /dev/null
     #$ -S /bin/bash
     #$ -t 1-10
+    #$ -l h_rt=12:00:00
     #$ -V
 
     # handle if we are or are not part of an array job

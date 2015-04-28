@@ -152,7 +152,6 @@ class HyperoptTPE(BaseStrategy):
 
         fmin(fn=mock_fn, algo=tpe.suggest, space=hp_searchspace, trials=trials,
              max_evals=len(trials.trials)+1,
-             allow_trials_fmin=False,
              **self._hyperopt_fmin_random_kwarg(random))
         chosen_params = chosen_params_container[0]
 
@@ -162,7 +161,7 @@ class HyperoptTPE(BaseStrategy):
     def _hyperopt_fmin_random_kwarg(random):
         if 'rstate' in inspect.getargspec(fmin).args:
             # 0.0.3-dev version uses this argument
-            kwargs = {'rstate': random}
+            kwargs = {'rstate': random, allow_trials_fmin: False}
         elif 'rseed' in inspect.getargspec(fmin).args:
             # 0.0.2 version uses different argument
             kwargs = {'rseed': random.randint(2**32-1)}

@@ -36,6 +36,7 @@ def hyperopt_x2_iterates(n_iters=100):
 
     for i in range(n_iters):
         fmin(fn=fn, algo=tpe.suggest, max_evals=i+1, trials=trials,
+             allow_trials_fmin=False,
              space={'x': hp.uniform('x', -10, 10)},
              **HyperoptTPE._hyperopt_fmin_random_kwarg(random))
 

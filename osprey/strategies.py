@@ -152,6 +152,7 @@ class HyperoptTPE(BaseStrategy):
 
         fmin(fn=mock_fn, algo=tpe.suggest, space=hp_searchspace, trials=trials,
              max_evals=len(trials.trials)+1,
+             allow_trials_fmin=False,
              **self._hyperopt_fmin_random_kwarg(random))
         chosen_params = chosen_params_container[0]
 

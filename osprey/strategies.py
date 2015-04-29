@@ -161,7 +161,7 @@ class HyperoptTPE(BaseStrategy):
     def _hyperopt_fmin_random_kwarg(random):
         if 'rstate' in inspect.getargspec(fmin).args:
             # 0.0.3-dev version uses this argument
-            kwargs = {'rstate': random, allow_trials_fmin: False}
+            kwargs = {'rstate': random, 'allow_trials_fmin': False}
         elif 'rseed' in inspect.getargspec(fmin).args:
             # 0.0.2 version uses different argument
             kwargs = {'rseed': random.randint(2**32-1)}

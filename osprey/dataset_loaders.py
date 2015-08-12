@@ -29,6 +29,21 @@ class MSMBuilderDatasetLoader(BaseDatasetLoader):
         return ds, None
 
 
+class NumpyDatasetLoader(BaseDatasetLoader):
+    short_name = 'numpy'
+
+    def __init__(self, filenames):
+        self.filenames = filenames
+
+    def load(self):
+        filenames = sorted(glob.glob(expand_path(self.filenames)))
+        if len(filenames) == 0:
+            raise RuntimeError('no filenames matched by pattern: %s' %
+                               self.filenames)
+        ds = [np.load(f) for f in filenames]
+        return ds, None
+
+
 class MDTrajDatasetLoader(BaseDatasetLoader):
     short_name = 'mdtraj'
 

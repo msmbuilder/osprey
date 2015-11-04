@@ -12,7 +12,8 @@ from .config import Config
 try:
     import pandas as pd
     import bokeh.plotting as bk
-    from bokeh.objects import HoverTool, ColumnDataSource
+    from bokeh.models import HoverTool
+    from bokeh.models.sources import ColumnDataSource
 except ImportError:
     raise RuntimeError(
         'This command requires the Bokeh library (http://bokeh.pydata.org/). '

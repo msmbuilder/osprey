@@ -17,7 +17,7 @@ try:
     from bokeh.models.sources import ColumnDataSource
 except ImportError:
     raise RuntimeError(
-        'This command requires the Bokeh library (http://bokeh.pydata.org/). '
+        'This command requires the Bokeh library (http://bokeh.pydata.org/) version >=0.10.0. '
         '\n\n    $ conda install bokeh  # (recommended)\n'
         'or\n    $ pip install bokeh')
 

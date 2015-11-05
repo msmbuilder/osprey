@@ -9,9 +9,6 @@ import numpy as np
 from six.moves.urllib.error import HTTPError, URLError
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.parse import urlparse
-DEFAULT_TIMEOUT = socket._GLOBAL_DEFAULT_TIMEOUT
-
-
 from sklearn.utils import check_random_state
 try:
     from hyperopt import (Trials, tpe, fmin, STATUS_OK, STATUS_RUNNING,
@@ -21,6 +18,8 @@ except ImportError:
     pass
 
 from .search_space import EnumVariable
+
+DEFAULT_TIMEOUT = socket._GLOBAL_DEFAULT_TIMEOUT
 
 
 class BaseStrategy(object):
@@ -162,7 +161,7 @@ class HyperoptTPE(BaseStrategy):
     def _hyperopt_fmin_random_kwarg(random):
         if 'rstate' in inspect.getargspec(fmin).args:
             # 0.0.3-dev version uses this argument
-            kwargs = {'rstate': random}
+            kwargs = {'rstate': random, 'allow_trials_fmin': False}
         elif 'rseed' in inspect.getargspec(fmin).args:
             # 0.0.2 version uses different argument
             kwargs = {'rseed': random.randint(2**32-1)}
@@ -196,7 +195,8 @@ class MOE(BaseStrategy):
                 # force flake8 not to complain about unused import
                 bool(GpNextPointsEpi)
                 self._use_local_moe = True
-            except ImportError:
+            except ImportError as e:
+                print(e, file=sys.stderr)
                 msg = ('with strategy = "moe", either "url" parameter must be '
                        'set to point to an external MOE REST API, or you must '
                        'have a local copy of MOE installed and importable. '

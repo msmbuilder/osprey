@@ -1,4 +1,13 @@
 language: c
+sudo: false
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+      - liblapack-dev
+      - libatlas3gf-base
+      - gfortran
 
 branches:
   only:
@@ -14,11 +23,6 @@ env:
         - hyperopt=none    python=3.4  pylearn2=none
 
 install:
-  # install packages for pylearn2 plugin
-  - '[ "$pylearn2" != "none" ]
-      && sudo apt-get install -qq libatlas3gf-base liblapack-dev gfortran
-      || echo ""'
-
   - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
   - bash Miniconda-latest-Linux-x86_64.sh -b
   - export PATH=$HOME/miniconda/bin:$PATH
@@ -48,13 +52,7 @@ install:
       && pip install hyperopt
       || echo ""'
   - '[ "$hyperopt" = "dev" ]
-      && git clone https://github.com/hyperopt/hyperopt.git
-      && cd hyperopt
-      && git remote add rmcgibbo https://github.com/rmcgibbo/hyperopt.git
-      && git pull rmcgibbo no-distribute
-      && python setup.py install
-      && cd ..
-      && rm -rf hyperopt
+      && pip install git+git://github.com/hyperopt/hyperopt.git
       || echo ""'
 
   # install packages for pylearn2 plugin

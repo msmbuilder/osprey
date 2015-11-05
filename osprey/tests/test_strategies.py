@@ -50,7 +50,8 @@ def our_x2_iterates(n_iters=100):
 
     # note the switch of sign, because _our_ function hyperopt_tpe is
     # a maximizer, not a minimizer
-    fn = lambda params: -params['x']**2
+    def fn(params):
+        return -params['x']**2
 
     for i in range(n_iters):
         params = HyperoptTPE(seed=random).suggest(history, searchspace)

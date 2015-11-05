@@ -19,6 +19,7 @@ from .config import Config
 from .trials import Trial
 from .fit_estimator import fit_and_score_estimator
 from .utils import Unbuffered, format_timedelta, current_pretty_time
+from .utils import is_msmbuilder_estimator
 
 
 def execute(args, parser):
@@ -34,9 +35,12 @@ def execute(args, parser):
     config_sha1 = config.sha1()
     scoring = config.scoring()
 
-    print('\nLoading dataset...')
+    if is_msmbuilder_estimator(estimator):
+        print_msmbuilder_version()
+
+    print('\nLoading dataset...\n')
     X, y = config.dataset()
-    print('  %d elements with %s labels'
+    print('Dataset contains %d elements with %s labels'
           % (len(X), 'out' if y is None else ''))
     print('Instantiated estimator:')
     print('  %r' % estimator)
@@ -169,11 +173,20 @@ def print_header():
           'hyperparameter optimization. =')
     print('='*70)
     print()
-    print('osprey version:  %s' % __version__)
-    print('time:            %s' % current_pretty_time())
-    print('hostname:        %s' % gethostname())
-    print('cwd:             %s' % os.path.abspath(os.curdir))
-    print('pid:             %s' % os.getpid())
+    print('osprey version:      %s' % __version__)
+    print('time:                %s' % current_pretty_time())
+    print('hostname:            %s' % gethostname())
+    print('cwd:                 %s' % os.path.abspath(os.curdir))
+    print('pid:                 %s' % os.getpid())
+    print()
+
+
+def print_msmbuilder_version():
+    from msmbuilder.version import full_version as msmb_version
+    from mdtraj.version import full_version as mdtraj_version
+    print()
+    print('msmbuilder version:  %s' % msmb_version)
+    print('mdtraj version:      %s' % mdtraj_version)
     print()
 
 

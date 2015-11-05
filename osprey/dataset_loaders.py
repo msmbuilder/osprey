@@ -24,10 +24,23 @@ class MSMBuilderDatasetLoader(BaseDatasetLoader):
     def load(self):
         from msmbuilder.dataset import dataset
         ds = dataset(self.path, mode='r', fmt=self.fmt, verbose=self.verbose)
-        print('Provenance')
-        print('----------')
+        print('Dataset provenance:\n')
         print(ds.provenance)
-        print()
+        return ds, None
+
+
+class NumpyDatasetLoader(BaseDatasetLoader):
+    short_name = 'numpy'
+
+    def __init__(self, filenames):
+        self.filenames = filenames
+
+    def load(self):
+        filenames = sorted(glob.glob(expand_path(self.filenames)))
+        if len(filenames) == 0:
+            raise RuntimeError('no filenames matched by pattern: %s' %
+                               self.filenames)
+        ds = [np.load(f) for f in filenames]
         return ds, None
 
 
@@ -44,6 +57,9 @@ class MDTrajDatasetLoader(BaseDatasetLoader):
         import mdtraj
 
         filenames = sorted(glob.glob(expand_path(self.trajectories)))
+        if len(filenames) == 0:
+            raise RuntimeError('no filenames matched by pattern: %s' %
+                               self.trajectories)
 
         top = self.topology
         kwargs = {}
@@ -75,6 +91,10 @@ class FilenameDatasetLoader(BaseDatasetLoader):
 
     def load(self):
         filenames = sorted(glob.glob(expand_path(self.traj_glob)))
+        if len(filenames) == 0:
+            raise RuntimeError('no filenames matched by pattern: %s' %
+                               self.traj_glob)
+
         if self.abs_path:
             filenames = [os.path.abspath(fn) for fn in filenames]
         return filenames, None
@@ -99,6 +119,10 @@ class JoblibDatasetLoader(BaseDatasetLoader):
         X, y = [], []
 
         filenames = sorted(glob.glob(expand_path(self.filenames)))
+        if len(filenames) == 0:
+            raise RuntimeError('no filenames matched by pattern: %s' %
+                               self.filenames)
+
         for fn in filenames:
             obj = joblib.load(fn)
             if isinstance(obj, (list, np.ndarray)):

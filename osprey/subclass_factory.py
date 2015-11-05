@@ -22,8 +22,7 @@ def init_subclass_by_name(baseclass, short_name, params):
     sc = baseclass.__subclasses__()
     for kls in sc:
         if kls.short_name == short_name or \
-                (_is_collection(kls.short_name)
-                 and short_name in kls.short_name):
+           (_is_collection(kls.short_name) and short_name in kls.short_name):
             try:
                 return kls(**params)
             except TypeError as e:

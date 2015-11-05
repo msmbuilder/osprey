@@ -48,13 +48,7 @@ install:
       && pip install hyperopt
       || echo ""'
   - '[ "$hyperopt" = "dev" ]
-      && git clone https://github.com/hyperopt/hyperopt.git
-      && cd hyperopt
-      && git remote add rmcgibbo https://github.com/rmcgibbo/hyperopt.git
-      && git pull rmcgibbo no-distribute
-      && python setup.py install
-      && cd ..
-      && rm -rf hyperopt
+      && pip install git+git://github.com/hyperopt/hyperopt.git
       || echo ""'
 
   # install packages for pylearn2 plugin

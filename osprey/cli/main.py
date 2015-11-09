@@ -10,6 +10,7 @@ from . import parser_worker
 from . import parser_plot
 from . import parser_currentbest
 
+
 def main():
     help = 'osprey is a tool for machine learning hyperparameter optimization.'
     p = argparse.ArgumentParser(description=help)

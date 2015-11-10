@@ -223,8 +223,8 @@ class Config(object):
             type = info.pop('type')
             if type not in ('int', 'float', 'enum', 'jump'):
                 raise RuntimeError('search/space/%s type="%s" is not valid. '
-                                   'valid types are int, float, enum, and jump' %
-                                   param_name)
+                                   'valid types are int, float, enum, and jump'
+                                   % param_name)
             try:
                 if type == 'int':
                     if sorted(list(info.keys())) != ['max', 'min']:
@@ -246,10 +246,10 @@ class Config(object):
                             '"min", "max", and optionally "warp"' % param_name)
                     searchspace.add_float(param_name, **info)
                 elif type == 'jump':
-                    if sorted(list(info.keys())) != ['jump', 'max', 'min']:
+                    if sorted(list(info.keys())) != ['max', 'min', 'step']:
                         raise RuntimeError(
                             'search/space/%s type="jump" must contain keys '
-                            '"min", "max", and "jump"' % param_name)
+                            '"min", "max", and "step"' % param_name)
                     searchspace.add_jump(param_name, **info)
             except ValueError as e:
                 # searchspace.add_XXX can throw a ValueError on malformed

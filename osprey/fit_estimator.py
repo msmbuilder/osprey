@@ -8,13 +8,13 @@ import sklearn
 from sklearn.base import is_classifier, clone
 from sklearn.metrics.scorer import check_scoring
 from sklearn.externals.joblib import Parallel, delayed
-from sklearn.cross_validation import _check_cv as check_cv, _safe_split, _score
+from sklearn.cross_validation import check_cv, _safe_split, _score
 
 from .utils import check_arrays
 from .utils import short_format_time, is_msmbuilder_estimator
 
 
-if LooseVersion(sklearn.__version__) < LooseVersion('0.15.0'):
+if LooseVersion(sklearn.__version__) < LooseVersion('0.16.1'):
     raise ImportError('Please upgrade to the latest version of scikit-learn')
 
 
@@ -30,9 +30,8 @@ def fit_and_score_estimator(estimator, parameters, cv, X, y=None, scoring=None,
     way it's written, you can't change it by subclassing or monkeypatching.
 
     This function uses some undocumented internal sklearn APIs (non-public).
-    It was written against sklearn version 0.15.2, and tested against version
-    0.15.0b1; version 0.14 and before fail, due to changes in the design of
-    the CV internals.
+    It was written against sklearn version 0.16.1. Prior Versions are likely
+    to fail due to changes in the design of cross_validation module.
 
     Returns
     -------

@@ -30,6 +30,19 @@ class SearchSpace(object):
     def n_dims(self):
         return len(self.variables)
 
+    def add_jump(self, name, min, max, jump):
+        """ An integer/float valued dimension bounded between
+        range(min,max,jump). Note that the right endpoint of the interval
+        includes `max`. This is a wrapper around the add_enum.
+        """
+        try:
+            min, max, jump= map(float, (min, max, jump))
+        except:
+            raise ValueError('Variable %s must be either an int or a float'
+                             % name)
+        choices = np.arange(min, max + 1, jump)
+        self.variables[name] = EnumVariable(name, list(choices))
+
     def add_int(self, name, min, max):
         """An integer-valued dimension bounded between `min` <= x <= `max`.
         Note that the right endpoint of the interval includes `max`.

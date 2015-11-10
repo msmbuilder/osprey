@@ -74,12 +74,14 @@ def test_search_space():
             'fvar': {'type': 'float', 'min': 1, 'max': 3.5},
             'logvar': {'type': 'float', 'min': 1, 'max': 2.5, 'warp': 'log'},
             'enumvar': {'type': 'enum', 'choices': [1, False]},
+            'jumpvar': {'type': 'jump',  'min': 1, 'max': 3, 'jump': 1}
         }}, check_fields=False)
     searchspace = config.search_space()
     assert searchspace['intvar'] == IntVariable('intvar', 1, 2)
     assert searchspace['fvar'] == FloatVariable('fvar', 1, 3.5, warp=None)
     assert searchspace['logvar'] == FloatVariable('logvar', 1, 2.5, warp='log')
     assert searchspace['enumvar'] == EnumVariable('enumvar', [1, False])
+    assert searchspace['jumpvar'] == EnumVariable('jumpvar', [1.0, 2.0, 3.0])
 
 
 def test_strategy_random():

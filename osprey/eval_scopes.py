@@ -43,7 +43,7 @@ def import_all_estimators(pkg):
             for kls in estimator_in_module(mod):
                 result[kls.__name__] = kls
         except ImportError as e:
-            print('e', e)
+            print('Import Error', c, e)
             continue
 
     return result

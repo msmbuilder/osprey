@@ -102,8 +102,8 @@ def initialize_trial(strategy, searchspace, estimator, config_sha1,
         # estimator class, to save in the database
         params = clone(estimator).set_params(**params).get_params()
         params = dict((k, v) for k, v in iteritems(params)
-                      if not isinstance(v, BaseEstimator)
-                      and (k != 'steps'))
+                      if not isinstance(v, BaseEstimator) and
+                      (k != 'steps'))
 
         t = Trial(status='PENDING', parameters=params, host=gethostname(),
                   user=getuser(), started=datetime.now(),

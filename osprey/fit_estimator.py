@@ -1,6 +1,5 @@
 from __future__ import print_function, absolute_import, division
 
-import sys
 import time
 from distutils.version import LooseVersion
 

@@ -1,5 +1,6 @@
 from __future__ import print_function, absolute_import, division
 
+import sys
 import time
 from distutils.version import LooseVersion
 
@@ -95,6 +96,15 @@ def _fit_and_score(estimator, X, y, scorer, train, test, verbose, parameters,
             msg = '%s' % (', '.join('%s=%s' % (k, v)
                           for k, v in parameters.items()))
         print("[CV] %s %s" % (msg, (64 - len(msg)) * '.'))
+
+    if len(train) == 0 or len(test) == 0:
+        raise RuntimeError(
+            'Cross validation error in fit_estimator. The total data set '
+            'contains %d elements, which were split into a training set '
+            'of %d elements and a test set of %d elements. Unfortunately, '
+            'you can\'t have a %s set with 0 elements.' % (
+                len(X), len(train), len(test),
+                'training' if len(train) == 0 else 'test'))
 
     # adjust length of sample weights
     n_samples = _num_samples(X)

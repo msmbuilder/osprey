@@ -40,8 +40,11 @@ def execute(args, parser):
 
     print('\nLoading dataset...\n')
     X, y = config.dataset()
-    print('Dataset contains %d elements with %s labels'
+    print('Dataset contains %d element(s) with %s labels'
           % (len(X), 'out' if y is None else ''))
+    print('The elements have shape: [%s' %
+          ', '.join([str(X[i].shape) for i in range(min(len(X), 20))]), end='')
+    print(', ...]' if (len(X) > 20) else ']')
     print('Instantiated estimator:')
     print('  %r' % estimator)
     print(searchspace)
@@ -99,7 +102,8 @@ def initialize_trial(strategy, searchspace, estimator, config_sha1,
         # estimator class, to save in the database
         params = clone(estimator).set_params(**params).get_params()
         params = dict((k, v) for k, v in iteritems(params)
-                      if not isinstance(v, BaseEstimator))
+                      if not isinstance(v, BaseEstimator) and
+                      (k != 'steps'))
 
         t = Trial(status='PENDING', parameters=params, host=gethostname(),
                   user=getuser(), started=datetime.now(),

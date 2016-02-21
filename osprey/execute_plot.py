@@ -17,8 +17,8 @@ try:
     from bokeh.models.sources import ColumnDataSource
 except ImportError:
     raise RuntimeError(
-        'This command requires the Bokeh library (http://bokeh.pydata.org/) version >=0.10.0. '
-        '\n\n    $ conda install bokeh  # (recommended)\n'
+        'This command requires the Bokeh library (http://bokeh.pydata.org/) '
+        'version >=0.10.0.\n\n    $ conda install bokeh  # (recommended)\n'
         'or\n    $ pip install bokeh')
 
 TOOLS = "pan,wheel_zoom,box_zoom,reset,hover"
@@ -38,7 +38,7 @@ def execute(args, parser):
     p2 = plot_2(data)
     p3 = plot_3(data, config.search_space())
 
-    p = vplot(p1,p2,p3,*p4)
+    p = vplot(p1, p2, p3, *p4)
     if args.browser:
         bk.show(p)
     else:
@@ -85,15 +85,15 @@ def plot_3(data, ss):
     color = (e_scores - mine) / (maxe - mine)
     mapped_colors = map(rgb2hex, cm.get_cmap('RdBu_r')(color))
 
-    p = bk.figure(title='t-SNE (unsupervised)',tools=TOOLS)
-    #bk.hold()
+    p = bk.figure(title='t-SNE (unsupervised)', tools=TOOLS)
+
     df_params = nonconstant_parameters(data)
     df_params['score'] = scores
     p.circle(
         X[:, 0], X[:, 1], color=mapped_colors, radius=1,
         source=ColumnDataSource(df_params), fill_alpha=0.6,
         line_color=None)
-    cp = p 
+    cp = p
     hover = cp.select(dict(type=HoverTool))
     format_tt = [(s, '@%s' % s) for s in df_params.columns]
     hover.tooltips = OrderedDict([("index", "$index")] + format_tt)
@@ -102,6 +102,7 @@ def plot_3(data, ss):
     xax.axis_label = 't-SNE coord 1'
     yax.axis_label = 't-SNE coord 2'
     return p
+
 
 def plot_4(data):
     """Scatter plot of score vs each param
@@ -113,7 +114,7 @@ def plot_4(data):
     for key in params.keys():
         if params[key].dtype == np.dtype('bool'):
             params[key] = params[key].astype(np.int)
-    p_list=[]
+    p_list = []
     for key in params.keys():
         x = params[key][order]
         y = scores[order]
@@ -129,6 +130,7 @@ def plot_4(data):
             xlabel=key, title='Score vs %s' % key))
     return p_list
 
+
 def nonconstant_parameters(data):
     assert len(data) > 0
     df = pd.DataFrame([d['parameters'] for d in data])
@@ -139,8 +141,8 @@ def nonconstant_parameters(data):
 
 def build_scatter_tooltip(x, y, tt, add_line=True, radius=3, title='My Plot',
                           xlabel='Iteration number', ylabel='Score'):
-    p = bk.figure(title=title,tools=TOOLS)
-    #bk.hold()
+    p = bk.figure(title=title, tools=TOOLS)
+
     p.circle(
         x, y, radius=radius, source=ColumnDataSource(tt),
         fill_alpha=0.6, line_color=None)

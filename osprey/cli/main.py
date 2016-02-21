@@ -8,6 +8,7 @@ from . import parser_dump
 from . import parser_skeleton
 from . import parser_worker
 from . import parser_plot
+from . import parser_currentbest
 
 
 def main():
@@ -27,6 +28,7 @@ def main():
     parser_skeleton.configure_parser(sub_parsers)
     parser_worker.configure_parser(sub_parsers)
     parser_plot.configure_parser(sub_parsers)
+    parser_currentbest.configure_parser(sub_parsers)
 
     if len(sys.argv) == 1:
         sys.argv.append('-h')
@@ -45,7 +47,6 @@ def args_func(args, p):
             message = """\
 An unexpected error has occurred with osprey (version %s), please
 consider sending the following traceback to the osprey GitHub issue tracker at:
-
         https://github.com/pandegroup/osprey/issues
 """
             print(message % __version__, file=sys.stderr)

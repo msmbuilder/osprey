@@ -2,7 +2,7 @@ estimator:
   entry_point: sklearn.svm.SVC
 
 strategy:
-  name: hyperopt_tpe
+  name: gp 
 
 search_space:
   C:

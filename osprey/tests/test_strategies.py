@@ -1,16 +1,14 @@
 from __future__ import print_function, absolute_import, division
 
-import os
 import sys
 import nose
 from six import iteritems
-from six.moves.urllib import request, error
 import numpy as np
 from numpy.testing.decorators import skipif
 
 from osprey.search_space import SearchSpace
 from osprey.search_space import IntVariable, EnumVariable, FloatVariable
-from osprey.strategies import RandomSearch, HyperoptTPE, MOE
+from osprey.strategies import RandomSearch, HyperoptTPE, GP
 
 try:
     from hyperopt import hp, fmin, tpe, Trials
@@ -68,15 +66,7 @@ def test_1():
     np.testing.assert_array_equal(ref, ours)
 
 
-def test_moe_rest_1():
-    moe_url = os.environ.get('MOE_API_URL', 'http://ERROR-sdjssfssdbsdf.com')
-    try:
-        request.urlopen(moe_url)
-    except error.URLError:
-        raise nose.SkipTest(
-            'No available MOE REST API endpoint (set with '
-            'MOE_API_URL environment variable)')
-
+def test_gp():
     searchspace = SearchSpace()
     searchspace.add_float('x', -10, 10)
     searchspace.add_float('y', 1, 10, warp='log')
@@ -85,7 +75,7 @@ def test_moe_rest_1():
 
     history = [(searchspace.rvs(), np.random.random(), 'SUCCEEDED')
                for _ in range(4)]
-    params = MOE(url=moe_url).suggest(history, searchspace)
+    params = GP().suggest(history, searchspace)
     for k, v in iteritems(params):
         assert k in searchspace.variables
         if isinstance(searchspace[k], EnumVariable):

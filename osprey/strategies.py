@@ -192,18 +192,20 @@ class GP(BaseStrategy):
         model.optimize(messages=False, max_f_eval=self.max_feval)
         self.model = model
 
-    def _optimize(self, init=None, uncertainty=False):
+    def _get_random_point(self):
+        return np.array([np.random.uniform(low=0., high=1.)
+                         for i in range(self.n_dims)])
+
+    def _optimize(self, init=None):
         if not init:
-            init = self._init()
+            init = self._get_random_point()
 
         def z(x):
             y = x.copy().reshape(-1, self.n_dims)
             s, v = self.model.predict(y)
             s[(x < 0.)*(x > 1.)] = -1
             v[(x < 0.)*(x > 1.)] = -1
-            if uncertainty:
-                return -v.flatten()
-            return -s.flatten()
+            return -(s+v).flatten()
 
         return minimizer(z, init, maxiter=self.max_iter, disp=0)
 
@@ -227,6 +229,7 @@ class GP(BaseStrategy):
                 ignore.append(point)
             else:
                 raise RuntimeError('unrecognized status: %s' % status)
+
         return (np.array(X).reshape(-1, self.n_dims),
                 np.array(Y).reshape(-1, 1),
                 np.array(ignore).reshape(-1, self.n_dims))
@@ -248,10 +251,6 @@ class GP(BaseStrategy):
             return True
         return False
 
-    def _init(self):
-        return np.array([np.random.uniform(low=0., high=1.)
-                         for i in range(self.n_dims)])
-
     def suggest(self, history, searchspace, max_tries=5):
         if not GPRegression:
             raise ImportError('No module named GPy')
@@ -270,11 +269,7 @@ class GP(BaseStrategy):
 
         suggestion = self._optimize()
 
-        tries = 0
-        while suggestion in ignore or self._is_within(suggestion, X):
-            if tries > max_tries:
-                return RandomSearch().suggest(history, searchspace)
-            suggestion = self._optimize(uncertainty=True)
-            tries += 1
+        if suggestion in ignore or self._is_within(suggestion, X):
+            return RandomSearch().suggest(history, searchspace)
 
         return self._from_gp(suggestion, searchspace)

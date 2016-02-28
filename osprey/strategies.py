@@ -16,10 +16,10 @@ try:
     from GPy import kern
     from GPy.kern import Matern52, White, Bias
     from GPy.models import GPRegression
-    from scipy.optimize import fmin as minimizer
+    from scipy.optimize import minimize
 except:
-    # GPy is optional, but required for hyperopt_gp()
-    GPRegression = kern = minimizer = None
+    # GPy is optional, but required for gp
+    GPRegression = kern = minimize = None
     pass
 from .search_space import EnumVariable
 
@@ -203,11 +203,10 @@ class GP(BaseStrategy):
         def z(x):
             y = x.copy().reshape(-1, self.n_dims)
             s, v = self.model.predict(y)
-            s[(x < 0.)*(x > 1.)] = -1
-            v[(x < 0.)*(x > 1.)] = -1
             return -(s+v).flatten()
 
-        return minimizer(z, init, maxiter=self.max_iter, disp=0)
+        return minimize(z, init, bounds=self.n_dims*[(0., 1.)],
+                        options={'maxiter': self.max_iter, 'disp': 0}).x
 
     def _get_data(self, history, searchspace):
         X = []
@@ -254,7 +253,7 @@ class GP(BaseStrategy):
     def suggest(self, history, searchspace, max_tries=5):
         if not GPRegression:
             raise ImportError('No module named GPy')
-        if not minimizer:
+        if not minimize:
             raise ImportError('No module named SciPy')
 
         if not history:

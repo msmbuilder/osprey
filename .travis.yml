@@ -17,10 +17,10 @@ env:
     global:
         - secure: "VYtefbSblg3LfO6aHY92MSPhOlRIHFu3VffyJ9jys7r4/3s+xnXUs/5SMw+74RHMq4JLMF7jzfnGOyOxX4wcvckPLtgKzQC+Oa5yPXpsssQB/Pw3jlvN+2Oo3LgiTKTand23UYnxcjNQuY7rh/YnJBFZEnPB7BHfrqadfnKNJEI="
     matrix:
-        - hyperopt=0.0.2   python=2.6  pylearn2=dev
-        - hyperopt=dev     python=2.7  pylearn2=dev
+        - hyperopt=none     python=2.7  pylearn2=none
         - hyperopt=0.0.2   python=2.7  pylearn2=dev
         - hyperopt=none    python=3.4  pylearn2=none
+        - hyperopt=dev    python=3.4  pylearn2=none
 
 install:
   - MINICONDA=Miniconda3-latest-Linux-x86_64.sh
@@ -36,11 +36,6 @@ install:
 
   # install pip
   - conda install --yes pip
-
-  # install python2.6 backports
-  - '[ "$python" = "2.6" ]
-      && pip install importlib argparse
-      || echo ""'
 
   # install extra dependency for style checking
   - conda install --yes flake8
@@ -69,9 +64,7 @@ install:
       || echo ""'
 
 # install GPy
-  - '[ "$python" != "2.6" ]
-        && conda install --yes -c omnia gpy
-        || echo ""'
+  - conda install --yes -c omnia gpy
 
   - python setup.py install
 

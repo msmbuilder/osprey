@@ -1,7 +1,6 @@
 from __future__ import print_function, absolute_import, division
 
 import sys
-import nose
 from six import iteritems
 import numpy as np
 from numpy.testing.decorators import skipif
@@ -66,6 +65,7 @@ def test_1():
     np.testing.assert_array_equal(ref, ours)
 
 
+@skipif('GPy' not in sys.modules, 'this test requires hyperopt')
 def test_gp():
     searchspace = SearchSpace()
     searchspace.add_float('x', -10, 10)

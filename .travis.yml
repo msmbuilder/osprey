@@ -68,7 +68,10 @@ install:
       && rm -rf pylearn2
       || echo ""'
 
-  - conda install -c omnia gpy
+# install GPy
+  - '[ "$python" != "2.6" ]
+        && conda install --yes -c omnia gpy
+        || echo ""'
 
   - python setup.py install
 

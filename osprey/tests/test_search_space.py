@@ -126,42 +126,42 @@ def test_5_2():
     _run_chi2_test(values, bin_edges)
 
 
-def test_moe_1():
+def test_gp_1():
     v = IntVariable('name', 1, 10)
-    assert 2 == v.point_from_moe(v.point_to_moe(2))
-    assert 1 == v.point_from_moe(v.point_to_moe(1))
-    assert 10 == v.point_from_moe(v.point_to_moe(10))
+    assert 2 == v.point_from_gp(v.point_to_gp(2))
+    assert 1 == v.point_from_gp(v.point_to_gp(1))
+    assert 10 == v.point_from_gp(v.point_to_gp(10))
 
-    assert v.point_to_moe(1) == 0
-    assert v.point_to_moe(10) == 1
+    assert v.point_to_gp(1) == 0
+    assert v.point_to_gp(10) == 1
 
 
-def test_moe_2():
+def test_gp_2():
     v = FloatVariable('name', 1, 10, None)
-    assert (2-1) / (10-1) == v.point_to_moe(2)
-    assert 0.0 == v.point_to_moe(1)
-    assert 1.0 == v.point_to_moe(10)
-    assert 2.0 == v.point_from_moe(v.point_to_moe(2))
-    assert 1.0 == v.point_from_moe(v.point_to_moe(1))
-    assert 1.0 == v.point_from_moe(v.point_to_moe(0.9))
-    assert 10.0 == v.point_from_moe(v.point_to_moe(10))
-    assert 10.0 == v.point_from_moe(v.point_to_moe(10.1))
+    assert (2-1) / (10-1) == v.point_to_gp(2)
+    assert 0.0 == v.point_to_gp(1)
+    assert 1.0 == v.point_to_gp(10)
+    assert 2.0 == v.point_from_gp(v.point_to_gp(2))
+    assert 1.0 == v.point_from_gp(v.point_to_gp(1))
+    assert 1.0 == v.point_from_gp(v.point_to_gp(0.9))
+    assert 10.0 == v.point_from_gp(v.point_to_gp(10))
+    assert 10.0 == v.point_from_gp(v.point_to_gp(10.1))
 
 
-def test_moe_3():
+def test_gp_3():
     v = FloatVariable('name', 1, 10, 'log')
-    assert 2.0 == v.point_from_moe(v.point_to_moe(2))
-    assert 1.0 == v.point_from_moe(v.point_to_moe(1))
-    assert 1.0 == v.point_from_moe(v.point_to_moe(0.9))
-    assert 10.0 == v.point_from_moe(v.point_to_moe(10))
-    assert 10.0 == v.point_from_moe(v.point_to_moe(10.1))
+    assert 2.0 == v.point_from_gp(v.point_to_gp(2))
+    assert 1.0 == v.point_from_gp(v.point_to_gp(1))
+    assert 1.0 == v.point_from_gp(v.point_to_gp(0.9))
+    assert 10.0 == v.point_from_gp(v.point_to_gp(10))
+    assert 10.0 == v.point_from_gp(v.point_to_gp(10.1))
 
 
-def test_moe_4():
+def test_gp_4():
     v = EnumVariable('name', ['a', 'b', 'c'])
-    assert 'a' == v.point_from_moe(v.point_to_moe('a'))
-    assert 'b' == v.point_from_moe(v.point_to_moe('b'))
-    assert 'c' == v.point_from_moe(v.point_to_moe('c'))
-    assert 0 == v.point_to_moe('a')
-    assert 0.5 == v.point_to_moe('b')
-    assert 1 == v.point_to_moe('c')
+    assert 'a' == v.point_from_gp(v.point_to_gp('a'))
+    assert 'b' == v.point_from_gp(v.point_to_gp('b'))
+    assert 'c' == v.point_from_gp(v.point_to_gp('c'))
+    assert 0 == v.point_to_gp('a')
+    assert 0.5 == v.point_to_gp('b')
+    assert 1 == v.point_to_gp('c')

@@ -219,7 +219,7 @@ class GP(BaseStrategy):
                 # not sure how to deal with these yet
                 continue
 
-            point = searchspace.point_to_moe(param_dict)
+            point = searchspace.point_to_gp(param_dict)
             if status == 'SUCCEEDED':
                 X.append(point)
                 Y.append(score)
@@ -237,11 +237,11 @@ class GP(BaseStrategy):
 
         # Note that MOE only deals with float-valued variables, so we have
         # a transform step on either side, where int and enum valued variables
-        # are transformed before calling moe, and then the result suggested by
+        # are transformed before calling gp, and then the result suggested by
         # MOE needs to be reverse-transformed.
         out = {}
-        for moevalue, var in zip(result, searchspace):
-            out[var.name] = var.point_from_moe(float(moevalue))
+        for gpvalue, var in zip(result, searchspace):
+            out[var.name] = var.point_from_gp(float(gpvalue))
 
         return out
 

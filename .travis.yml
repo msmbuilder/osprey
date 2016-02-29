@@ -31,7 +31,6 @@ install:
   - export PATH=$HOME/miniconda3/bin:$PATH
 
   # install requirements file in python
-  - conda config --add channels https://conda.anaconda.org/omnia
   - conda create --yes -n test python=$python `cat requirements.txt | xargs`
   - source activate test
 
@@ -68,6 +67,8 @@ install:
       && cd -
       && rm -rf pylearn2
       || echo ""'
+
+  - conda install -c omnia gpy
 
   - python setup.py install
 

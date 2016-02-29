@@ -88,15 +88,12 @@ package `hyperopt <https://github.com/hyperopt/hyperopt>`_ be installed. Example
     name: hyperopt_tpe
 
 Finally, ``osprey`` supports a Gaussian process expected improvement search
-strategy, using the package `MOE <https://github.com/yelp/moe>`_, with
-``strategy: {name: moe}``. MOE can be used either as a python package installed
-locally, or over a HTTP REST API. To use the REST API, specify the
+strategy, using the package `GPy <https://github.com/SheffieldML/GPy>`_, with
+``strategy: {name: gp}``.
 ``url`` param. Example: ::
 
   strategy:
-    name: moe
-    params:
-      # url: http://path.to.moe.rest.api
+    name: gpy
 
 
 .. _dataset_loader:
@@ -116,7 +113,7 @@ Example: ::
 Cross Validation
 ----------------
 
-Many types of cross-validation iterators are supported. The simplest 
+Many types of cross-validation iterators are supported. The simplest
 option is to simply pass an ``int``, which sets up k-fold cross validation.
 Example: ::
 
@@ -129,7 +126,7 @@ To access the other iterators, use the ``name`` and ``params`` keywords: ::
     params:
       n_iter: 5
       test_size: 0.5
-      
+
 Here's a complete list of supported iterators, along with their ``name`` mappings:
 
 * ``kfold``: `KFold <http://scikit-learn.org/stable/modules/generated/sklearn.cross_validation.KFold.html#sklearn.cross_validation.KFold>`_

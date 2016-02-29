@@ -39,7 +39,7 @@ Dependencies
 - ``scikit-learn``
 - ``sqlalchemy``
 - ``hyperopt`` (recommended, required for ``engine=hyperopt_tpe``)
-- ``MOE`` (recommended, required for ``engine=moe``)
+- ``GPy`` (recommended, required for ``engine=gp``)
 - ``scipy`` (optional, for testing)
 - ``nose`` (optional, for testing)
 
@@ -52,25 +52,15 @@ Hyperopt can be installed with pip. ::
   $ pip install hyperopt
 
 
-Getting Moe
+Getting GPy
 -----------
 
-To use the MOE search strategy, ``osprey`` can call MOE via two interfaces
+To use the Gaussian Process (``gp``) search strategy, ``osprey`` uses
+GPy <https://github.com/SheffieldML/GPy>
 
- - MOE's REST API, over HTTP
- - MOE's python API
 
-Using the MOE REST API requires that you set up a MOE server somewhere.
-The recommended way to do this is via the MOE docker image. See the
-`MOE documentation <https://github.com/Yelp/MOE#install-in-docker>`_
-for more information.
+To use the GPy python API, you must install GPy on the machines you use to run
+osprey. For easy installation, use the conda binary packages that
+we've compiled. ::
 
-To use the MOE python API, you must install MOE on the machines you use to run
-osprey. The MOE documentation has some information on how to do this, but it
-can be tricky. An easier alternative is to use the conda binary packages that
-we compiled for 64-bit linux (otherwise, sorry, you're on your own). ::
-
-  conda install -c https://conda.binstar.org/rmcgibbo moe
-
-See `the github repo <https://github.com/rmcgibbo/conda-moe>`_ for more info
-on the compilation of these binaries.
+  conda install -c omnia gp

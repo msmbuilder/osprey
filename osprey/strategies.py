@@ -14,7 +14,8 @@ except ImportError:
 
 try:
     from GPy import kern
-    from GPy.kern import Matern52, White, Bias
+    from GPy.kern import RBF, Fixed, Bias
+    from GPy.util.linalg import tdot
     from GPy.models import GPRegression
     from scipy.optimize import minimize
 except:
@@ -100,11 +101,11 @@ class HyperoptTPE(BaseStrategy):
         hp_searchspace = searchspace.to_hyperopt()
 
         trials = Trials()
-        for i, (params, score, status) in enumerate(history):
+        for i, (params, scores, status) in enumerate(history):
             if status == 'SUCCEEDED':
                 # we're doing maximization, hyperopt.fmin() does minimization,
                 # so we need to swap the sign
-                result = {'loss': -score, 'status': STATUS_OK}
+                result = {'loss': -np.mean(scores), 'status': STATUS_OK}
             elif status == 'PENDING':
                 result = {'status': STATUS_RUNNING}
             elif status == 'FAILED':
@@ -175,17 +176,22 @@ class HyperoptTPE(BaseStrategy):
 class GP(BaseStrategy):
     short_name = 'gp'
 
-    def __init__(self, kernel=None, max_feval=5E4, max_iter=1E5):
-        self.kernel = kernel
+    def __init__(self, max_feval=5E4, max_iter=1E5):
         self.max_feval = max_feval
         self.max_iter = max_iter
         self.model = None
         self.n_dims = None
+        self.kernel = None
+        self._kerns = None
+        self._kernf = None
+        self._kernb = None
 
-    def _set_kernel(self):
-        self.kernel = (Matern52(self.n_dims, ARD=True) +
-                       White(self.n_dims) +
-                       Bias(self.n_dims))
+    def _create_kernel(self, V):
+        self._kerns = [RBF(1, ARD=True, active_dims=[i])
+                       for i in range(self.n_dims)]
+        self._kernf = Fixed(self.n_dims, tdot(V))
+        self._kernb = Bias(self.n_dims)
+        self.kernel = np.sum(self._kerns) + self._kernf + self._kernb
 
     def _fit_model(self, X, Y):
         model = GPRegression(X, Y, self.kernel)
@@ -202,7 +208,8 @@ class GP(BaseStrategy):
 
         def z(x):
             y = x.copy().reshape(-1, self.n_dims)
-            s, v = self.model.predict(y)
+            s, v = self.model.predict(y, kern=(np.sum(self._kerns).copy() +
+                                               self._kernb.copy()))
             return -(s+v).flatten()
 
         return minimize(z, init, bounds=self.n_dims*[(0., 1.)],
@@ -211,8 +218,9 @@ class GP(BaseStrategy):
     def _get_data(self, history, searchspace):
         X = []
         Y = []
+        V = []
         ignore = np.array([])
-        for param_dict, score, status in history:
+        for param_dict, scores, status in history:
             # transform points into the MOE domain. This invloves bringing
             # int and enum variables to floating point, etc.
             if status == 'FAILED':
@@ -222,7 +230,8 @@ class GP(BaseStrategy):
             point = searchspace.point_to_gp(param_dict)
             if status == 'SUCCEEDED':
                 X.append(point)
-                Y.append(score)
+                Y.append(np.mean(scores))
+                V.append(np.var(scores))
 
             elif status == 'PENDING':
                 ignore.append(point)
@@ -231,6 +240,7 @@ class GP(BaseStrategy):
 
         return (np.array(X).reshape(-1, self.n_dims),
                 np.array(Y).reshape(-1, 1),
+                np.array(V).reshape(-1, 1),
                 np.array(ignore).reshape(-1, self.n_dims))
 
     def _from_gp(self, result, searchspace):
@@ -260,10 +270,9 @@ class GP(BaseStrategy):
             return RandomSearch().suggest(history, searchspace)
 
         self.n_dims = searchspace.n_dims
-        if not self.kernel:
-            self._set_kernel()
 
-        X, Y, ignore = self._get_data(history, searchspace)
+        X, Y, V, ignore = self._get_data(history, searchspace)
+        self._create_kernel(V)
         self._fit_model(X, Y)
 
         suggestion = self._optimize()

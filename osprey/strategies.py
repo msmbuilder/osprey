@@ -220,7 +220,7 @@ class GP(BaseStrategy):
         X = []
         Y = []
         V = []
-        ignore = np.array([])
+        ignore = []
         for param_dict, scores, status in history:
             # transform points into the MOE domain. This invloves bringing
             # int and enum variables to floating point, etc.

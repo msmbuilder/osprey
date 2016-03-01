@@ -3,6 +3,8 @@ estimator:
 
 strategy:
   name: gp
+  params:
+    seeds: 5
 
 search_space:
   C:

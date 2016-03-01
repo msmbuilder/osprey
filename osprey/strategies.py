@@ -176,7 +176,8 @@ class HyperoptTPE(BaseStrategy):
 class GP(BaseStrategy):
     short_name = 'gp'
 
-    def __init__(self, max_feval=5E4, max_iter=1E5):
+    def __init__(self, seeds=1, max_feval=5E4, max_iter=1E5):
+        self.seeds = seeds
         self.max_feval = max_feval
         self.max_iter = max_iter
         self.model = None
@@ -266,7 +267,7 @@ class GP(BaseStrategy):
         if not minimize:
             raise ImportError('No module named SciPy')
 
-        if not history:
+        if len(history) < self.seeds:
             return RandomSearch().suggest(history, searchspace)
 
         self.n_dims = searchspace.n_dims

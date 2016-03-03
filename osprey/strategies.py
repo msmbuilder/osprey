@@ -1,14 +1,9 @@
 from __future__ import print_function, absolute_import, division
 import sys
-import json
 import inspect
 import socket
-from argparse import Namespace
 
 import numpy as np
-from six.moves.urllib.error import HTTPError, URLError
-from six.moves.urllib.request import urlopen
-from six.moves.urllib.parse import urlparse
 from sklearn.utils import check_random_state
 try:
     from hyperopt import (Trials, tpe, fmin, STATUS_OK, STATUS_RUNNING,
@@ -17,6 +12,16 @@ except ImportError:
     # hyperopt is optional, but required for hyperopt_tpe()
     pass
 
+try:
+    from GPy import kern
+    from GPy.kern import RBF, Fixed, Bias
+    from GPy.util.linalg import tdot
+    from GPy.models import GPRegression
+    from scipy.optimize import minimize
+except:
+    # GPy is optional, but required for gp
+    GPRegression = kern = minimize = None
+    pass
 from .search_space import EnumVariable
 
 DEFAULT_TIMEOUT = socket._GLOBAL_DEFAULT_TIMEOUT
@@ -96,11 +101,11 @@ class HyperoptTPE(BaseStrategy):
         hp_searchspace = searchspace.to_hyperopt()
 
         trials = Trials()
-        for i, (params, score, status) in enumerate(history):
+        for i, (params, scores, status) in enumerate(history):
             if status == 'SUCCEEDED':
                 # we're doing maximization, hyperopt.fmin() does minimization,
                 # so we need to swap the sign
-                result = {'loss': -score, 'status': STATUS_OK}
+                result = {'loss': -np.mean(scores), 'status': STATUS_OK}
             elif status == 'PENDING':
                 result = {'status': STATUS_RUNNING}
             elif status == 'FAILED':
@@ -168,166 +173,112 @@ class HyperoptTPE(BaseStrategy):
         return kwargs
 
 
-class MOE(BaseStrategy):
-    short_name = 'moe'
+class GP(BaseStrategy):
+    short_name = 'gp'
 
-    def __init__(self, url=None, noise_variance=0.1, method='constant_liar',
-                 lie_method='constant_liar_min'):
-        self.url = url
-        self.noise_variance = noise_variance
-        self.method = method
-        self.lie_method = lie_method
-        if method not in ('epi', 'kriging', 'constant_liar'):
-            raise ValueError("method must be one of 'epi', 'kriging', "
-                             "'constant_liar'")
+    def __init__(self, seeds=1, max_feval=5E4, max_iter=1E5):
+        self.seeds = seeds
+        self.max_feval = max_feval
+        self.max_iter = max_iter
+        self.model = None
+        self.n_dims = None
+        self.kernel = None
+        self._kerns = None
+        self._kernf = None
+        self._kernb = None
 
-        if lie_method not in ('constant_liar_min', 'constant_liar_max',
-                              'constant_liar_mean'):
-            raise ValueError("method lie_method be one of 'constant_liar_min',"
-                             " 'constant_liar_max', 'constant_liar_mean'")
+    def _create_kernel(self, V):
+        self._kerns = [RBF(1, ARD=True, active_dims=[i])
+                       for i in range(self.n_dims)]
+        self._kernf = Fixed(self.n_dims, tdot(V))
+        self._kernb = Bias(self.n_dims)
+        self.kernel = np.sum(self._kerns) + self._kernf + self._kernb
 
-        if self.url:
-            self._use_local_moe = False
-        else:
-            try:
-                # check if it's importable
-                from moe.views.rest.gp_next_points_epi import GpNextPointsEpi
-                # force flake8 not to complain about unused import
-                bool(GpNextPointsEpi)
-                self._use_local_moe = True
-            except ImportError as e:
-                print(e, file=sys.stderr)
-                msg = ('with strategy = "moe", either "url" parameter must be '
-                       'set to point to an external MOE REST API, or you must '
-                       'have a local copy of MOE installed and importable. '
-                       'See the MOE documentation at '
-                       'http://yelp.github.io/MOE/ for details')
-                raise RuntimeError(msg)
+    def _fit_model(self, X, Y):
+        model = GPRegression(X, Y, self.kernel)
+        model.optimize(messages=False, max_f_eval=self.max_feval)
+        self.model = model
 
-    def suggest(self, history, searchspace):
-        """Suggest params to maximize an objective function based on the
-        function evaluation history using a Gaussian Process Expected
-        Parallel Improvement (GPEI) algorithm, as implemented by MOE [1].
+    def _get_random_point(self):
+        return np.array([np.random.uniform(low=0., high=1.)
+                         for i in range(self.n_dims)])
 
-        .. [1] http://yelp.github.io/MOE/index.html
-        """
-        request = self._build_request(history, searchspace)
+    def _optimize(self, init=None):
+        if not init:
+            init = self._get_random_point()
 
-        if self._use_local_moe:
-            results = self._call_moe_locally(request)
-        else:
-            results = self._call_moe_rest_api(request)
+        def z(x):
+            y = x.copy().reshape(-1, self.n_dims)
+            s, v = self.model.predict(y, kern=(np.sum(self._kerns).copy() +
+                                               self._kernb.copy()))
+            return -(s+v).flatten()
 
-        return self._build_response(results, searchspace)
+        return minimize(z, init, bounds=self.n_dims*[(0., 1.)],
+                        options={'maxiter': self.max_iter, 'disp': 0}).x
 
-    def _build_request(self, history, searchspace):
-        points_sampled = []
-        points_being_sampled = []
-        for param_dict, score, status in history:
+    def _get_data(self, history, searchspace):
+        X = []
+        Y = []
+        V = []
+        ignore = []
+        for param_dict, scores, status in history:
             # transform points into the MOE domain. This invloves bringing
             # int and enum variables to floating point, etc.
             if status == 'FAILED':
                 # not sure how to deal with these yet
                 continue
 
-            point = searchspace.point_to_moe(param_dict)
+            point = searchspace.point_to_gp(param_dict)
             if status == 'SUCCEEDED':
-                points_sampled.append({
-                    'point': point,
-                    'value': -score,
-                    'value_var': self.noise_variance,
-                })
+                X.append(point)
+                Y.append(np.mean(scores))
+                V.append(np.var(scores))
+
             elif status == 'PENDING':
-                points_being_sampled.append(point)
+                ignore.append(point)
             else:
                 raise RuntimeError('unrecognized status: %s' % status)
 
-        # shift the 'score' to be zero mean, which is suggested
-        # in the MOE docs
-        # http://yelp.github.io/MOE/moe.views.schemas.html#moe.views.schemas.base_schemas.GpHistoricalInfo
-        mean = np.mean([p['value'] for p in points_sampled])
-        for p in points_sampled:
-            p['value'] = p['value'] - mean
+        return (np.array(X).reshape(-1, self.n_dims),
+                np.array(Y).reshape(-1, 1),
+                np.array(V).reshape(-1, 1),
+                np.array(ignore).reshape(-1, self.n_dims))
 
-        request = {
-            'num_to_sample': 1,
-            'domain_info': {
-                'dim': searchspace.n_dims,
-                'domain_bounds': [var.domain_to_moe() for var in searchspace],
-            }, 'gp_historical_info': {
-                'points_sampled': points_sampled
-            },
-            'points_being_sampled': points_being_sampled
-        }
-
-        if self.method == 'constant_liar':
-            request['lie_method'] = self.lie_method
-            request['lie_noise_variance'] = 1e-12
-        if self.method == 'kriging':
-            request['kriging_noise_variance'] = 1e-12
-        return request
-
-    def _build_response(self, results, searchspace):
-        if 'optimizer_success' not in results['status']:
-            raise ValueError('failure from MOE. received %s' % results)
+    def _from_gp(self, result, searchspace):
 
         # Note that MOE only deals with float-valued variables, so we have
         # a transform step on either side, where int and enum valued variables
-        # are transformed before calling moe, and then the result suggested by
+        # are transformed before calling gp, and then the result suggested by
         # MOE needs to be reverse-transformed.
         out = {}
-        for moevalue, var in zip(results['points_to_sample'][0], searchspace):
-            out[var.name] = var.point_from_moe(float(moevalue))
+        for gpvalue, var in zip(result, searchspace):
+            out[var.name] = var.point_from_gp(float(gpvalue))
 
         return out
 
-    def _call_moe_rest_api(self, request):
-        base = self.url
-        if base.endswith('/'):
-            base = base[:-1]
-        endpoint = base + '/gp/next_points/' + self.method
-        parsed = urlparse(endpoint)
-        if parsed.netloc == '':
-            endpoint = 'http://' + endpoint
+    def _is_within(self, point, X, tol=1E-2):
+        if True in (np.sqrt(((point - X)**2).sum(axis=0)) <= tol):
+            return True
+        return False
 
-        if not bool(urlparse(endpoint)):
-            raise RuntimeError('moe url "%s" is not a valid endpoint' %
-                               endpoint)
+    def suggest(self, history, searchspace, max_tries=5):
+        if not GPRegression:
+            raise ImportError('No module named GPy')
+        if not minimize:
+            raise ImportError('No module named SciPy')
 
-        jdata = json.dumps(request).encode('utf-8')
-        resp = urlopen_with_retries(endpoint, jdata)
-        result = json.loads(resp.read().decode('utf-8'))
-        return result
+        if len(history) < self.seeds:
+            return RandomSearch().suggest(history, searchspace)
 
-    def _call_moe_locally(self, request):
-        from moe.views.rest.gp_next_points_epi import GpNextPointsEpi
-        from moe.views.rest.gp_next_points_kriging import GpNextPointsKriging
-        from moe.views.rest.gp_next_points_constant_liar import \
-            GpNextPointsConstantLiar
+        self.n_dims = searchspace.n_dims
 
-        mock_object = Namespace(json_body=request)
-        if self.method == 'epi':
-            gp_next_points_epi = GpNextPointsEpi(mock_object)
-            result = gp_next_points_epi.gp_next_points_epi_view()
-        elif self.method == 'kriging':
-            gp_next_points_kriging = GpNextPointsKriging(mock_object)
-            result = gp_next_points_kriging.gp_next_points_kriging_view()
-        elif self.method == 'constant_liar':
-            gp_next_points_cl = GpNextPointsConstantLiar(mock_object)
-            result = gp_next_points_cl.gp_next_points_constant_liar_view()
-        else:
-            raise ValueError('unrecognized method: %s' % self.method)
+        X, Y, V, ignore = self._get_data(history, searchspace)
+        self._create_kernel(V)
+        self._fit_model(X, Y)
 
-        return result
+        suggestion = self._optimize()
 
+        if suggestion in ignore or self._is_within(suggestion, X):
+            return RandomSearch().suggest(history, searchspace)
 
-def urlopen_with_retries(url, data=None, timeout=DEFAULT_TIMEOUT, n_retries=3):
-    error = None
-    for i in range(n_retries):
-        try:
-            return urlopen(url=url, data=data, timeout=timeout)
-        except (URLError, HTTPError) as e:
-            error = e
-            continue
-    print("Error hitting url=%s" % url, file=sys.stderr)
-    raise error
+        return self._from_gp(suggestion, searchspace)

@@ -8,7 +8,7 @@ from sklearn.cluster import KMeans
 
 from osprey.config import Config
 from osprey.search_space import IntVariable, FloatVariable, EnumVariable
-from osprey.strategies import RandomSearch, HyperoptTPE, MOE
+from osprey.strategies import RandomSearch, HyperoptTPE, GP
 
 
 os.environ['OSPREYRC'] = ' '
@@ -98,20 +98,11 @@ def test_search_engine_hyperopt_tpe():
     assert isinstance(config.strategy(), HyperoptTPE)
 
 
-def test_search_engine_moe_1():
+def test_search_engine_gp():
     config = Config.fromdict({
-        'strategy': {'name': 'moe', 'params': {'url': 'sdfsdf'}}
+        'strategy': {'name': 'gp'}
     }, check_fields=False)
-    assert isinstance(config.strategy(), MOE)
-
-
-def test_search_engine_moe_2():
-    config = Config.fromdict({
-        'strategy': {'name': 'moe', 'params': {'url': 'abc'}}
-    }, check_fields=False)
-    strat = config.strategy()
-    assert isinstance(strat, MOE)
-    assert strat.url == 'abc'
+    assert isinstance(config.strategy(), GP)
 
 
 def test_scoring():

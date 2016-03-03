@@ -99,8 +99,8 @@ class SearchSpace(object):
     def to_hyperopt(self):
         return dict((v.name, v.to_hyperopt()) for v in self)
 
-    def point_to_moe(self, point_dict):
-        return [var.point_to_moe(point_dict[var.name]) for var in self]
+    def point_to_gp(self, point_dict):
+        return [var.point_to_gp(point_dict[var.name]) for var in self]
 
     def __repr__(self):
         lines = (['Hyperparameter search space:'] +
@@ -126,14 +126,14 @@ class IntVariable(namedtuple('IntVariable', ('name', 'min', 'max'))):
     def to_hyperopt(self):
         return pyll.scope.int(hp.uniform(self.name, self.min, self.max+1))
 
-    def domain_to_moe(self):
+    def domain_to_gp(self):
         return {'min': 0.0, 'max': 1.0}
 
-    def point_to_moe(self, value):
+    def point_to_gp(self, value):
         return (value - self.min) / (self.max - self.min)
 
-    def point_from_moe(self, moevalue):
-        return int(self.min + (moevalue * (self.max - self.min)))
+    def point_from_gp(self, gpvalue):
+        return int(self.min + (gpvalue * (self.max - self.min)))
 
 
 class FloatVariable(namedtuple('FloatVariable',
@@ -158,10 +158,10 @@ class FloatVariable(namedtuple('FloatVariable',
             return hp.loguniform(self.name, np.log(self.min), np.log(self.max))
         raise ValueError('unknown warp: %s' % self.warp)
 
-    def domain_to_moe(self):
+    def domain_to_gp(self):
         return {'min': 0.0, 'max': 1.0}
 
-    def point_to_moe(self, value):
+    def point_to_gp(self, value):
         if self.warp is None:
             return (value - self.min) / (self.max - self.min)
         elif self.warp == 'log':
@@ -170,12 +170,12 @@ class FloatVariable(namedtuple('FloatVariable',
 
         raise ValueError('unknown warp: %s' % self.warp)
 
-    def point_from_moe(self, moevalue):
+    def point_from_gp(self, gpvalue):
         if self.warp is None:
-            outvalue = self.min + (moevalue * (self.max - self.min))
+            outvalue = self.min + (gpvalue * (self.max - self.min))
         elif self.warp == 'log':
             rng = np.log(self.max) - np.log(self.min)
-            outvalue = np.exp(np.log(self.min) + moevalue * rng)
+            outvalue = np.exp(np.log(self.min) + gpvalue * rng)
         else:
             raise ValueError('unknown warp: %s' % self.warp)
 
@@ -196,15 +196,15 @@ class EnumVariable(namedtuple('EnumVariable', ('name', 'choices'))):
     def to_hyperopt(self):
         return hp.choice(self.name, self.choices)
 
-    def domain_to_moe(self):
+    def domain_to_gp(self):
         return {'min': 0.0, 'max': 1.0}
 
-    def point_to_moe(self, value):
+    def point_to_gp(self, value):
         try:
             index = next(i for i, c in enumerate(self.choices) if c == value)
         except StopIteration:
             raise ValueError('%s not in %s' % (value, self.choices))
         return float(index) / (len(self.choices) - 1)
 
-    def point_from_moe(self, moevalue):
-        return self.choices[int(np.round(moevalue * (len(self.choices) - 1)))]
+    def point_from_gp(self, gpvalue):
+        return self.choices[int(np.round(gpvalue * (len(self.choices) - 1)))]

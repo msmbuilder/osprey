@@ -86,7 +86,7 @@ def initialize_trial(strategy, searchspace, estimator, config_sha1,
     with sessionbuilder() as session:
         # requery the history ever iteration, because another worker
         # process may have written to it in the mean time
-        history = [[t.parameters, t.mean_test_score, t.status]
+        history = [[t.parameters, t.test_scores, t.status]
                    for t in session.query(Trial).all()]
 
         print('History contains: %d trials' % len(history))

@@ -1,7 +1,9 @@
 Osprey
 ======
-[![Build Status](https://travis-ci.org/pandegroup/osprey.svg?branch=master)](https://travis-ci.org/pandegroup/osprey)
-[![Documentation Status](https://readthedocs.org/projects/osprey/badge/?version=latest)](http://osprey.rtfd.org)
+[![Build Status](https://travis-ci.org/msmbuilder/osprey.svg?branch=master)](https://travis-ci.org/msmbuilder/osprey)
+[![PyPi version](https://badge.fury.io/py/osprey.svg)](https://pypi.python.org/pypi/osprey/)
+[![License](https://img.shields.io/badge/license-ASLv2.0-red.svg?style=flat)]  (https://pypi.python.org/pypi/osprey/)
+[![Documentation](https://img.shields.io/badge/docs-latest-blue.svg?style=flat)] (http://msmbuilder.org/osprey)
 
 osprey is an easy-to-use tool for hyperparameter optimization for machine
 learning algorithms in python using scikit-learn (or using scikit-learn

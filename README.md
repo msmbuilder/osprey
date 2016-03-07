@@ -1,7 +1,9 @@
 Osprey
 ======
-[![Build Status](https://travis-ci.org/pandegroup/osprey.svg?branch=master)](https://travis-ci.org/pandegroup/osprey) [![PyPi version](https://pypip.in/v/osprey/badge.svg)](https://pypi.python.org/pypi/osprey/) [![Supported Python versions](https://pypip.in/py_versions/osprey/badge.svg)](https://pypi.python.org/pypi/osprey/) [![License](https://pypip.in/license/osprey/badge.svg)](https://pypi.python.org/pypi/osprey/)
-[![Documentation Status](https://readthedocs.org/projects/osprey/badge/?version=latest)](http://osprey.rtfd.org)
+[![Build Status](https://travis-ci.org/msmbuilder/osprey.svg?branch=master)](https://travis-ci.org/msmbuilder/osprey)
+[![PyPi version](https://badge.fury.io/py/osprey.svg)](https://pypi.python.org/pypi/osprey/)
+[![License](https://img.shields.io/badge/license-ASLv2.0-red.svg?style=flat)]  (https://pypi.python.org/pypi/osprey/)
+[![Documentation](https://img.shields.io/badge/docs-latest-blue.svg?style=flat)] (http://msmbuilder.org/osprey)
 
 osprey is an easy-to-use tool for hyperparameter optimization for machine
 learning algorithms in python using scikit-learn (or using scikit-learn
@@ -11,14 +13,37 @@ Each osprey experiment combines an dataset, an estimator, a search space
 (and engine), cross validation and asynchronous serialization for distributed
 parallel optimization of model hyperparameters.
 
-<p align="center">
-  <a href='http://osprey.rtfd.org'>Full documentation</a>
-</p>
+Documentation
+------------
+For full documentation, please visit the [Osprey homepage](http://msmbuilder.org/osprey).
 
-Example (with [MSMBuilder](https://github.com/msmbuilder/msmbuilder) models/datasets)
--------------------------------------------------------------
+
+Installation
+------------
+
+If you have an Anaconda Python distribution, installation is as easy as:
 ```
-$ cat config.yaml
+$ conda install -c omnia osprey
+```
+
+You can also install with `pip`:
+```
+$ pip install git+git://github.com/pandegroup/osprey.git
+```
+
+Alternatively, you can install directly from this GitHub repo:
+```
+$ git clone https://github.com/msmbuilder/osprey.git
+$ cd osprey && python setup.py install
+```
+
+
+Example using [MSMBuilder](https://github.com/msmbuilder/msmbuilder)
+-------------------------------------------------------------
+Below is an example of an osprey `config` file to cross validate Markov state
+models based on varying the number of clusters and dihedral angles used in a
+model:
+```yaml
 estimator:
   eval_scope: msmbuilder
   eval: |
@@ -57,28 +82,8 @@ of `osprey worker` simultaneously on a cluster too.
 
 ```
 $ osprey worker config.yaml
-======================================================================
-= osprey is a tool for machine learning hyperparameter optimization. =
-======================================================================
 
-osprey version:  0.2_10_g18392d9_dirty-py2.7.egg
-time:            October 27, 2014 10:44 PM
-hostname:        dn0a230538.sunet
-cwd:             /private/var/folders/yb/vpt17lxs67vf02qpvgvjrc5m0000gn/T/tmpDgBwlU
-pid:             99407
-
-Loading config file:     config.yaml...
-Loading trials database: sqlite:///osprey-trials.db (table = "trials")...
-
-Loading dataset...
-  100 elements without labels
-Instantiated estimator:
-  Pipeline(steps=[('featurizer', DihedralFeaturizer(sincos=True, types=['phi', 'psi'])), ('tica', tICA(gamma=0.05, lag_time=1, n_components=4, weighted_transform=False)), ('cluster', MiniBatchKMeans(batch_size=100, compute_labels=True, init='k-means++',
-        init_size=None, max_iter=100, max_no_improvement=...toff=1, lag_time=1, n_timescales=5, prior_counts=0,
-         reversible_type='mle', verbose=False))])
-Hyperparameter search space:
-  featurizer__types        	(enum)    choices = (['phi', 'psi'], ['phi', 'psi', 'chi1'])
-  cluster__n_clusters      	(int)         10 <= x <= 100
+...
 
 ----------------------------------------------------------------------
 Beginning iteration                                              1 / 1
@@ -103,20 +108,6 @@ osprey worker exiting.
 You can dump the database to JSON or CSV with `osprey dump`.
 
 
-Installation
-------------
-```
-# grab the latest version from github
-$ pip install git+git://github.com/pandegroup/osprey.git
-```
-
-```
-# or clone the repo yourself and run `setup.py`
-$ git clone https://github.com/pandegroup/osprey.git
-$ cd osprey && python setup.py install
-```
-
-
 Dependencies
 ------------
 - `six`
@@ -124,8 +115,7 @@ Dependencies
 - `numpy`
 - `scikit-learn`
 - `sqlalchemy`
-- `hyperopt` (recommended, required for `engine=hyperopt_tpe`)
-- `scipy` (optional, for testing)
+- `GPy` (optional, required for `gp` strategy)
+- `scipy` (optional, required for `gp` strategy)
+- `hyperopt` (optional, required for `hyperopt_tpe` strategy)
 - `nose` (optional, for testing)
-
-On python2.6, the `argparse` and `importlib` backports are also required

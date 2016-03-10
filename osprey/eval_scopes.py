@@ -41,7 +41,8 @@ def import_all_estimators(pkg):
             if ispkg:
                 result.update(import_all_estimators(mod))
             for kls in estimator_in_module(mod):
-                result[kls.__name__] = kls
+                if kls.__name__ not in result.keys():
+                    result[kls.__name__] = kls
         except ImportError as e:
             print('Import Error', c, e)
             continue

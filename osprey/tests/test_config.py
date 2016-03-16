@@ -71,15 +71,18 @@ def test_search_space():
     config = Config.fromdict({
         'search_space': {
             'intvar': {'type': 'int', 'min': 1, 'max': 2},
+            'logivar': {'type': 'int', 'min': 1, 'max': 2, 'warp': 'log'},
             'fvar': {'type': 'float', 'min': 1, 'max': 3.5},
-            'logvar': {'type': 'float', 'min': 1, 'max': 2.5, 'warp': 'log'},
+            'logfvar': {'type': 'float', 'min': 1, 'max': 2.5, 'warp': 'log'},
             'enumvar': {'type': 'enum', 'choices': [1, False]},
             'jumpvar': {'type': 'jump',  'min': 1, 'max': 3, 'step': 1}
         }}, check_fields=False)
     searchspace = config.search_space()
-    assert searchspace['intvar'] == IntVariable('intvar', 1, 2)
+    assert searchspace['intvar'] == IntVariable('intvar', 1, 2, warp=None)
+    assert searchspace['logivar'] == IntVariable('logivar', 1, 2, warp='log')
     assert searchspace['fvar'] == FloatVariable('fvar', 1, 3.5, warp=None)
-    assert searchspace['logvar'] == FloatVariable('logvar', 1, 2.5, warp='log')
+    assert searchspace['logfvar'] == FloatVariable('logfvar', 1, 2.5,
+                                                   warp='log')
     assert searchspace['enumvar'] == EnumVariable('enumvar', [1, False])
     assert searchspace['jumpvar'] == EnumVariable('jumpvar', [1.0, 2.0, 3.0])
 

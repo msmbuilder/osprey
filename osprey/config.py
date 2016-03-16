@@ -227,7 +227,8 @@ class Config(object):
                                    % param_name)
             try:
                 if type == 'int':
-                    if sorted(list(info.keys())) != ['max', 'min']:
+                    if sorted(list(info.keys())) not in (
+                            ['max', 'min'], ['max', 'min', 'warp']):
                         raise RuntimeError(
                             'search/space/%s type="int" must contain keys '
                             '"min", "max"' % param_name)

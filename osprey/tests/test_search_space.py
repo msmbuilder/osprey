@@ -127,7 +127,7 @@ def test_5_2():
 
 
 def test_gp_1():
-    v = IntVariable('name', 1, 10)
+    v = IntVariable('name', 1, 10, None)
     assert 2 == v.point_from_gp(v.point_to_gp(2))
     assert 1 == v.point_from_gp(v.point_to_gp(1))
     assert 10 == v.point_from_gp(v.point_to_gp(10))

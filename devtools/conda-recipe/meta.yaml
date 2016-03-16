@@ -28,6 +28,7 @@ test:
 
   commands:
     - osprey --help
+    - nosetests osprey
 
   # requires:
     # Put any additional test requirements here.  For example

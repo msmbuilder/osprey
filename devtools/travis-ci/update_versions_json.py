@@ -1,12 +1,12 @@
 import json
 from urllib.request import urlopen
-from msmbuilder import version
+from osprey import version
 
 if not version.release:
     print("This is not a release.")
     exit(0)
 
-URL = 'http://www.msmbuilder.org'
+URL = 'http://www.msmbuilder.org/osprey'
 versions = json.load(urlopen(URL + '/versions.json'))
 
 # new release so all the others are now old

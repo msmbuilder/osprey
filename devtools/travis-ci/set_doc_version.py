@@ -1,8 +1,8 @@
 import os
 import shutil
-from msmbuilder import version
+from osprey import version
 
-if version.release:
+if osprey.release:
     docversion = version.short_version
 else:
     docversion = 'development'

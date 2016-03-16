@@ -5,13 +5,6 @@ import subprocess
 from distutils.spawn import find_executable
 from setuptools import setup, find_packages
 
-versioneer.VCS = 'git'
-versioneer.versionfile_source = 'osprey/_version.py'
-versioneer.versionfile_build = 'osprey/_version.py'
-versioneer.tag_prefix = ''  # tags are like 1.2.0
-versioneer.parentdir_prefix = 'osprey-'  # dirname like 'myproject-1.2.0'
-
-
 def main(**kwargs):
     classifiers = """\
     Development Status :: 3 - Alpha

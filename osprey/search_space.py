@@ -43,7 +43,7 @@ class SearchSpace(object):
         choices = np.arange(min, max + 1, step)
         self.variables[name] = EnumVariable(name, list(choices))
 
-    def add_int(self, name, min, max):
+    def add_int(self, name, min, max, warp=None):
         """An integer-valued dimension bounded between `min` <= x <= `max`.
         Note that the right endpoint of the interval includes `max`.
 
@@ -53,7 +53,13 @@ class SearchSpace(object):
         min, max = map(int, (min, max))
         if max < min:
             raise ValueError('variable %s: max < min error' % name)
-        self.variables[name] = IntVariable(name, min, max)
+        if warp not in (None, 'log'):
+            raise ValueError('variable %s: warp=%s is not supported. use '
+                             'None or "log",' % (name, warp))
+        if min <= 0 and warp == 'log':
+            raise ValueError('variable %s: log-warping requires min > 0')
+
+        self.variables[name] = IntVariable(name, min, max, warp)
 
     def add_float(self, name, min, max, warp=None):
         """A floating point-valued dimension bounded `min` <= x < `max`
@@ -108,7 +114,7 @@ class SearchSpace(object):
         return '\n'.join(lines)
 
 
-class IntVariable(namedtuple('IntVariable', ('name', 'min', 'max'))):
+class IntVariable(namedtuple('IntVariable', ('name', 'min', 'max', 'warp'))):
     # this pattern is a simple memory-efficient way to add some methods to
     # a namedtuple, demonstrated in sklearn.
     # https://github.com/scikit-learn/scikit-learn/blob/a38372998b560d184a195bbd10a16c8f20119aa8/sklearn/grid_search.py#L259-L278
@@ -121,19 +127,37 @@ class IntVariable(namedtuple('IntVariable', ('name', 'min', 'max'))):
 
     def rvs(self, random):
         # extra +1 here because of the _inclusive_ endpoint
-        return random.randint(self.min, self.max + 1)
+        if self.warp is None:
+            return random.randint(self.min, self.max+1)
+        elif self.warp == 'log':
+            return np.exp(random.uniform(np.log(self.min), np.log(self.max+1)))
+        raise ValueError('unknown warp: %s' % self.warp)
 
     def to_hyperopt(self):
-        return pyll.scope.int(hp.uniform(self.name, self.min, self.max+1))
+        if self.warp is None:
+            return pyll.scope.int(hp.uniform(self.name, self.min, self.max+1))
+        raise ValueError('warped integers are not supported for hyperopt')
 
     def domain_to_gp(self):
         return {'min': 0.0, 'max': 1.0}
 
     def point_to_gp(self, value):
-        return (value - self.min) / (self.max - self.min)
+        if self.warp is None:
+            return (value - self.min) / (self.max - self.min)
+        elif self.warp == 'log':
+            rng = np.log(self.max) - np.log(self.min)
+            return (np.log(value) - np.log(self.min)) / rng
+
+        raise ValueError('unknown warp: %s' % self.warp)
 
     def point_from_gp(self, gpvalue):
-        return int(self.min + (gpvalue * (self.max - self.min)))
+        if self.warp is None:
+            return int(self.min + (gpvalue * (self.max - self.min)))
+        elif self.warp == 'log':
+            rng = np.log(self.max) - np.log(self.min)
+            outvalue = np.exp(np.log(self.min) + gpvalue * rng)
+            return np.clip(outvalue, self.min, self.max).astype(int)
+        raise ValueError('unknown warp: %s' % self.warp)
 
 
 class FloatVariable(namedtuple('FloatVariable',

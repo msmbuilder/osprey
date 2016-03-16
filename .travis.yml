@@ -1,77 +1,33 @@
 language: c
 sudo: false
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-      - liblapack-dev
-      - libatlas3gf-base
-      - gfortran
 
 branches:
   only:
     - master
 
-env:
-    global:
-        - secure: "VYtefbSblg3LfO6aHY92MSPhOlRIHFu3VffyJ9jys7r4/3s+xnXUs/5SMw+74RHMq4JLMF7jzfnGOyOxX4wcvckPLtgKzQC+Oa5yPXpsssQB/Pw3jlvN+2Oo3LgiTKTand23UYnxcjNQuY7rh/YnJBFZEnPB7BHfrqadfnKNJEI="
-    matrix:
-        - hyperopt=none     python=2.7  pylearn2=none
-        - hyperopt=0.0.2   python=2.7  pylearn2=dev
-        - hyperopt=none    python=3.4  pylearn2=none
-        - hyperopt=dev    python=3.4  pylearn2=none
-
 install:
-  - MINICONDA=Miniconda3-latest-Linux-x86_64.sh
-  - MINICONDA_MD5=$(curl -s http://repo.continuum.io/miniconda/ | grep -A3 $MINICONDA | sed -n '4p' | sed -n 's/ *<td>\(.*\)<\/td> */\1/p')
-  - wget http://repo.continuum.io/miniconda/$MINICONDA
-  - if [[ $MINICONDA_MD5 != $(md5sum $MINICONDA | cut -d ' ' -f 1) ]]; then  echo "Miniconda MD5 mismatch"; exit 1; fi
-  - bash $MINICONDA -b
-  - export PATH=$HOME/miniconda3/bin:$PATH
-
-  # install requirements file in python
-  - conda create --yes -n test python=$python `cat requirements.txt | xargs`
-  - source activate test
-
-  # install pip
-  - conda install --yes pip
-
-  # install extra dependency for style checking
-  - conda install --yes flake8
-
-  # instal hyperopt dependencies
-  - '[ "$hyperopt" != "none" ]
-      && conda install --yes pymongo networkx
-      || echo ""'
-
-  # install hyperopt
-  - '[ "$hyperopt" = "0.0.2" ]
-      && pip install hyperopt
-      || echo ""'
-  - '[ "$hyperopt" = "dev" ]
-      && pip install git+git://github.com/hyperopt/hyperopt.git
-      || echo ""'
-
-  # install packages for pylearn2 plugin
-  - '[ "$pylearn2" != "none" ]
-      && pip install -q --no-deps git+git://github.com/Theano/Theano.git
-      && git clone https://github.com/lisa-lab/pylearn2.git
-      && cd pylearn2
-      && echo install | python setup.py -q install
-      && cd -
-      && rm -rf pylearn2
-      || echo ""'
-
-# install GPy
-  - conda install --yes -c omnia gpy
-
-  - python setup.py install
-
+    - source devtools/travis-ci/install_miniconda.sh
+    - conda config --add channels omnia
 
 script:
-  - nosetests -v
-  # exclude versioneer.py and _version.py from style checking, since we don't
-  # write/maintain them
-  - flake8 `find . -name '*.py'  ! -name build ! -path './build/*' !
-            -path './docs*' ! -name versioneer.py ! -name _version.py | xargs`
+    conda build --quiet devtools/conda-recipe
+    && devtools/travis-ci/build_docs.sh
+
+env:
+    matrix:
+        - CONDA_PY=2.7
+        - CONDA_PY=3.5
+
+deploy:
+    - provider: s3
+      access_key_id:
+        secure: ""
+      secrete_access_key:
+        secure: ""
+      bucket: "msmbuilder.org"
+      upload-dir: osprey
+      skip_cleanup: true
+      local_dir: docs/_deploy/
+      on:
+          branch: master
+          condition: "$CONDA_PY = 3.5"

@@ -1,54 +1,67 @@
 package:
-  name: msmbuilder-dev
-  version: "3.4.0.dev0"
+  name: osprey
+  version: "0.4"
 
 source:
-  path: ../../
+  fn: osprey-0.4.tar.gz
+  url: https://pypi.python.org/packages/source/o/osprey/osprey-0.4.tar.gz
+  md5: 76c9f4467490f80d2d5d0536c47de296
+#  patches:
+   # List any patch files here
+   # - fix.patch
 
 build:
-  preserve_egg_dir: True
-  number: 0
+  # noarch_python: True
+  # preserve_egg_dir: True
   entry_points:
-    - msmb = msmbuilder.scripts.msmb:main
+    # Put any entry points (scripts to be generated automatically) here. The
+    # syntax is module:function.  For example
+    #
+    # - osprey = osprey:main
+    #
+    # Would create an entry point called osprey that calls osprey.main()
 
+    - osprey = osprey.cli.main:main
+
+  # If this is a new build for the same version, increment the build
+  # number. If you do not include this key, it defaults to 0.
+  # number: 1
 
 requirements:
   build:
     - python
     - setuptools
-    - cython
-    - numpy x.x
-    - mdtraj
+
   run:
     - python
-    - setuptools
-    - numpy x.x
-    - scipy
-    - pandas
-    - six
-    - mdtraj
-    - scikit-learn
-    - numpydoc
-    - pytables
-    - pyhmc
-
 
 test:
-  requires:
-    - nose
-    - munkres
-    - numdifftools
-    - statsmodels
-    - hmmlearn
-    - cvxpy # [not win]
+  # Python imports
   imports:
-    - msmbuilder
-  commands:
-    - msmb -h
-    - nosetests msmbuilder -v
+    - osprey
+    - osprey.cli
+    - osprey.plugins
+    - osprey.plugins.tests
+    - osprey.tests
 
+  commands:
+    # You can put test commands to be run here.  Use this to test that the
+    # entry points work.
+
+    - osprey --help
+
+  # You can also put a file called run_test.py in the recipe that will be run
+  # at test time.
+
+  # requires:
+    # Put any additional test requirements here.  For example
+    # - nose
 
 about:
-  home: https://github.com/msmbuilder/msmbuilder
-  license: LGPLv2.1+
-  summary: 'MSMBuilder: Statistical models for biomolecular dynamics'
+  home: https://github.com/pandegroup/osprey
+  license: Apache Software License
+  summary: '|Build Status| |PyPi version| |Supported Python versions| |License|\n|Documentation Status|'
+
+# See
+# http://docs.continuum.io/conda/build.html for
+# more information about meta.yaml

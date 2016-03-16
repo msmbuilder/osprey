@@ -9,7 +9,7 @@ Pre-release + Github
      of the PRs that have been merged since the laster release.
 - Update the version number in `setup.py`, change `ISRELEASED` to `True`
 - Update the version number in `devtools/conda-recipe/meta.yaml`
-- Commit to master, and [tag](https://github.com/mdtraj/mdtraj/releases) the
+- Commit to master, and tag the
   release on github.
 
 PyPI
@@ -43,6 +43,7 @@ Conda
 
 Wheels
 ------
+
 PyPI hosts *wheels*, pre-compiled binary packages, like conda packages, for OS X and
 Windows. (At the time of this writing, they are still ironing out issues w.r.t.
 linux.) To create and upload wheels, download the sdist and unpack the (or check out
@@ -68,33 +69,20 @@ Docs Building & Hosting
 =======================
 
 After a travis build succeeds, the docs are built with sphinx and pushed to
-the mdtraj.org amazon s3 account. The credentials for that account are stored,
+the msmbuilder.org amazon s3 account in the osprey/ subdirectory.
+The credentials for that account are stored,
 encrypted, in the .travis.yml file.
-(http://docs.travis-ci.com/user/build-configuration/#Secure-environment-variables)
 
-As of version 0.7-dev (0.8 release) multiple versions of the docs are hosted
+Multiple versions of the docs are hosted
 online. When a build happens on a version with ISRELEASED==False, it's put into
-the "latest" folder on the S3 bucket. If ISRELEASED==True, it's put into a
+the "development" folder on the S3 bucket. If ISRELEASED==True, it's put into a
 subfolder with the name of the short release. The relevant logic is in
-`tools/travis-ci/push-docs-to-s3.py`.
+`devtools/travis-ci/set_doc_version.py`.
 
-In order for the select bar at the bottom of the docs that toggles between
-versions to work, these folders MUST match up with the tag names on github.
-This is because the list of items to put in that little dropdown menu is
-dynamically determined from the github API in the browser. This is the only
-way I could think of to make sure the old docs have a link to the latest
-version. The logic that populates the version dropdown menu in the browser is in
-
-`docs/themes/sphinx_rtd_theme-0.1.5/sphinx_rtd_theme/versions.html`
-
-Specifically note that it goes to https://api.github.com/repos/mdtraj/mdtraj/releases,
-and uses the `tag_names` to build the links. So these must line up with the
-prefix of `mdtraj.version.short_version` used in `tools/travis-ci/push-docs-to-s3.py`
-for the links not to break.
 
 Tools License
 =============
-Copyright (c) 2012-2015 Stanford University and the Authors
+Copyright (c) 2012-2016 Stanford University and the Authors
 All rights reserved.
 
 Redistribution and use of all files in this folder (devtools) and (../.travis.yml,

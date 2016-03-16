@@ -21,9 +21,9 @@ env:
 deploy:
     - provider: s3
       access_key_id:
-        secure: ""
+        secure: "SqhEJJ2SKUk1PfmOIXvMAvycinQAhrj7hHBPvJLQBmZTeHmDxmBA5CRsZ94wCHDRuhspVRZ3AV2f0DlxqnJFS9R2zHdHtl1tz8uLG5mTLNh9uH2CyXu+iVeGnJg5S1tzzjOFeOvNZUS50UB6mQwfsjkszaHXjWBAvKYdE5PUSaw="
       secrete_access_key:
-        secure: ""
+        secure: "GwJh4dZrIFgTU8COqzwpBeemA0vjV/USrtgv4OKcUcOCoVb2hcIm4+NKZt5UH8Xhikd96u2KHb4bLict4mImVEQpbw8iL8+hJczsGFuNFM54pSFnAt0Qcg+pDb2P+2qFs4kPyOGyORKUSyXjfWpTqMsC44vwKR+PLwGZk76GT0s="
       bucket: "msmbuilder.org"
       upload-dir: osprey
       skip_cleanup: true

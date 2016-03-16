@@ -1,6 +1,6 @@
 package:
   name: osprey-dev
-  version: "0.5.dev0"
+  version: "1.0.dev0"
 
 source:
   path: ../../
@@ -28,7 +28,7 @@ test:
 
   requires:
     - nose
-    - msmbuilder
+    - gpy
 
   imports:
     - osprey

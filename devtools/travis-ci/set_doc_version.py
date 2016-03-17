@@ -2,7 +2,7 @@ import os
 import shutil
 from osprey import version
 
-if osprey.release:
+if version.release:
     docversion = version.short_version
 else:
     docversion = 'development'

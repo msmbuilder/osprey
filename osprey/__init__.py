@@ -1,2 +1,3 @@
-from .version import version
-__version__ = version
+# Don't disallow importing osprey.version the module
+from .version import version as _version
+__version__ = _version

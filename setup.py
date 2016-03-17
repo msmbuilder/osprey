@@ -44,7 +44,8 @@ def main(**kwargs):
 def readme_to_rst():
     pandoc = find_executable('pandoc')
     if pandoc is None:
-        return {}
+        raise RuntimeError("Turning the readme into a description requires "
+                           "pandoc.")
     long_description = subprocess.check_output(
         [pandoc, 'README.md', '-t', 'rst'])
     short_description = long_description.split('\n\n')[1]

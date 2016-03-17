@@ -284,9 +284,12 @@ class Config(object):
 
         return X, y
 
+    def project_name(self):
+        return self.get_value('trials/project_name')
+
     def trials(self):
         uri = self.get_value('trials/uri')
-        project_name = self.get_value('trials/project_name')
+        project_name = self.project_name()
         if self.verbose:
             print('Loading trials database: %s...' % uri)
 

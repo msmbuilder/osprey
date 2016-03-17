@@ -35,6 +35,7 @@ def execute(args, parser):
     strategy = config.strategy()
     config_sha1 = config.sha1()
     scoring = config.scoring()
+    project_name = config.project_name()
 
     if is_msmbuilder_estimator(estimator):
         print_msmbuilder_version()
@@ -72,6 +73,7 @@ def execute(args, parser):
 
         trial_id, params = initialize_trial(
             strategy, searchspace, estimator, config_sha1=config_sha1,
+            project_name=project_name,
             sessionbuilder=config.trialscontext)
 
         s = run_single_trial(
@@ -85,13 +87,14 @@ def execute(args, parser):
 
 
 def initialize_trial(strategy, searchspace, estimator, config_sha1,
-                     sessionbuilder):
+                     project_name, sessionbuilder):
 
     with sessionbuilder() as session:
         # requery the history ever iteration, because another worker
         # process may have written to it in the mean time
         history = [[t.parameters, t.test_scores, t.status]
-                   for t in session.query(Trial).all()]
+                   for t in session.query(Trial).all()
+                   if t.project_name == project_name]
 
         print('History contains: %d trials' % len(history))
         print('Choosing next hyperparameters with %s...' % strategy.short_name)

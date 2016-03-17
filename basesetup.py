@@ -15,21 +15,6 @@ from distutils.sysconfig import customize_compiler, get_config_vars
 from distutils.command.build_ext import build_ext as _build_ext
 
 
-def find_packages():
-    """Find all of mdtraj's python packages.
-    Adapted from IPython's setupbase.py. Copyright IPython
-    contributors, licensed under the BSD license.
-    """
-    packages = ['mdtraj.scripts']
-    for dir,subdirs,files in os.walk('MDTraj'):
-        package = dir.replace(os.path.sep, '.')
-        if '__init__.py' not in files:
-            # not a package
-            continue
-        packages.append(package.replace('MDTraj', 'mdtraj'))
-    return packages
-
-
 def check_dependencies(dependencies):
     def module_exists(dep):
         try:
@@ -60,10 +45,6 @@ def check_dependencies(dependencies):
             ]
             print(os.linesep.join(lines), file=sys.stderr)
 
-
-################################################################################
-# Detection of compiler capabilities
-################################################################################
 
 class CompilerDetection(object):
     # Necessary for OSX. See https://github.com/mdtraj/mdtraj/issues/576
@@ -225,10 +206,6 @@ exit(status)
         self._print_support_end('SSE4.1', result)
         return result
 
-################################################################################
-# Writing version control information to the module
-################################################################################
-
 def git_version():
     # Return the git revision as a string
     # copied from numpy setup.py
@@ -256,9 +233,9 @@ def git_version():
     return GIT_REVISION
 
 
-def write_version_py(VERSION, ISRELEASED, filename='MDTraj/version.py'):
+def write_version_py(VERSION, ISRELEASED, filename):
     cnt = """
-# THIS FILE IS GENERATED FROM MDTRAJ SETUP.PY
+# THIS FILE IS GENERATED FROM SETUP.PY
 short_version = '%(version)s'
 version = '%(version)s'
 full_version = '%(full_version)s'

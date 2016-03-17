@@ -1,8 +1,0 @@
-setuptools
-six
-pyyaml
-nose
-numpy
-scipy
-scikit-learn
-sqlalchemy

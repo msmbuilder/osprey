@@ -1,0 +1,53 @@
+package:
+  name: osprey-dev
+  version: "1.0.0.dev0"
+
+source:
+  path: ../../
+
+build:
+  entry_points:
+    - osprey = osprey.cli.main:main
+  number: 0
+
+requirements:
+  build:
+    - python
+    - setuptools
+
+  run:
+    - python
+    - six
+    - pyyaml
+    - numpy
+    - scipy
+    - scikit-learn
+    - sqlalchemy
+
+test:
+
+  requires:
+    - nose
+    - gpy
+
+  imports:
+    - osprey
+    - osprey.cli
+    - osprey.plugins
+    - osprey.plugins.tests
+    - osprey.tests
+
+  commands:
+    - osprey --help
+    - nosetests osprey -v
+
+  # requires:
+    # Put any additional test requirements here.  For example
+    # - nose
+
+about:
+  home: https://github.com/msmbuilder/osprey
+  license: Apache Software License
+  summary: 'Run distributed cross-validation'
+
+# vim: ts=2 sw=2 et

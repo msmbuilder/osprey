@@ -1,28 +1,26 @@
 from __future__ import print_function, absolute_import, division
 import sys
-import versioneer
 import subprocess
 from distutils.spawn import find_executable
 from setuptools import setup, find_packages
+from basesetup import write_version_py
 
-versioneer.VCS = 'git'
-versioneer.versionfile_source = 'osprey/_version.py'
-versioneer.versionfile_build = 'osprey/_version.py'
-versioneer.tag_prefix = ''  # tags are like 1.2.0
-versioneer.parentdir_prefix = 'osprey-'  # dirname like 'myproject-1.2.0'
-
+VERSION = '1.0.0.dev0'
+ISRELEASED = False
+__version__ = VERSION
 
 def main(**kwargs):
+    write_version_py(VERSION, ISRELEASED, 'osprey/version.py')
+
     classifiers = """\
     Development Status :: 3 - Alpha
     Intended Audience :: Science/Research
     License :: OSI Approved :: Apache Software License
     Programming Language :: Python
-    Programming Language :: Python :: 2.6
     Programming Language :: Python :: 2.7
     Programming Language :: Python :: 3
-    Programming Language :: Python :: 3.3
     Programming Language :: Python :: 3.4
+    Programming Language :: Python :: 3.5
     Operating System :: Unix
     Operating System :: MacOS
     Operating System :: Microsoft :: Windows
@@ -32,13 +30,12 @@ def main(**kwargs):
         name='osprey',
         author='Robert T. McGibbon',
         author_email='rmcgibbo@gmail.com',
-        url='https://github.com/pandegroup/osprey',
+        url='https://github.com/msmbuilder/osprey',
         classifiers=[e.strip() for e in classifiers.splitlines()],
         platforms=["Windows", "Linux", "Mac OS-X", "Unix"],
         license='Apache Software License',
         download_url='https://pypi.python.org/pypi/osprey/',
-        version=versioneer.get_version(),
-        cmdclass=versioneer.get_cmdclass(),
+        version=VERSION,
         packages=find_packages(),
         zip_safe=False,
         package_data={'osprey': ['data/*']},
@@ -54,7 +51,8 @@ def main(**kwargs):
 def readme_to_rst():
     pandoc = find_executable('pandoc')
     if pandoc is None:
-        return {}
+        raise RuntimeError("Turning the readme into a description requires "
+                           "pandoc.")
     long_description = subprocess.check_output(
         [pandoc, 'README.md', '-t', 'rst'])
     short_description = long_description.split('\n\n')[1]

@@ -14,9 +14,9 @@ estimator:
     eval: |
         Pipeline([
                 ('featurizer', DihedralFeaturizer(types=['phi', 'psi'])),
-                ('tica', tICA(n_components=4)),
+                ('tica', tICA(n_components=2)),
                 ('cluster', MiniBatchKMeans()),
-                ('msm', MarkovStateModel(n_timescales=5, verbose=False)),
+                ('msm', MarkovStateModel(n_timescales=2, verbose=False)),
         ])
 
     # for eval, a python package containing the estimator definitions
@@ -43,8 +43,8 @@ search_space:
     type: enum
 
   cluster__n_clusters:
-    min: 10
-    max: 100
+    min: 5
+    max: 10
     type: int       # from 10 to 100 (with inclusive endpoints)
 
   tica__gamma:
@@ -59,9 +59,9 @@ dataset_loader:
   # specification of the dataset on which to train the models.
   name: mdtraj
   params:
-    trajectories: ~/local/msmbuilder/Tutorial/XTC/*/*.xtc
-    topology: ~/local/msmbuilder/Tutorial/native.pdb
-    stride: 1
+    trajectories: ./fs_peptide/trajectory-*.xtc
+    topology: ./fs_peptide/fs-peptide.pdb
+    stride: 100
 
 
 trials:

@@ -29,6 +29,7 @@ test:
   requires:
     - nose
     - gpy
+    - msmbuilder
 
   imports:
     - osprey

@@ -18,7 +18,7 @@ pip install -I sphinx==1.3.5 sphinx_rtd_theme==0.1.9 msmb_theme==1.2.0
 conda install --yes --file docs/requirements.txt
 
 # Make docs
-cd doc && make html && cd -
+cd docs && make html && cd -
 
 # Move the docs into a versioned subdirectory
 python devtools/travis-ci/set_doc_version.py

@@ -5,6 +5,8 @@ Osprey
 [![License](https://img.shields.io/badge/license-ASLv2.0-red.svg?style=flat)]  (https://pypi.python.org/pypi/osprey/)
 [![Documentation](https://img.shields.io/badge/docs-latest-blue.svg?style=flat)] (http://msmbuilder.org/osprey)
 
+![Logo](https://raw.githubusercontent.com/msmbuilder/osprey/master/docs/_static/osprey.svg)
+
 osprey is an easy-to-use tool for hyperparameter optimization for machine
 learning algorithms in python using scikit-learn (or using scikit-learn
 compatible APIs).

@@ -68,6 +68,11 @@ def fit_and_score_estimator(estimator, parameters, cv, X, y=None, scoring=None,
         n_test_samples.append(n_test)
         n_train_samples.append(n_train)
 
+    train_scores, test_scores = map(list, check_arrays(train_scores,
+                                                       test_scores,
+                                                       warn_nans=True,
+                                                       replace_nans=True))
+
     if iid:
         if verbose > 0 and is_msmbuilder_estimator(estimator):
             print('[CV] Using MSMBuilder API n_samples averaging')

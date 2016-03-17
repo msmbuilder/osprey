@@ -1,4 +1,5 @@
 from __future__ import print_function, absolute_import, division
+import warnings
 import numpy as np
 import scipy.sparse as sp
 import os.path
@@ -167,6 +168,19 @@ def _assert_all_finite(X):
                          " or a value too large for %r." % X.dtype)
 
 
+def _warn_if_not_finite(X):
+    """UserWarning if array contains non-finite elements"""
+    X = np.asanyarray(X)
+    # First try an O(n) time, O(1) space solution for the common case that
+    # everything is finite; fall back to O(n) space np.isfinite to prevent
+    # false positives from overflow in sum method
+    if (X.dtype.char in np.typecodes['AllFloat'] and
+            not np.isfinite(X.sum()) and not np.isfinite(X).all()):
+        warnings.warn("Result contains NaN, infinity"
+                      " or a value too large for %r." % X.dtype,
+                      category=UserWarning)
+
+
 def _num_samples(x):
     """Return number of samples in array-like x."""
     if hasattr(x, 'fit'):
@@ -219,6 +233,11 @@ def check_arrays(*arrays, **options):
         Check that the arrays are C contiguous
     dtype : a numpy dtype instance, None by default
         Enforce a specific dtype.
+    warn_nans : boolean, False by default
+        Prints warning if nans in the arrays
+        Disables allow_nans
+    replace_nans : boolean, False by default
+        Replace nans in the arrays with zeros
     allow_lists : bool
         Allow lists of arbitrary objects as input, just check their length.
         Disables
@@ -233,6 +252,8 @@ def check_arrays(*arrays, **options):
     copy = options.pop('copy', False)
     check_ccontiguous = options.pop('check_ccontiguous', False)
     dtype = options.pop('dtype', None)
+    warn_nans = options.pop('warn_nans', False)
+    replace_nans = options.pop('replace_nans', False)
     allow_lists = options.pop('allow_lists', False)
     allow_nans = options.pop('allow_nans', False)
     allow_nd = options.pop('allow_nd', False)
@@ -284,6 +305,11 @@ def check_arrays(*arrays, **options):
                     array = np.ascontiguousarray(array, dtype=dtype)
                 else:
                     array = np.asarray(array, dtype=dtype)
+                if warn_nans:
+                    allow_nans = True
+                    _warn_if_not_finite(array)
+                if replace_nans:
+                    array = np.nan_to_num(array)
                 if not allow_nans:
                     _assert_all_finite(array)
 

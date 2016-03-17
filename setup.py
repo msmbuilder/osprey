@@ -3,8 +3,15 @@ import sys
 import subprocess
 from distutils.spawn import find_executable
 from setuptools import setup, find_packages
+from basesetup import write_version_py
+
+VERSION = '1.0.0.dev0'
+ISRELEASED = False
+__version__ = VERSION
 
 def main(**kwargs):
+    write_version_py(VERSION, ISRELEASED, 'osprey/version.py')
+
     classifiers = """\
     Development Status :: 3 - Alpha
     Intended Audience :: Science/Research
@@ -28,7 +35,7 @@ def main(**kwargs):
         platforms=["Windows", "Linux", "Mac OS-X", "Unix"],
         license='Apache Software License',
         download_url='https://pypi.python.org/pypi/osprey/',
-        version='TODO',
+        version=VERSION,
         packages=find_packages(),
         zip_safe=False,
         package_data={'osprey': ['data/*']},

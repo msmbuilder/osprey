@@ -1,6 +1,5 @@
 from __future__ import print_function, absolute_import, division
 import sys
-import versioneer
 import subprocess
 from distutils.spawn import find_executable
 from setuptools import setup, find_packages
@@ -29,8 +28,7 @@ def main(**kwargs):
         platforms=["Windows", "Linux", "Mac OS-X", "Unix"],
         license='Apache Software License',
         download_url='https://pypi.python.org/pypi/osprey/',
-        version=versioneer.get_version(),
-        cmdclass=versioneer.get_cmdclass(),
+        version='TODO',
         packages=find_packages(),
         zip_safe=False,
         package_data={'osprey': ['data/*']},

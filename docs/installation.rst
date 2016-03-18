@@ -55,11 +55,11 @@ Hyperopt can be installed with pip. ::
 Getting GPy
 -----------
 
-To use the Gaussian Process (``gp``) search strategy, ``osprey`` uses
-GPy <https://github.com/SheffieldML/GPy>
+To run the gaussian process (``gp``) search strategy, ``osprey`` uses
+`GPy <https://github.com/SheffieldML/GPy>`_
 
 
-To use the GPy python API, you must install GPy on the machines you use to run
+To use ``gp`` search, you must install GPy on the machines you use to run
 osprey. For easy installation, use the conda binary packages that
 we've compiled. ::
 

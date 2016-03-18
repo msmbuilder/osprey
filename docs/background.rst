@@ -25,7 +25,7 @@ our current best solution, by maximize the expected **entropy reduction in the d
 
 ``osprey`` supports multiple :ref:`search strategies <strategy>` for choosing
 the next set of hyperparameters to evaluate your model at. The most
-theoretically elegant of the supported methods, Gaussian process expected improvement using the MOE backend, attacks this problem directly by modeling
+theoretically elegant of the supported methods, Gaussian process expected improvement, attacks this problem directly by modeling
 the objective function as a draw from a `Gaussian process <http://en.wikipedia.org/wiki/Gaussian_process>`_.
 
 References

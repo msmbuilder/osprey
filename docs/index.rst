@@ -19,7 +19,7 @@ and storage for the :ref:`results <trials>`.
 
 Related tools include and `spearmint <https://github.com/JasperSnoek/spearmint>`_,
 `hyperopt <http://hyperopt.github.io/hyperopt/>`_, and
-`MOE <http://yelp.github.io/MOE/>`_. Both hyperopt and MOE can serve as backend
+`GPy <http://sheffieldml.github.io/GPy/>`_. Both hyperopt and GPy can serve as backend
 :ref:`search strategies <strategy>` for osprey.
 
 
@@ -50,4 +50,3 @@ then boot up one or more parallel instances of ``osprey worker``.
 .. * :ref:`genindex`
 .. * :ref:`modindex`
 .. * :ref:`search`
-

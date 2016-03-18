@@ -222,7 +222,7 @@ class GP(BaseStrategy):
         V = []
         ignore = []
         for param_dict, scores, status in history:
-            # transform points into the MOE domain. This invloves bringing
+            # transform points into the GP domain. This invloves bringing
             # int and enum variables to floating point, etc.
             if status == 'FAILED':
                 # not sure how to deal with these yet
@@ -246,10 +246,10 @@ class GP(BaseStrategy):
 
     def _from_gp(self, result, searchspace):
 
-        # Note that MOE only deals with float-valued variables, so we have
+        # Note that GP only deals with float-valued variables, so we have
         # a transform step on either side, where int and enum valued variables
         # are transformed before calling gp, and then the result suggested by
-        # MOE needs to be reverse-transformed.
+        # GP needs to be reverse-transformed.
         out = {}
         for gpvalue, var in zip(result, searchspace):
             out[var.name] = var.point_from_gp(float(gpvalue))

@@ -17,7 +17,7 @@ parallel optimization of model hyperparameters.
 
 Documentation
 ------------
-For full documentation, please visit the [Osprey homepage](http://msmbuilder.org/osprey).
+For full documentation, please visit the [Osprey homepage](http://msmbuilder.org/osprey/development).
 
 
 Installation

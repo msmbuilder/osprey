@@ -93,7 +93,7 @@ strategy, using the package `GPy <https://github.com/SheffieldML/GPy>`_, with
 ``url`` param. Example: ::
 
   strategy:
-    name: gpy
+    name: gp
 
 
 .. _dataset_loader:

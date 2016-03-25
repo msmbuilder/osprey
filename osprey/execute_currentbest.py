@@ -3,7 +3,7 @@ from __future__ import print_function
 import numpy as np
 from .config import Config
 from .trials import Trial
-from sklearn import Pipeline
+from sklearn.pipeline import Pipeline
 
 
 def execute(args, parser):

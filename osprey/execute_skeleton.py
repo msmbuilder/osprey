@@ -8,6 +8,9 @@ def execute(args, parser):
     if args.template == 'msmbuilder':
         fn = resource_filename('osprey', join('data',
                                'msmbuilder_skeleton_config.yaml'))
+    elif args.template == 'sklearn':
+        fn = resource_filename('osprey', join('data',
+                               'sklearn_skeleton_config.yaml'))
     else:
         raise RuntimeError('unknown template: %s' % args.template)
 

@@ -37,6 +37,27 @@ def test_1():
         shutil.rmtree(dirname)
 
 
+def test_2():
+    assert OSPREY_BIN is not None
+    cwd = os.path.abspath(os.curdir)
+    dirname = tempfile.mkdtemp()
+
+    try:
+        os.chdir(dirname)
+        subprocess.check_call([OSPREY_BIN, 'skeleton', '-t', 'sklearn',
+                              '-f', 'config.yaml'])
+        subprocess.check_call([OSPREY_BIN, 'worker', 'config.yaml', '-n', '1'])
+        assert os.path.exists('osprey-trials.db')
+
+        subprocess.check_call([OSPREY_BIN, 'current_best', 'config.yaml'])
+
+        yield _test_dump_1
+
+    finally:
+        os.chdir(cwd)
+        shutil.rmtree(dirname)
+
+
 def _test_dump_1():
     out = subprocess.check_output(
         [OSPREY_BIN, 'dump', 'config.yaml', '-o', 'json'])

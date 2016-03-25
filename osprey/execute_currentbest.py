@@ -3,6 +3,7 @@ from __future__ import print_function
 import numpy as np
 from .config import Config
 from .trials import Trial
+from sklearn.pipeline import Pipeline
 
 
 def execute(args, parser):
@@ -20,12 +21,19 @@ def execute(args, parser):
         print('Best Current Model = %f +- %f' % (c_b_m["mean_test_score"],
                                                  np.std(c_b_m["test_scores"])))
         print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-        print('PipelineStep\tParamter \t Value')
-        for i in config.estimator().steps:
-            print(i[0])
+        if isinstance(config.estimator(), Pipeline):
+            print('PipelineStep\tParamter \t Value')
+            for i in config.estimator().steps:
+                print(i[0])
+                for param in sorted(parameter_dict.keys()):
+                    if str(param).startswith(i[0]):
+                        print("\t\t", param.split("__")[1], "\t",
+                              parameter_dict[param])
+        else:
+            print(config.estimator())
+            search_space = config.search_space().variables.keys()
             for param in sorted(parameter_dict.keys()):
-                if str(param).startswith(i[0]):
-                    print("\t\t", param.split("__")[1], "\t",
-                          parameter_dict[param])
+                if param in search_space:
+                    print("\t\t", param, "\t", parameter_dict[param])
 
     return

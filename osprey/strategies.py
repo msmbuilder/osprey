@@ -5,6 +5,7 @@ import socket
 
 import numpy as np
 from sklearn.utils import check_random_state
+from sklearn.grid_search import ParameterGrid
 try:
     from hyperopt import (Trials, tpe, fmin, STATUS_OK, STATUS_RUNNING,
                           STATUS_FAIL)
@@ -282,3 +283,25 @@ class GP(BaseStrategy):
             return RandomSearch().suggest(history, searchspace)
 
         return self._from_gp(suggestion, searchspace)
+
+
+class GridSearch(BaseStrategy):
+    short_name = 'grid'
+
+    def __init__(self):
+        self.param_grid = None
+        self.current = -1
+
+    def suggest(self, history, searchspace):
+        # Convert searchspace to param_grid
+        if self.param_grid is None:
+            if not all(isinstance(v, EnumVariable) for v in searchspace):
+                raise RuntimeError("GridSearchStrategy is defined only for all-enum search space")
+
+            self.param_grid = ParameterGrid(dict((v.name, v.choices) for v in searchspace))
+
+        # NOTE: there is no way of signaling end of parameters to be searched against
+        # so user should pick correctly number of evaluations
+        self.current += 1
+        return self.param_grid[self.current % len(self.param_grid)]
+

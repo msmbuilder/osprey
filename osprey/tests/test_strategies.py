@@ -7,7 +7,7 @@ from numpy.testing.decorators import skipif
 
 from osprey.search_space import SearchSpace
 from osprey.search_space import IntVariable, EnumVariable, FloatVariable
-from osprey.strategies import RandomSearch, HyperoptTPE, GP
+from osprey.strategies import RandomSearch, HyperoptTPE, GP, GridSearch
 
 try:
     from hyperopt import hp, fmin, tpe, Trials
@@ -20,6 +20,16 @@ def test_random():
     searchspace.add_float('x', -10, 10)
     random = np.random.RandomState(0)
     RandomSearch(seed=random).suggest([], searchspace)
+
+
+def test_grid():
+    searchspace = SearchSpace()
+    searchspace.add_enum('x', [1, 2])
+    searchspace.add_jump('y', min=3, max=4, step=1)
+    grid_search = GridSearch()
+    suggestions = [grid_search.suggest([], searchspace) for _ in range(4)]
+    suggestions = [(s['x'], s['y']) for s in suggestions]
+    assert suggestions == [(1, 3), (1, 4), (2, 3), (2, 4)], "Didn't examine whole space correctly"
 
 
 def hyperopt_x2_iterates(n_iters=100):

@@ -84,8 +84,6 @@ def test_search_space():
     assert searchspace['logfvar'] == FloatVariable('logfvar', 1, 2.5,
                                                    warp='log')
     assert searchspace['enumvar'] == EnumVariable('enumvar', [1, False])
-    print(searchspace['jumpvar'])
-    print(EnumVariable('jumpvar', [1.0, 2.0, 3.0]))
     assert searchspace['jumpvar'] == EnumVariable('jumpvar', [1.0, 2.0, 3.0])
 
 

@@ -37,8 +37,7 @@ class SearchSpace(object):
         that the jump is float but can also use ints. 
         """
         
-        min, max, step = map(var_type, (min, max, step))
-        choices = np.arange(min, max+step, step)
+        choices = np.arange(min, max+step, step, dtype=var_type)
         self.variables[name] = EnumVariable(name, list(choices))
 
     def add_int(self, name, min, max, warp=None):

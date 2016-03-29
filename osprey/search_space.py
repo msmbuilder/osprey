@@ -30,18 +30,17 @@ class SearchSpace(object):
     def n_dims(self):
         return len(self.variables)
 
-    def add_jump(self, name, min, max, step, type=float):
+    def add_jump(self, name, min, max, step, var_type=float):
         """ An integer/float valued dimension bounded between
         range(min,max,step). Note that the right endpoint of the interval
         includes `max`. This is a wrapper around the add_enum. It assumes
         that the jump is float but can also use ints. 
         """
-        try:
-            min, max, step = map(type, (min, max, step))
-        except:
-            raise ValueError('Variable %s must be either an int or a float'
-                             % name)
-        choices = np.arange(min, max, step)
+        if var_type != float and var_type != int:
+            raise ValueError('Type must either int or float.')
+        
+        min, max, step = map(var_type, (min, max, step))
+        choices = np.arange(min, max+step, step)
         self.variables[name] = EnumVariable(name, list(choices))
 
     def add_int(self, name, min, max, warp=None):

@@ -20,7 +20,7 @@ from .config import Config
 from .trials import Trial
 from .fit_estimator import fit_and_score_estimator
 from .utils import Unbuffered, format_timedelta, current_pretty_time
-from .utils import is_msmbuilder_estimator
+from .utils import is_msmbuilder_estimator, num_samples
 
 
 def execute(args, parser):
@@ -43,13 +43,13 @@ def execute(args, parser):
     print('\nLoading dataset...\n')
     X, y = config.dataset()
     print('Dataset contains %d element(s) with %s labels'
-          % (len(X), 'out' if y is None else ''))
+          % (num_samples(X), 'out' if y is None else ''))
     print('The elements have shape: [%s' %
           ', '.join([str(X[i].shape)
                      if isinstance(X[i], (np.ndarray, np.generic))
-                     else '(%s,)' % len(X[i])
-                     for i in range(min(len(X), 20))]), end='')
-    print(', ...]' if (len(X) > 20) else ']')
+                     else '(%s,)' % num_samples(X[i])
+                     for i in range(min(num_samples(X), 20))]), end='')
+    print(', ...]' if (num_samples(X) > 20) else ']')
     print('Instantiated estimator:')
     print('  %r' % estimator)
     print(searchspace)

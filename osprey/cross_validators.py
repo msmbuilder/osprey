@@ -1,5 +1,7 @@
 from __future__ import print_function, absolute_import, division
 
+from .utils import num_samples
+
 import numpy as np
 
 
@@ -26,7 +28,7 @@ class ShuffleSplitFactory(BaseCVFactory):
     def create(self, X, y=None):
         from sklearn.cross_validation import ShuffleSplit
 
-        return ShuffleSplit(len(X), n_iter=self.n_iter,
+        return ShuffleSplit(num_samples(X), n_iter=self.n_iter,
                             test_size=self.test_size,
                             train_size=self.train_size,
                             random_state=self.random_state)
@@ -43,7 +45,7 @@ class KFoldFactory(BaseCVFactory):
     def create(self, X, y=None):
         from sklearn.cross_validation import KFold
 
-        return KFold(len(X), n_folds=self.n_folds, shuffle=self.shuffle,
+        return KFold(num_samples(X), n_folds=self.n_folds, shuffle=self.shuffle,
                      random_state=self.random_state)
 
 
@@ -56,7 +58,7 @@ class LeaveOneOutFactory(BaseCVFactory):
     def create(self, X, y=None):
         from sklearn.cross_validation import LeaveOneOut
 
-        return LeaveOneOut(len(X))
+        return LeaveOneOut(num_samples(X))
 
 
 class StratifiedShuffleSplitFactory(BaseCVFactory):
@@ -110,7 +112,7 @@ class FixedCVFactory(BaseCVFactory):
         self.valid = slice(start, stop)
 
     def create(self, X, y):
-        indices = np.arange(len(X))
+        indices = np.arange(num_samples(X))
         valid = indices[self.valid]
         train = np.setdiff1d(indices, valid)
         return (train, valid),  # return a nested tuple

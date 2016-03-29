@@ -31,7 +31,7 @@ from six.moves import reduce
 from pkg_resources import resource_filename
 
 from .entry_point import load_entry_point
-from .utils import dict_merge, in_directory, prepend_syspath
+from .utils import dict_merge, in_directory, prepend_syspath, num_samples
 from .search_space import SearchSpace
 from .strategies import BaseStrategy
 from .dataset_loaders import BaseDatasetLoader
@@ -279,7 +279,7 @@ class Config(object):
         with in_directory(dirname(abspath(self.path))):
             X, y = loader.load()
 
-        if len(X) == 0:
+        if num_samples(X) == 0:
             raise RuntimeError('dataset not found.')
 
         return X, y

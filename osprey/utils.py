@@ -10,7 +10,6 @@ from sklearn.pipeline import Pipeline
 
 from .eval_scopes import import_all_estimators
 
-
 def dict_merge(base, top):
     """Recursively merge two dictionaries, with the elements from `top`
     taking precedence over elements from `top`.
@@ -181,12 +180,16 @@ def _warn_if_not_finite(X):
                       category=UserWarning)
 
 
-def _num_samples(x):
+def num_samples(x, is_nested=False):
     """Return number of samples in array-like x."""
     if hasattr(x, 'fit'):
         # Don't get num_samples from an ensembles length!
         raise TypeError('Expected sequence or array-like, got '
                         'estimator %s' % x)
+
+    if is_nested:
+        return sum(num_samples(xx, is_nested=False) for xx in x)
+
     if not hasattr(x, '__len__') and not hasattr(x, 'shape'):
         if hasattr(x, '__array__'):
             x = np.asarray(x)
@@ -264,7 +267,7 @@ def check_arrays(*arrays, **options):
     if len(arrays) == 0:
         return None
 
-    n_samples = _num_samples(arrays[0])
+    n_samples = num_samples(arrays[0])
 
     checked_arrays = []
     for array in arrays:
@@ -273,7 +276,7 @@ def check_arrays(*arrays, **options):
             # special case: ignore optional y=None kwarg pattern
             checked_arrays.append(array)
             continue
-        size = _num_samples(array)
+        size = num_samples(array)
 
         if size != n_samples:
             raise ValueError("Found array with dim %d. Expected %d"

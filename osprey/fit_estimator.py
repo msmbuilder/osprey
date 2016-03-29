@@ -10,7 +10,7 @@ from sklearn.metrics.scorer import check_scoring
 from sklearn.externals.joblib import Parallel, delayed
 from sklearn.cross_validation import check_cv, _safe_split, _score
 
-from .utils import check_arrays
+from .utils import check_arrays, num_samples
 from .utils import short_format_time, is_msmbuilder_estimator
 
 
@@ -40,7 +40,7 @@ def fit_and_score_estimator(estimator, parameters, cv, X, y=None, scoring=None,
         score.
     """
     scorer = check_scoring(estimator, scoring=scoring)
-    n_samples = _num_samples(X)
+    n_samples = num_samples(X)
     X, y = check_arrays(X, y, allow_lists=True, sparse_format='csr',
                         allow_nans=True)
     if y is not None:
@@ -101,17 +101,17 @@ def _fit_and_score(estimator, X, y, scorer, train, test, verbose, parameters,
                           for k, v in parameters.items()))
         print("[CV] %s %s" % (msg, (64 - len(msg)) * '.'))
 
-    if len(train) == 0 or len(test) == 0:
+    if num_samples(train) == 0 or num_samples(test) == 0:
         raise RuntimeError(
             'Cross validation error in fit_estimator. The total data set '
             'contains %d elements, which were split into a training set '
             'of %d elements and a test set of %d elements. Unfortunately, '
             'you can\'t have a %s set with 0 elements.' % (
-                len(X), len(train), len(test),
-                'training' if len(train) == 0 else 'test'))
+                num_samples(X), num_samples(train), num_samples(test),
+                'training' if num_samples(train) == 0 else 'test'))
 
     # adjust length of sample weights
-    n_samples = _num_samples(X)
+    n_samples = num_samples(X)
     fit_params = fit_params if fit_params is not None else {}
     fit_params = dict([(k, np.asarray(v)[train]
                        if hasattr(v, '__len__') and len(v) == n_samples else v)
@@ -135,8 +135,8 @@ def _fit_and_score(estimator, X, y, scorer, train, test, verbose, parameters,
     scoring_time = time.time() - start_time
 
     msmbuilder_api = is_msmbuilder_estimator(estimator)
-    n_samples_test = _num_samples(X_test, msmbuilder_api=msmbuilder_api)
-    n_samples_train = _num_samples(X_train, msmbuilder_api=msmbuilder_api)
+    n_samples_test = num_samples(X_test, is_nested=msmbuilder_api)
+    n_samples_train = num_samples(X_train, is_nested=msmbuilder_api)
     if verbose > 2:
         msg += ", score=%f" % test_score
     if verbose > 1:
@@ -145,18 +145,3 @@ def _fit_and_score(estimator, X, y, scorer, train, test, verbose, parameters,
 
     return (test_score, n_samples_test, train_score, n_samples_train,
             scoring_time)
-
-
-def _num_samples(x, msmbuilder_api=False):
-    """Return number of samples in array-like x."""
-    if not hasattr(x, '__len__') and not hasattr(x, 'shape'):
-        if hasattr(x, '__array__'):
-            x = np.asarray(x)
-        else:
-            raise TypeError("Expected sequence or array-like, got %r" % x)
-
-    if msmbuilder_api:
-        assert isinstance(x, list)
-        return sum(len(xx) for xx in x)
-
-    return x.shape[0] if hasattr(x, 'shape') else len(x)

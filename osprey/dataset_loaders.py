@@ -3,7 +3,8 @@ from __future__ import print_function, absolute_import, division
 import glob
 import os
 import numpy as np
-from .utils import expand_path
+
+from .utils import expand_path, num_samples
 
 
 class BaseDatasetLoader(object):
@@ -131,7 +132,7 @@ class JoblibDatasetLoader(BaseDatasetLoader):
                 X.append(obj[self.x_name])
                 y.append(obj[self.y_name])
 
-        if len(X) == 1:
+        if num_samples(X) == 1:
             X = X[0]
         if len(y) == 1:
             y = y[0]

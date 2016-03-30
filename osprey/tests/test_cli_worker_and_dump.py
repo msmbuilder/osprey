@@ -19,9 +19,11 @@ OSPREY_BIN = find_executable('osprey')
 
 @skipif(not HAVE_MSMBUILDER, 'this test requires MSMBuilder')
 def test_1():
+    from msmbuilder.example_datasets import FsPeptide
     assert OSPREY_BIN is not None
     cwd = os.path.abspath(os.curdir)
     dirname = tempfile.mkdtemp()
+    FsPeptide(dirname).get()
 
     try:
         os.chdir(dirname)

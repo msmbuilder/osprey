@@ -13,13 +13,15 @@ branches:
 install:
     - source devtools/travis-ci/install_miniconda.sh
     - conda config --add channels omnia
+    - conda install -yq python-coveralls
 
 script:
     - conda build --quiet devtools/conda-recipe
     - devtools/travis-ci/build_docs.sh
 
 after_success:
-  - echo "after_success
+  - cp $HOME/miniconda3/conda-bld/test-tmp_dir/.coverage .
+  - coveralls
 
 deploy:
     - provider: s3

@@ -43,6 +43,7 @@ test:
 
   commands:
     - osprey --help
+    - nosetests -v osprey --with-timer --with-coverage  --cover-package=osprey
 
 about:
   home: https://github.com/msmbuilder/osprey

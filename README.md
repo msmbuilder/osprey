@@ -1,6 +1,7 @@
 Osprey
 ======
 [![Build Status](https://travis-ci.org/msmbuilder/osprey.svg?branch=master)](https://travis-ci.org/msmbuilder/osprey)
+[![Coverage Status](https://coveralls.io/repos/github/msmbuilder/osprey/badge.svg?branch=master)](https://coveralls.io/github/msmbuilder/osprey?branch=master)
 [![PyPi version](https://badge.fury.io/py/osprey.svg)](https://pypi.python.org/pypi/osprey/)
 [![License](https://img.shields.io/badge/license-ASLv2.0-red.svg?style=flat)]  (https://pypi.python.org/pypi/osprey/)
 [![Documentation](https://img.shields.io/badge/docs-latest-blue.svg?style=flat)] (http://msmbuilder.org/osprey)

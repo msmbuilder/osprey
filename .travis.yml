@@ -1,22 +1,31 @@
 language: c
 sudo: false
 
+env:
+    matrix:
+        - CONDA_PY=2.7
+        - CONDA_PY=3.5
+    global:
+        - ORGNAME="omnia"
+        - PACKAGENAME="osprey"
+
 branches:
   only:
     - master
 
 install:
     - source devtools/travis-ci/install_miniconda.sh
-    - conda config --add channels omnia
+    - conda config --add channels $ORGNAME
 
 script:
-    conda build --quiet devtools/conda-recipe
-    && devtools/travis-ci/build_docs.sh
+    - conda build --quiet devtools/conda-recipe
+    - source activate _test
+    - cd devtools && nosetests -v ${PACKAGENAME} --with-timer --with-coverage  --cover-package=${PACKAGENAME} && cd ..
+    - devtools/travis-ci/build_docs.sh
 
-env:
-    matrix:
-        - CONDA_PY=2.7
-        - CONDA_PY=3.5
+after_success:
+  - echo "after_success"
+  - cd devtools && coveralls && cd ..
 
 deploy:
     - provider: s3

@@ -28,8 +28,11 @@ test:
 
   requires:
     - nose
+    - nose-timer
     - gpy
     - msmbuilder
+    - coverage
+    - python-coveralls
 
   imports:
     - osprey
@@ -40,11 +43,6 @@ test:
 
   commands:
     - osprey --help
-    - nosetests osprey -v
-
-  # requires:
-    # Put any additional test requirements here.  For example
-    # - nose
 
 about:
   home: https://github.com/msmbuilder/osprey

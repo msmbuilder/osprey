@@ -30,9 +30,8 @@ def execute(args, parser):
     ss = config.search_space()
     for plot in PLOTS:
         plt = plot(data, ss)
-        if plt is not None and not isinstance(plt, list):
-            plt = [plt]
         if plt is not None:
+            plt = plt if isinstance(plt, list) else [plt]
             plots.extend(plt)
 
     p = vplot(*plots)

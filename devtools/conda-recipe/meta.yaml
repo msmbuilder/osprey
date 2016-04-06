@@ -32,6 +32,8 @@ test:
     - gpy
     - msmbuilder
     - coverage
+    - python-coveralls
+    - matplotlib
     - bokeh
 
   imports:

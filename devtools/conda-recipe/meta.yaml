@@ -33,6 +33,8 @@ test:
     - msmbuilder
     - coverage
     - python-coveralls
+    - matplotlib
+    - bokeh
 
   imports:
     - osprey

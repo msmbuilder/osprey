@@ -34,6 +34,8 @@ def test_1():
 
         yield _test_dump_1
 
+        yield _test_plot_1
+
     finally:
         os.chdir(cwd)
         shutil.rmtree(dirname)
@@ -55,6 +57,8 @@ def test_2():
 
         yield _test_dump_1
 
+        yield _test_plot_1
+
     finally:
         os.chdir(cwd)
         shutil.rmtree(dirname)
@@ -66,3 +70,10 @@ def _test_dump_1():
     if sys.version_info >= (3, 0):
         out = out.decode()
     json.loads(out)
+
+
+def _test_plot_1():
+    out = subprocess.check_output(
+        [OSPREY_BIN, 'plot', 'config.yaml', '--no-browser'])
+    if not os.path.isfile('./plot.html'):
+        raise ValueError('Plot not created')

@@ -15,7 +15,10 @@ def execute(args, parser):
     if not items:
         print('No Models Found')
     else:
-        c_b_m = items[np.argmax([i["mean_test_score"] for i in items])]
+        mean_test_scores = np.nan_to_num(np.array([i["mean_test_score"]
+                                                  for i in items],
+                                                  dtype=float))
+        c_b_m = items[mean_test_scores.argmax()]
         parameter_dict = c_b_m["parameters"]
         print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
         print('Best Current Model = %f +- %f' % (c_b_m["mean_test_score"],

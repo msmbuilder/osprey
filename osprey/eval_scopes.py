@@ -34,6 +34,8 @@ def import_all_estimators(pkg):
     result = {}
     for _, modname, ispkg in pkgutil.iter_modules(pkg.__path__):
         c = '%s.%s' % (pkg.__name__, modname)
+        if pkg.__name__ + '.tests' in c:
+            continue
         try:
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", category=DeprecationWarning)

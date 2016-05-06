@@ -93,7 +93,7 @@ def plot_3(data, ss, *args):
     e_scores = np.exp(scores)
     mine, maxe = np.min(e_scores), np.max(e_scores)
     color = (e_scores - mine) / (maxe - mine)
-    mapped_colors = map(rgb2hex, cm.get_cmap('RdBu_r')(color))
+    mapped_colors = list(map(rgb2hex, cm.get_cmap('RdBu_r')(color)))
 
     p = bk.figure(title='t-SNE (unsupervised)', tools=TOOLS)
 

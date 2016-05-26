@@ -28,11 +28,6 @@ def execute(args, parser):
         print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
         print('Best Current Model = %f +- %f' % (weighted_mean,
                                                  weighted_std))
-
-
-        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-        print('Best Current Model = %f +- %f' % (c_b_m["mean_test_score"],
-                                                 np.std(c_b_m["test_scores"])))
         print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
         if isinstance(config.estimator(), Pipeline):
             print('PipelineStep\tParamter \t Value')

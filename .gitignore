@@ -56,3 +56,6 @@ MANIFEST
 
 # vim
 *.swp
+
+#Notebooks
+.ipynb_checkpoints

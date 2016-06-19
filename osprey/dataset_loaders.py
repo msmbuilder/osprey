@@ -45,6 +45,29 @@ class NumpyDatasetLoader(BaseDatasetLoader):
         return ds, None
 
 
+class HDF5DatasetLoader(BaseDatasetLoader):
+    short_name = 'hdf5'
+
+    def __init__(self, filename, stride=1):
+        self.filename = filename
+        self.stride = stride
+
+    def transform(self, arr):
+        return arr[::self.stride, :]
+
+    def load(self):
+        from mdtraj import io
+        X = []
+        y = []
+        filenames = [fn.strip() for fn in self.filename.split(',')]
+        for i, fn in enumerate(filenames):
+            dataset = io.loadh(fn)
+            for key in dataset.iterkeys():
+                X.append(self.transform(dataset[key]))
+                y.append(i)
+        return X, y
+
+
 class MDTrajDatasetLoader(BaseDatasetLoader):
     short_name = 'mdtraj'
 

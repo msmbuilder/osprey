@@ -10,6 +10,7 @@ from sklearn.pipeline import Pipeline
 
 from .eval_scopes import import_all_estimators
 
+
 def dict_merge(base, top):
     """Recursively merge two dictionaries, with the elements from `top`
     taking precedence over elements from `top`.

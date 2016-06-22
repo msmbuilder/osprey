@@ -7,9 +7,10 @@ import numpy as np
 import sklearn.datasets
 from sklearn.externals.joblib import dump
 
-from osprey.dataset_loaders import FilenameDatasetLoader
-from osprey.dataset_loaders import JoblibDatasetLoader
-from osprey.dataset_loaders import SklearnDatasetLoader
+from osprey.dataset_loaders import (FilenameDatasetLoader, JoblibDatasetLoader,
+                                    HDF5DatasetLoader, MDTrajDatasetLoader,
+                                    MSMBuilderDatasetLoader,
+                                    NumpyDatasetLoader, SklearnDatasetLoader)
 
 
 def test_FilenameDatasetLoader_1():
@@ -68,6 +69,86 @@ def test_JoblibDatasetLoader_1():
     finally:
         os.chdir(cwd)
         shutil.rmtree(dirname)
+
+
+def test_HDF5DatasetLoader_1():
+    from mdtraj import io
+
+    assert HDF5DatasetLoader.short_name == 'hdf5'
+
+    cwd = os.path.abspath(os.curdir)
+    dirname = tempfile.mkdtemp()
+    try:
+        os.chdir(dirname)
+
+        # one file
+        io.saveh('f1.h5', **{'test': np.zeros((10, 2))})
+        loader = HDF5DatasetLoader('f1.h5')
+        X, y = loader.load()
+        assert np.all(X == np.zeros((10, 2)))
+        assert y[0] == 0
+
+        # two files
+        io.saveh('f2.h5', **{'test': np.ones((10, 2))})
+        loader = HDF5DatasetLoader('f*.h5')
+        X, y = loader.load()
+        assert isinstance(X, list)
+        assert np.all(X[0] == np.zeros((10, 2)))
+        assert np.all(X[1] == np.ones((10, 2)))
+        assert y[1] == 1
+
+    finally:
+        os.chdir(cwd)
+        shutil.rmtree(dirname)
+
+
+def test_MDTrajDatasetLoader_1():
+    from mdtraj.testing import get_fn
+
+    loader = MDTrajDatasetLoader(get_fn('legacy_msmbuilder_trj0.lh5'))
+    X, y = loader.load()
+    assert X[0].n_frames == 501
+    assert y is None
+
+
+def test_MSMBuilderDatasetLoader_1():
+    from msmbuilder.dataset import dataset
+
+    path = tempfile.mkdtemp()
+    shutil.rmtree(path)
+    try:
+        x = np.random.randn(10, 2)
+        ds = dataset(path, 'w', 'dir-npy')
+        ds[0] = x
+
+        loader = MSMBuilderDatasetLoader(path, fmt='dir-npy')
+        X, y = loader.load()
+
+        assert np.all(X[0] == x)
+        assert y is None
+
+    finally:
+        shutil.rmtree(path)
+
+
+def test_NumpyDatasetLoader_1():
+        cwd = os.path.abspath(os.curdir)
+        dirname = tempfile.mkdtemp()
+        try:
+            os.chdir(dirname)
+
+            x = np.random.randn(10, 2)
+            np.save('f1.npy', x)
+
+            loader = NumpyDatasetLoader('f1.npy')
+            X, y = loader.load()
+
+            assert np.all(X[0] == x)
+            assert y is None
+
+        finally:
+            os.chdir(cwd)
+            shutil.rmtree(dirname)
 
 
 def test_SklearnDatasetLoader_1():

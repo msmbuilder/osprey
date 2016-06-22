@@ -73,7 +73,7 @@ def _test_dump_1():
 
 
 def _test_plot_1():
-    out = subprocess.check_output(
+    _ = subprocess.check_output(
         [OSPREY_BIN, 'plot', 'config.yaml', '--no-browser'])
     if not os.path.isfile('./plot.html'):
         raise ValueError('Plot not created')

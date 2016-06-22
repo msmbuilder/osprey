@@ -48,8 +48,8 @@ class NumpyDatasetLoader(BaseDatasetLoader):
 class HDF5DatasetLoader(BaseDatasetLoader):
     short_name = 'hdf5'
 
-    def __init__(self, filename, stride=1):
-        self.filename = filename
+    def __init__(self, filenames, stride=1):
+        self.filenames = filenames
         self.stride = stride
 
     def transform(self, arr):
@@ -59,7 +59,7 @@ class HDF5DatasetLoader(BaseDatasetLoader):
         from mdtraj import io
         X = []
         y = []
-        filenames = [fn.strip() for fn in self.filename.split(',')]
+        filenames = sorted(glob.glob(expand_path(self.filenames)))
         for i, fn in enumerate(filenames):
             dataset = io.loadh(fn)
             for key in dataset.iterkeys():

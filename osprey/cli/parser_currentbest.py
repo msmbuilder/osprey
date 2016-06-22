@@ -11,7 +11,7 @@ def func(args, parser):
 
 
 def configure_parser(sub_parsers):
-    help = 'Get paramters for the current best model'
+    help = 'Get parameters for the current best model'
     p = sub_parsers.add_parser('current_best', description=help, help=help,
                                formatter_class=ArgumentDefaultsHelpFormatter)
     p.add_argument('config', help='Path to worker config file (yaml)')

@@ -8,7 +8,7 @@ osprey job file file. The config file has four major sections:
                    instance of sklearn.base.BaseEstimator.
  - search_space:   the specification of the hyperparameter search space
  - strategy:       strategy for adaptive exploration of hyperparameters.
- - dataset_lodaer: the specification of the dataset to fit the models with.
+ - dataset_loader: the specification of the dataset to fit the models with.
  - trials:         as each hyperparameter setting is explored, the results are
                    serialized to a database specified in this section.
  - cv:             specification for cross-validation.

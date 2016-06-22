@@ -47,7 +47,7 @@ Search Space
 The search space describes the space of hyperparameters to search over
 to find the best model. It is specified as the product space of
 bounded intervals for different variables, which can either be of type
-``int``, ``float``, or ``enum``. Variables of type ``float`` can also
+``int``, ``float``, ``jump``, or ``enum``. Variables of type ``float`` can also
 be warped into log-space, which means that the optimization will be
 performed on the log of the parameter instead of the parameter itself.
 

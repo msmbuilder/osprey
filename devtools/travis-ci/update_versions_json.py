@@ -1,4 +1,6 @@
+import os
 import json
+
 try:
     from urllib.request import urlopen
 except ImportError:
@@ -10,7 +12,8 @@ if not version.release:
     exit(0)
 
 URL = 'http://www.msmbuilder.org/osprey'
-versions = json.load(urlopen(URL + '/versions.json'))
+res = urlopen(URL + '/versions.json')
+versions = json.loads(res.read().decode('utf-8'))
 
 # new release so all the others are now old
 for i in range(len(versions)):
@@ -21,6 +24,7 @@ versions.append({
     'url': "{base}/{version}".format(base=URL, version=version.short_version),
     'latest': True})
 
-with open("doc/_deploy/versions.json", 'w') as versionf:
+curpath = os.path.abspath(os.curdir)
+savepath = os.path.join(curpath, "docs/_deploy/versions.json")
+with open(savepath, 'w') as versionf:
     json.dump(versions, versionf)
-

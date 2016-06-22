@@ -6,7 +6,7 @@ set -ev
 # Install the built package
 conda create --yes -n docenv python=$CONDA_PY
 source activate docenv
-conda install -yq --use-local osprey-dev
+conda install -yq --use-local osprey
 
 # We don't use conda for these:
 # sphinx_rtd_theme's latest releases are not available

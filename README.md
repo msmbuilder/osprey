@@ -21,7 +21,6 @@ Documentation
 ------------
 For full documentation, please visit the [Osprey homepage](http://msmbuilder.org/osprey/development).
 
-
 Installation
 ------------
 
@@ -123,3 +122,25 @@ Dependencies
 - `scipy` (optional, required for `gp` strategy)
 - `hyperopt` (optional, required for `hyperopt_tpe` strategy)
 - `nose` (optional, for testing)
+
+Citing
+------
+
+If you use Osprey in your research, please cite:
+
+```bibtex
+@misc{robert_t_mcgibbon_2016_56251,
+  author       = {Robert T. McGibbon and
+                  Carlos Hernández and
+                  Matthew Harrigan and
+                  Steven Kearnes and
+                  Muneeb Sultan and
+                  Stanislaw Jastrzebski and
+                  Brooke Husic},
+  title        = {osprey: Osprey 1.0.0},
+  month        = jun,
+  year         = 2016,
+  doi          = {10.5281/zenodo.56251},
+  url          = {http://dx.doi.org/10.5281/zenodo.56251}
+}
+```

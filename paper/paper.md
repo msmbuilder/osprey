@@ -7,7 +7,7 @@ tags:
   - machine learning
 authors:
   - name: Robert T. McGibbon
-    affiliation: D.E. Shaw Research
+    affiliation: Stanford University
   - name: Carlos X. Hernández
     orcid: 0000-0002-8146-5904
     affiliation: Stanford University
@@ -33,17 +33,18 @@ bibliography: paper.bib
 *Osprey* is a tool for hyperparameter optimization of machine learning
 algorithms in Python. Hyperparameter optimization can often be an onerous
 process for researchers, due to time-consuming experimental replicates,
-non-convex functionals, and constant tension between exploration of global
-parameter space and local optimization [@Jones1998]. We've designed *Osprey* to
-provide scientists with a practical, easy-to-use way of finding optimal model
-parameters. The software works seamlessly with `scikit-learn` estimators
-[@scikit-learn] and supports many different search strategies for choosing the
-next set of parameters with which to evaluate a given model, including gaussian
-processes [@gpy2014], tree-structured Parzen estimators [@hyperopt], as well as
-random and grid search. As hyperparameter optimization is an embarrassingly
-parallel problem, *Osprey* can easily scale to hundreds of concurrent processes
-by executing a simple command-line program multiple times. This makes it easy
-to exploit large resources available in high-performance computing environments.
+non-convex objective functions, and constant tension between exploration of
+global parameter space and local optimization [@Jones1998]. We've designed
+*Osprey* to provide scientists with a practical, easy-to-use way of finding
+optimal model parameters. The software works seamlessly with `scikit-learn`
+estimators [@scikit-learn] and supports many different search strategies for
+choosing the next set of parameters with which to evaluate a given model,
+including gaussian processes [@gpy2014], tree-structured Parzen estimators
+[@hyperopt], as well as random and grid search. As hyperparameter optimization
+is an embarrassingly parallel problem, *Osprey* can easily scale to hundreds of
+concurrent processes by executing a simple command-line program multiple times.
+This makes it easy to exploit large resources available in high-performance
+computing environments.
 
 *Osprey* is actively maintained by researchers at Stanford University and other
 institutions around the world. While originally developed to analyze

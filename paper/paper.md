@@ -38,15 +38,20 @@ parameter space and local optimization [@Jones1998]. We've designed *Osprey* to
 provide scientists with a practical, easy-to-use way of finding optimal model
 parameters. The software works seamlessly with `scikit-learn` estimators and
 supports many different search strategies for choosing the next set of
-parameters with which to evaluate your model
-[@scikit-learn; @gpy2014; @hyperopt]. Its simple command-line interface makes
-Osprey instances easy to submit on high-performance computing environments.
+parameters with which to evaluate a given model, including gaussian processes
+[@gpy2014], tree-structured Parzen estimators [@hyperopt], as well as random
+and grid search [@scikit-learn]. As hyperparameter optimization is an
+embarrassingly parallel problem, *Osprey* can easily scale to hundreds of
+concurrent processes by executing a simple command-line program multiple times.
+This makes it easy to exploit large resources available in high-performance
+computing environments.
 
-*Osprey* is actively being developed by researchers at Stanford University
-with primary application areas in computational protein dynamics and drug
-design. The source code for *Osprey* is hosted on GitHub and has been archived
-to Zenodo [@osprey_archive]. Full documentation can be found at
-[http://msmbuilder.org/osprey](http://msmbuilder.org/osprey).
+*Osprey* is actively developed by researchers at Stanford University and other
+institutions around the world. While originally developed to analyze
+computational protein dynamics [@msmbuilder], it is applicable to any
+`scikit-learn`-compatible pipeline. The source code for *Osprey* is hosted on
+GitHub and has been archived to Zenodo [@osprey_archive]. Full documentation can
+be found at [http://msmbuilder.org/osprey](http://msmbuilder.org/osprey).
 
 
 # References

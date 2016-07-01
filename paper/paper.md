@@ -36,17 +36,16 @@ process for researchers, due to time-consuming experimental replicates,
 non-convex functionals, and constant tension between exploration of global
 parameter space and local optimization [@Jones1998]. We've designed *Osprey* to
 provide scientists with a practical, easy-to-use way of finding optimal model
-parameters. The software works seamlessly with `scikit-learn` estimators and
-supports many different search strategies for choosing the next set of
-parameters with which to evaluate a given model, including gaussian processes
-[@gpy2014], tree-structured Parzen estimators [@hyperopt], as well as random
-and grid search [@scikit-learn]. As hyperparameter optimization is an
-embarrassingly parallel problem, *Osprey* can easily scale to hundreds of
-concurrent processes by executing a simple command-line program multiple times.
-This makes it easy to exploit large resources available in high-performance
-computing environments.
+parameters. The software works seamlessly with `scikit-learn` estimators
+[@scikit-learn] and supports many different search strategies for choosing the
+next set of parameters with which to evaluate a given model, including gaussian
+processes [@gpy2014], tree-structured Parzen estimators [@hyperopt], as well as
+random and grid search. As hyperparameter optimization is an embarrassingly
+parallel problem, *Osprey* can easily scale to hundreds of concurrent processes
+by executing a simple command-line program multiple times. This makes it easy
+to exploit large resources available in high-performance computing environments.
 
-*Osprey* is actively developed by researchers at Stanford University and other
+*Osprey* is actively maintained by researchers at Stanford University and other
 institutions around the world. While originally developed to analyze
 computational protein dynamics [@msmbuilder], it is applicable to any
 `scikit-learn`-compatible pipeline. The source code for *Osprey* is hosted on

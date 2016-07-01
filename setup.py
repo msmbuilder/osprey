@@ -5,9 +5,10 @@ from distutils.spawn import find_executable
 from setuptools import setup, find_packages
 from basesetup import write_version_py
 
-VERSION = '1.0.0'
-ISRELEASED = True
+VERSION = '1.1.0dev0'
+ISRELEASED = False
 __version__ = VERSION
+
 
 def main(**kwargs):
     write_version_py(VERSION, ISRELEASED, 'osprey/version.py')

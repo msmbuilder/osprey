@@ -129,14 +129,15 @@ Citing
 If you use Osprey in your research, please cite:
 
 ```bibtex
-@misc{robert_t_mcgibbon_2016_56251,
+@misc{osprey,
   author       = {Robert T. McGibbon and
-                  Carlos Hernández and
-                  Matthew Harrigan and
+                  Carlos X. Hernández and
+                  Matthew P. Harrigan and
                   Steven Kearnes and
-                  Muneeb Sultan and
+                  Mohammad M. Sultan and
                   Stanislaw Jastrzebski and
-                  Brooke Husic},
+                  Brooke E. Husic and
+                  Vijay S. Pande},
   title        = {osprey: Osprey 1.0.0},
   month        = jun,
   year         = 2016,

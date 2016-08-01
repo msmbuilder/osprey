@@ -247,10 +247,11 @@ class Config(object):
                             '"min", "max", and optionally "warp"' % param_name)
                     searchspace.add_float(param_name, **info)
                 elif type == 'jump':
-                    if sorted(list(info.keys())) != ['max', 'min', 'step', 'var_type']:
+                    if sorted(list(info.keys())) not in (['max', 'min', 'num', 'var_type'],
+                                                         ['max', 'min', 'num', 'var_type', 'warp']):
                         raise RuntimeError(
                             'search/space/%s type="jump" must contain keys '
-                            '"min", "max","step" and "var_type"' % param_name)
+                            '"min", "max", "num", "var_type", and optionally "warp"' % param_name)
                     searchspace.add_jump(param_name, **info)
             except ValueError as e:
                 # searchspace.add_XXX can throw a ValueError on malformed

@@ -2,6 +2,8 @@ from __future__ import print_function, absolute_import, division
 from argparse import ArgumentDefaultsHelpFormatter
 
 
+from ..execute_skeleton import TEMPLATES
+
 def func(args, parser):
     # delay import of the rest of the module to improve `osprey -h` performance
     from ..execute_skeleton import execute
@@ -15,7 +17,7 @@ def configure_parser(sub_parsers):
     p.add_argument('-t', '--template', help=(
         "which skeleton to create. 'msmbuilder' is a skeleton config file for"
         "MSMBuilder molecular dynamics / Markov state model based "
-        "projects."), choices=['msmbuilder', 'sklearn'], default='msmbuilder',)
+        "projects."), choices=TEMPLATES.keys(), default='msmbuilder')
     p.add_argument('-f', '--filename', help='config filename to create',
                    default='config.yaml')
     p.set_defaults(func=func)

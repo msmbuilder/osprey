@@ -1,10 +1,12 @@
 from __future__ import print_function, absolute_import, division
 import os
+import os.path
 import sys
 import json
 import shutil
 import subprocess
 import tempfile
+from shutil import copyfile
 from distutils.spawn import find_executable
 from numpy.testing.decorators import skipif
 
@@ -18,7 +20,7 @@ OSPREY_BIN = find_executable('osprey')
 
 
 @skipif(not HAVE_MSMBUILDER, 'this test requires MSMBuilder')
-def test_1():
+def test_msmbuilder_skeleton():
     from msmbuilder.example_datasets import FsPeptide
     assert OSPREY_BIN is not None
     cwd = os.path.abspath(os.curdir)
@@ -41,7 +43,7 @@ def test_1():
         shutil.rmtree(dirname)
 
 
-def test_2():
+def test_sklearn_skeleton():
     assert OSPREY_BIN is not None
     cwd = os.path.abspath(os.curdir)
     dirname = tempfile.mkdtemp()
@@ -49,6 +51,75 @@ def test_2():
     try:
         os.chdir(dirname)
         subprocess.check_call([OSPREY_BIN, 'skeleton', '-t', 'sklearn',
+                              '-f', 'config.yaml'])
+        subprocess.check_call([OSPREY_BIN, 'worker', 'config.yaml', '-n', '1'])
+        assert os.path.exists('osprey-trials.db')
+
+        subprocess.check_call([OSPREY_BIN, 'current_best', 'config.yaml'])
+
+        yield _test_dump_1
+
+        yield _test_plot_1
+
+    finally:
+        os.chdir(cwd)
+        shutil.rmtree(dirname)
+
+
+def test_random_example():
+    assert OSPREY_BIN is not None
+    cwd = os.path.abspath(os.curdir)
+    dirname = tempfile.mkdtemp()
+
+    try:
+        os.chdir(dirname)
+        subprocess.check_call([OSPREY_BIN, 'skeleton', '-t', 'random_example',
+                              '-f', 'config.yaml'])
+        subprocess.check_call([OSPREY_BIN, 'worker', 'config.yaml', '-n', '1'])
+        assert os.path.exists('osprey-trials.db')
+
+        subprocess.check_call([OSPREY_BIN, 'current_best', 'config.yaml'])
+
+        yield _test_dump_1
+
+        yield _test_plot_1
+
+    finally:
+        os.chdir(cwd)
+        shutil.rmtree(dirname)
+
+
+def test_gp_example():
+    assert OSPREY_BIN is not None
+    cwd = os.path.abspath(os.curdir)
+    dirname = tempfile.mkdtemp()
+
+    try:
+        os.chdir(dirname)
+        subprocess.check_call([OSPREY_BIN, 'skeleton', '-t', 'gp_example',
+                              '-f', 'config.yaml'])
+        subprocess.check_call([OSPREY_BIN, 'worker', 'config.yaml', '-n', '1'])
+        assert os.path.exists('osprey-trials.db')
+
+        subprocess.check_call([OSPREY_BIN, 'current_best', 'config.yaml'])
+
+        yield _test_dump_1
+
+        yield _test_plot_1
+
+    finally:
+        os.chdir(cwd)
+        shutil.rmtree(dirname)
+
+
+def test_grid_example():
+    assert OSPREY_BIN is not None
+    cwd = os.path.abspath(os.curdir)
+    dirname = tempfile.mkdtemp()
+
+    try:
+        os.chdir(dirname)
+        subprocess.check_call([OSPREY_BIN, 'skeleton', '-t', 'grid_example',
                               '-f', 'config.yaml'])
         subprocess.check_call([OSPREY_BIN, 'worker', 'config.yaml', '-n', '1'])
         assert os.path.exists('osprey-trials.db')

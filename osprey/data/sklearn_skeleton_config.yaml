@@ -27,3 +27,5 @@ dataset_loader:
 
 trials:
     uri: sqlite:///osprey-trials.db
+
+random_seed: 42

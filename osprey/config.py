@@ -13,6 +13,7 @@ osprey job file file. The config file has four major sections:
                    serialized to a database specified in this section.
  - cv:             specification for cross-validation.
  - scoring:        the score function used in cross-validation. (optional)
+ - random_seed:    random seed to be used. (optional)
 """
 
 import sys
@@ -50,6 +51,7 @@ FIELDS = {
     'strategy':        ['name', 'params'],
     'cv':              (int, dict),
     'scoring':         (str, type(None)),
+    'random_seed':     (int, type(None)),
 }
 
 
@@ -308,6 +310,11 @@ class Config(object):
         scoring = self.get_section('scoring')
         assert isinstance(scoring, (str, type(None)))
         return scoring
+
+    def random_seed(self):
+        random_seed = self.get_section('random_seed')
+        assert isinstance(random_seed, (int, type(None)))
+        return random_seed
 
     def cv(self, X, y=None):
         cv = self.get_section('cv')

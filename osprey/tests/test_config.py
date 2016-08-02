@@ -122,6 +122,13 @@ def test_scoring():
     assert config.scoring() is 'sdfsfsdf'
 
 
+def test_random_seed():
+    config = Config.fromdict({
+        'random_seed': 42
+    }, check_fields=False)
+    assert config.random_seed() == 42
+
+
 def test_cv_1():
     from sklearn.cross_validation import ShuffleSplit
     for name in ['shufflesplit', 'ShuffleSplit']:

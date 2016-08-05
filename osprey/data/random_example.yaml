@@ -2,9 +2,7 @@ estimator:
   entry_point: sklearn.svm.SVC
 
 strategy:
-  name: gp
-  params:
-    seeds: 5
+  name: random
 
 search_space:
   C:

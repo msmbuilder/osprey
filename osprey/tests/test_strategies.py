@@ -25,7 +25,7 @@ def test_random():
 def test_grid():
     searchspace = SearchSpace()
     searchspace.add_enum('x', [1, 2])
-    searchspace.add_jump('y', min=3, max=4, step=1)
+    searchspace.add_jump('y', min=3, max=4, num=2)
     grid_search = GridSearch()
     suggestions = [grid_search.suggest([], searchspace) for _ in range(4)]
     suggestions = [(s['x'], s['y']) for s in suggestions]

@@ -3,14 +3,17 @@ from __future__ import print_function, absolute_import, division
 from os.path import join, exists
 from pkg_resources import resource_filename
 
+TEMPLATES = {'msmbuilder': 'msmbuilder_skeleton_config.yaml',
+             'sklearn': 'sklearn_skeleton_config.yaml',
+             'random_example': 'random_example.yaml',
+             'gp_example': 'sklearn_skeleton_config.yaml',
+             'grid_example': 'grid_example.yaml'}
+
 
 def execute(args, parser):
-    if args.template == 'msmbuilder':
-        fn = resource_filename('osprey', join('data',
-                               'msmbuilder_skeleton_config.yaml'))
-    elif args.template == 'sklearn':
-        fn = resource_filename('osprey', join('data',
-                               'sklearn_skeleton_config.yaml'))
+    template_file = TEMPLATES.get(args.template, None)
+    if template_file:
+        fn = resource_filename('osprey', join('data', template_file))
     else:
         raise RuntimeError('unknown template: %s' % args.template)
 

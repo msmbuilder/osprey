@@ -3,7 +3,7 @@ Osprey
 [![Build Status](https://travis-ci.org/msmbuilder/osprey.svg?branch=master)](https://travis-ci.org/msmbuilder/osprey)
 [![Coverage Status](https://coveralls.io/repos/github/msmbuilder/osprey/badge.svg?branch=master)](https://coveralls.io/github/msmbuilder/osprey?branch=master)
 [![PyPi version](https://badge.fury.io/py/osprey.svg)](https://pypi.python.org/pypi/osprey/)
-[![License](https://img.shields.io/badge/license-ASLv2.0-red.svg?style=flat)]  (https://pypi.python.org/pypi/osprey/)
+[![License](https://img.shields.io/badge/license-ASLv2.0-red.svg?style=flat)]  (http://www.apache.org/licenses/LICENSE-2.0)
 [![DOI](https://zenodo.org/badge/9890/msmbuilder/osprey.svg)](https://zenodo.org/badge/latestdoi/9890/msmbuilder/osprey)
 [![Documentation](https://img.shields.io/badge/docs-latest-blue.svg?style=flat)] (http://msmbuilder.org/osprey)
 
@@ -19,7 +19,7 @@ parallel optimization of model hyperparameters.
 
 Documentation
 ------------
-For full documentation, please visit the [Osprey homepage](http://msmbuilder.org/osprey/development).
+For full documentation, please visit the [Osprey homepage](http://msmbuilder.org/osprey/).
 
 Installation
 ------------
@@ -29,15 +29,16 @@ If you have an Anaconda Python distribution, installation is as easy as:
 $ conda install -c omnia osprey
 ```
 
-You can also install with `pip`:
+You can also install Osprey with `pip`:
 ```
-$ pip install git+git://github.com/pandegroup/osprey.git
+$ pip install osprey
 ```
 
 Alternatively, you can install directly from this GitHub repo:
 ```
 $ git clone https://github.com/msmbuilder/osprey.git
-$ cd osprey && python setup.py install
+$ cd osprey && git checkout 1.1.0
+$ python setup.py install
 ```
 
 
@@ -113,15 +114,31 @@ You can dump the database to JSON or CSV with `osprey dump`.
 
 Dependencies
 ------------
-- `six`
-- `pyyaml`
-- `numpy`
-- `scikit-learn`
-- `sqlalchemy`
+- `six>=1.10.0`
+- `pyyaml>=3.11`
+- `numpy>=1.10.4`
+- `scipy>=0.17.0`
+- `scikit-learn>=0.17.0`
+- `sqlalchemy>=1.0.10`
+- `bokeh>=0.12.0`
+- `matplotlib>=1.5.0`
 - `GPy` (optional, required for `gp` strategy)
-- `scipy` (optional, required for `gp` strategy)
 - `hyperopt` (optional, required for `hyperopt_tpe` strategy)
 - `nose` (optional, for testing)
+
+
+Contributing
+------------
+
+In case you encounter any issues with this package, please consider submitting
+a ticket to the [GitHub Issue Tracker](https://github.com/msmbuilder/osprey/issues).
+We also welcome any feature requests and highly encourage users to
+[submit pull requests](https://help.github.com/articles/creating-a-pull-request/)
+for bug fixes and improvements.
+
+For more detailed information, please refer to our
+[documentation](http://msmbuilder.org/osprey/contributing.html).
+
 
 Citing
 ------

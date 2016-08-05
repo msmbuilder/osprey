@@ -23,6 +23,8 @@ requirements:
     - scipy
     - scikit-learn
     - sqlalchemy
+    - bokeh
+    - matplotlib
 
 test:
 
@@ -34,8 +36,8 @@ test:
     - mdtraj
     - coverage
     - python-coveralls
-    - matplotlib
-    - bokeh
+
+
 
   imports:
     - osprey

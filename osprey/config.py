@@ -13,6 +13,7 @@ osprey job file file. The config file has four major sections:
                    serialized to a database specified in this section.
  - cv:             specification for cross-validation.
  - scoring:        the score function used in cross-validation. (optional)
+ - random_seed:    random seed to be used. (optional)
 """
 
 import sys
@@ -50,6 +51,7 @@ FIELDS = {
     'strategy':        ['name', 'params'],
     'cv':              (int, dict),
     'scoring':         (str, type(None)),
+    'random_seed':     (int, type(None)),
 }
 
 
@@ -247,10 +249,11 @@ class Config(object):
                             '"min", "max", and optionally "warp"' % param_name)
                     searchspace.add_float(param_name, **info)
                 elif type == 'jump':
-                    if sorted(list(info.keys())) != ['max', 'min', 'step', 'var_type']:
+                    if sorted(list(info.keys())) not in (['max', 'min', 'num', 'var_type'],
+                                                         ['max', 'min', 'num', 'var_type', 'warp']):
                         raise RuntimeError(
                             'search/space/%s type="jump" must contain keys '
-                            '"min", "max","step" and "var_type"' % param_name)
+                            '"min", "max", "num", "var_type", and optionally "warp"' % param_name)
                     searchspace.add_jump(param_name, **info)
             except ValueError as e:
                 # searchspace.add_XXX can throw a ValueError on malformed
@@ -307,6 +310,11 @@ class Config(object):
         scoring = self.get_section('scoring')
         assert isinstance(scoring, (str, type(None)))
         return scoring
+
+    def random_seed(self):
+        random_seed = self.get_section('random_seed')
+        assert isinstance(random_seed, (int, type(None)))
+        return random_seed
 
     def cv(self, X, y=None):
         cv = self.get_section('cv')

@@ -3,6 +3,7 @@ from __future__ import print_function, absolute_import, division
 from .utils import num_samples
 
 import numpy as np
+from sklearn import cross_validation
 
 
 class BaseCVFactory(object):
@@ -16,6 +17,7 @@ class BaseCVFactory(object):
 
 
 class ShuffleSplitFactory(BaseCVFactory):
+    __doc__ = cross_validation.ShuffleSplit.__doc__
     short_name = ['shufflesplit', 'ShuffleSplit']
 
     def __init__(self, n_iter=10, test_size=0.1, train_size=None,
@@ -26,15 +28,16 @@ class ShuffleSplitFactory(BaseCVFactory):
         self.random_state = random_state
 
     def create(self, X, y=None):
-        from sklearn.cross_validation import ShuffleSplit
 
-        return ShuffleSplit(num_samples(X), n_iter=self.n_iter,
-                            test_size=self.test_size,
-                            train_size=self.train_size,
-                            random_state=self.random_state)
+        return cross_validation.ShuffleSplit(num_samples(X),
+                                             n_iter=self.n_iter,
+                                             test_size=self.test_size,
+                                             train_size=self.train_size,
+                                             random_state=self.random_state)
 
 
 class KFoldFactory(BaseCVFactory):
+    __doc__ = cross_validation.KFold.__doc__
     short_name = ['kfold', 'KFold']
 
     def __init__(self, n_folds=3, shuffle=False, random_state=None):
@@ -43,25 +46,27 @@ class KFoldFactory(BaseCVFactory):
         self.random_state = random_state
 
     def create(self, X, y=None):
-        from sklearn.cross_validation import KFold
 
-        return KFold(num_samples(X), n_folds=self.n_folds, shuffle=self.shuffle,
-                     random_state=self.random_state)
+        return cross_validation.KFold(num_samples(X),
+                                      n_folds=self.n_folds,
+                                      shuffle=self.shuffle,
+                                      random_state=self.random_state)
 
 
 class LeaveOneOutFactory(BaseCVFactory):
+    __doc__ = cross_validation.LeaveOneOut.__doc__
     short_name = ['loo', 'LeaveOneOut']
 
     def __init__(self):
         pass
 
     def create(self, X, y=None):
-        from sklearn.cross_validation import LeaveOneOut
 
-        return LeaveOneOut(num_samples(X))
+        return cross_validation.LeaveOneOut(num_samples(X))
 
 
 class StratifiedShuffleSplitFactory(BaseCVFactory):
+    __doc__ = cross_validation.StratifiedShuffleSplit.__doc__
     short_name = ['stratifiedshufflesplit', 'StratifiedShuffleSplit']
 
     def __init__(self, n_iter=10, test_size=0.1, train_size=None,
@@ -72,15 +77,15 @@ class StratifiedShuffleSplitFactory(BaseCVFactory):
         self.random_state = random_state
 
     def create(self, X, y):
-        from sklearn.cross_validation import StratifiedShuffleSplit
 
-        return StratifiedShuffleSplit(y, n_iter=self.n_iter,
-                                      test_size=self.test_size,
-                                      train_size=self.train_size,
-                                      random_state=self.random_state)
+        return cross_validation.StratifiedShuffleSplit(y, n_iter=self.n_iter,
+                                                       test_size=self.test_size,
+                                                       train_size=self.train_size,
+                                                       random_state=self.random_state)
 
 
 class StratifiedKFoldFactory(BaseCVFactory):
+    __doc__ = cross_validation.StratifiedKFold.__doc__
     short_name = ['stratifiedkfold', 'StratifiedKFold']
 
     def __init__(self, n_folds=3, shuffle=False, random_state=None):
@@ -89,10 +94,10 @@ class StratifiedKFoldFactory(BaseCVFactory):
         self.random_state = random_state
 
     def create(self, X, y):
-        from sklearn.cross_validation import StratifiedKFold
 
-        return StratifiedKFold(y, n_folds=self.n_folds, shuffle=self.shuffle,
-                               random_state=self.random_state)
+        return cross_validation.StratifiedKFold(y, n_folds=self.n_folds,
+                                                shuffle=self.shuffle,
+                                                random_state=self.random_state)
 
 
 class FixedCVFactory(BaseCVFactory):

@@ -200,13 +200,23 @@ $endif$
 
 $if(authors)$
   $for(authors)$
-  \author{$authors.name$}
   $if(authors.affiliation)$
-  \affil{$authors.affiliation$}
+    \author[$authors.affiliation$]{$authors.name$}
+  $else$
+    \author{$authors.name$}
   $endif$
   $endfor$
 $endif$
+
+$if(affiliations)$
+  $for(affiliations)$
+    \affil[$affiliations.index$]{$affiliations.name$}
+  $endfor$
+$endif$
+
 \date{$date$}
+
+
 
 \begin{document}
 $if(title)$

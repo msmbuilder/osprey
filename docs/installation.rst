@@ -1,51 +1,71 @@
 Installation
 ============
 
-Osprey is written in Python, and can be installed with standard python
-machinery
+Osprey is written in Python, and can be installed with standard Python
+machinery; we highly recommend using an
+`Anaconda Python distribution <https://www.continuum.io/downloads>`_.
+
+
+Release Version
+---------------
+
+
+With Anaconda, installation is as easy as:
+
+.. code-block:: bash
+
+  $ conda install -c omnia osprey
+
+You can also install Osprey with `pip`:
+
+.. code-block:: bash
+
+  $ pip install osprey
+
+Alternatively, you can install directly our
+`GitHub repository <https://github.com/msmbuilder/osprey>`_.:
+
+.. code-block:: bash
+
+  $ git clone https://github.com/msmbuilder/osprey.git
+  $ cd osprey && git checkout 1.1.0
+  $ python setup.py install
 
 
 Development Version
 -------------------
 
+To grab the latest version from github, run:
+
 .. code-block:: bash
 
-  # grab the latest version from github
   $ pip install git+git://github.com/pandegroup/osprey.git
 
+Or clone the repo yourself and run `setup.py`:
+
 .. code-block:: bash
 
-  # or clone the repo yourself and run `setup.py`
   $ git clone https://github.com/pandegroup/osprey.git
   $ cd osprey && python setup.py install
-
-Release Version
----------------
-
-Currently, **we recommend that you use the development version**, since things are
-moving fast. However, release versions from PyPI can be installed using ``pip``.
-
-.. code-block:: bash
-
-  # grab the release version from PyPI
-  $ pip install osprey
 
 
 Dependencies
 ------------
-- ``six``
-- ``pyyaml``
-- ``numpy``
-- ``scikit-learn``
-- ``sqlalchemy``
-- ``hyperopt`` (recommended, required for ``engine=hyperopt_tpe``)
-- ``GPy`` (recommended, required for ``engine=gp``)
-- ``scipy`` (optional, for testing)
-- ``nose`` (optional, for testing)
+- `six>=1.10.0`
+- `pyyaml>=3.11`
+- `numpy>=1.10.4`
+- `scipy>=0.17.0`
+- `scikit-learn>=0.17.0`
+- `sqlalchemy>=1.0.10`
+- `bokeh>=0.12.0`
+- `matplotlib>=1.5.0`
+- `GPy` (optional, required for `gp` strategy)
+- `hyperopt` (optional, required for `hyperopt_tpe` strategy)
+- `nose` (optional, for testing)
 
 You can grab most of them with conda. ::
 
-  $ conda install six pyyaml numpy scikit-learn sqlalchemy nose
+  $ conda install six pyyaml numpy scikit-learn sqlalchemy nose bokeh matplotlib
 
 Hyperopt can be installed with pip. ::
 
@@ -63,4 +83,4 @@ To use ``gp`` search, you must install GPy on the machines you use to run
 osprey. For easy installation, use the conda binary packages that
 we've compiled. ::
 
-  conda install -c omnia gp
+  conda install -c omnia gpy

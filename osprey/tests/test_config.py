@@ -75,8 +75,12 @@ def test_search_space():
             'fvar': {'type': 'float', 'min': 1, 'max': 3.5},
             'logfvar': {'type': 'float', 'min': 1, 'max': 2.5, 'warp': 'log'},
             'enumvar': {'type': 'enum', 'choices': [1, False]},
-            'jumpvar': {'type': 'jump',  'min': 1, 'max': 3, 'step': 1,'var_type':int}
+            'jumpivar': {'type': 'jump',  'min': 1, 'max': 3, 'num': 3, 'var_type': int},
+            'jumpfvar': {'type': 'jump',  'min': 1, 'max': 3, 'num': 3, 'var_type': float},
+            'logjumpivar': {'type': 'jump',  'min': 10, 'max': 1000, 'num': 3, 'warp': 'log', 'var_type': int},
+            'logjumpfvar': {'type': 'jump',  'min': 10, 'max': 1000, 'num': 3, 'warp': 'log', 'var_type': float}
         }}, check_fields=False)
+
     searchspace = config.search_space()
     assert searchspace['intvar'] == IntVariable('intvar', 1, 2, warp=None)
     assert searchspace['logivar'] == IntVariable('logivar', 1, 2, warp='log')
@@ -84,7 +88,10 @@ def test_search_space():
     assert searchspace['logfvar'] == FloatVariable('logfvar', 1, 2.5,
                                                    warp='log')
     assert searchspace['enumvar'] == EnumVariable('enumvar', [1, False])
-    assert searchspace['jumpvar'] == EnumVariable('jumpvar', [1.0, 2.0, 3.0])
+    assert searchspace['jumpivar'] == EnumVariable('jumpivar', [1, 2, 3])
+    assert searchspace['jumpfvar'] == EnumVariable('jumpfvar', [1.0, 2.0, 3.0])
+    assert searchspace['logjumpivar'] == EnumVariable('logjumpivar', [10, 100, 1000])
+    assert searchspace['logjumpfvar'] == EnumVariable('logjumpfvar', [10.0, 100.0, 1000.0])
 
 
 def test_strategy_random():
@@ -113,6 +120,13 @@ def test_scoring():
         'scoring': 'sdfsfsdf'
     }, check_fields=False)
     assert config.scoring() is 'sdfsfsdf'
+
+
+def test_random_seed():
+    config = Config.fromdict({
+        'random_seed': 42
+    }, check_fields=False)
+    assert config.random_seed() == 42
 
 
 def test_cv_1():

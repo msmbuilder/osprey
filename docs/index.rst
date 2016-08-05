@@ -4,10 +4,11 @@ Osprey
 Osprey is a tool for practical hyperparameter optimization of machine learning
 algorithms. It's designed to provide a practical, **easy to use** way for
 application scientists to find parameters that maximize the cross-validation
-score of a model on their dataset. Osprey is actively being developed by
-researchers around the world, with primary application areas in computational
-protein dynamics and drug design, and distributed under the
-`Apache License (v2.0) <https://www.apache.org/licenses/LICENSE-2.0>`_.
+score of a model on their dataset.
+
+Osprey is actively being developed by researchers around the world, with primary
+application areas in computational protein dynamics and drug design, and distributed
+under the `Apache License (v2.0) <https://www.apache.org/licenses/LICENSE-2.0>`_.
 All development takes place on `GitHub <https://github.com/msmbuilder/osprey>`_.
 
 Overview

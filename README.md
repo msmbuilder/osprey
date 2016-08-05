@@ -37,7 +37,7 @@ $ pip install osprey
 Alternatively, you can install directly from this GitHub repo:
 ```
 $ git clone https://github.com/msmbuilder/osprey.git
-$ cd osprey && git checkout 1.0.0
+$ cd osprey && git checkout 1.1.0
 $ python setup.py install
 ```
 
@@ -125,6 +125,20 @@ Dependencies
 - `GPy` (optional, required for `gp` strategy)
 - `hyperopt` (optional, required for `hyperopt_tpe` strategy)
 - `nose` (optional, for testing)
+
+
+Contributing
+------------
+
+In case you encounter any issues with this package, please consider submitting
+a ticket to the [GitHub Issue Tracker](https://github.com/msmbuilder/osprey/issues).
+We also welcome any feature requests and highly encourage users to
+[submit pull requests](https://help.github.com/articles/creating-a-pull-request/)
+for bug fixes and improvements.
+
+For more detailed information, please refer to our
+[documentation](http://msmbuilder.org/osprey/contributing.html).
+
 
 Citing
 ------

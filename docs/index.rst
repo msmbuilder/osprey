@@ -43,6 +43,7 @@ section.
    background
    installation
    getting_started
+   contributing
    config_file
    batch_submission
 

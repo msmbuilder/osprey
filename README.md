@@ -19,7 +19,7 @@ parallel optimization of model hyperparameters.
 
 Documentation
 ------------
-For full documentation, please visit the [Osprey homepage](http://msmbuilder.org/osprey/development).
+For full documentation, please visit the [Osprey homepage](http://msmbuilder.org/osprey/).
 
 Installation
 ------------
@@ -29,15 +29,16 @@ If you have an Anaconda Python distribution, installation is as easy as:
 $ conda install -c omnia osprey
 ```
 
-You can also install with `pip`:
+You can also install Osprey with `pip`:
 ```
-$ pip install git+git://github.com/pandegroup/osprey.git
+$ pip install osprey
 ```
 
 Alternatively, you can install directly from this GitHub repo:
 ```
 $ git clone https://github.com/msmbuilder/osprey.git
-$ cd osprey && python setup.py install
+$ cd osprey && git checkout 1.0.0
+$ python setup.py install
 ```
 
 
@@ -113,13 +114,15 @@ You can dump the database to JSON or CSV with `osprey dump`.
 
 Dependencies
 ------------
-- `six`
-- `pyyaml`
-- `numpy`
-- `scikit-learn`
-- `sqlalchemy`
+- `six>=1.10.0`
+- `pyyaml>=3.11`
+- `numpy>=1.10.4`
+- `scipy>=0.17.0`
+- `scikit-learn>=0.17.0`
+- `sqlalchemy>=1.0.10`
+- `bokeh>=0.12.0`
+- `matplotlib>=1.5.0`
 - `GPy` (optional, required for `gp` strategy)
-- `scipy` (optional, required for `gp` strategy)
 - `hyperopt` (optional, required for `hyperopt_tpe` strategy)
 - `nose` (optional, for testing)
 

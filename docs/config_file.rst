@@ -154,6 +154,7 @@ To access the other iterators, use the ``name`` and ``params`` keywords: ::
     params:
       n_iter: 5
       test_size: 0.5
+      random_state: 42
 
 Here's a complete list of supported iterators, along with their ``name`` mappings:
 
@@ -164,6 +165,19 @@ Here's a complete list of supported iterators, along with their ``name`` mapping
 * ``stratifiedshufflesplit``: `StratifiedShuffleSplit <http://scikit-learn.org/stable/modules/generated/sklearn.cross_validation.StratifiedShuffleSplit.html#sklearn.cross_validation.StratifiedShuffleSplit>`_
 
 .. _trials:
+
+
+Random Seed
+----------------
+In case you need reproducible Osprey trials, you can also include an
+optional random seed as seen below:
+
+Example: ::
+
+  random_seed: 42
+
+Please note that this makes parallel trials redundant and, thus, not
+recommended when scaling across multiple jobs.
 
 Trials Storage
 --------------

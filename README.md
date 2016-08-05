@@ -9,11 +9,11 @@ Osprey
 
 ![Logo](http://msmbuilder.org/osprey/development/_static/osprey.svg)
 
-osprey is an easy-to-use tool for hyperparameter optimization for machine
+Osprey is an easy-to-use tool for hyperparameter optimization for machine
 learning algorithms in python using scikit-learn (or using scikit-learn
 compatible APIs).
 
-Each osprey experiment combines an dataset, an estimator, a search space
+Each Osprey experiment combines an dataset, an estimator, a search space
 (and engine), cross validation and asynchronous serialization for distributed
 parallel optimization of model hyperparameters.
 

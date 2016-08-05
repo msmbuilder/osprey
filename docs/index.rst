@@ -4,9 +4,11 @@ Osprey
 Osprey is a tool for practical hyperparameter optimization of machine learning
 algorithms. It's designed to provide a practical, **easy to use** way for
 application scientists to find parameters that maximize the cross-validation
-score of a model on their dataset. Osprey is being developed by researchers at
-Stanford University with primary application areas in computational protein
-dynamics and drug design.
+score of a model on their dataset. Osprey is actively being developed by
+`researchers at Stanford University <https://pande.stanford.edu>`_, with primary
+application areas in computational protein dynamics and drug design,
+and distributed under the
+`Apache License (v2.0) <https://www.apache.org/licenses/LICENSE-2.0>`_.
 
 Overview
 --------
@@ -18,8 +20,8 @@ and storage for the :ref:`results <trials>`.
 
 
 Related tools include and `spearmint <https://github.com/JasperSnoek/spearmint>`_,
-`hyperopt <http://hyperopt.github.io/hyperopt/>`_, and
-`GPy <http://sheffieldml.github.io/GPy/>`_. Both hyperopt and GPy can serve as backend
+`hyperopt <https://hyperopt.github.io/hyperopt/>`_, and
+`GPy <https://sheffieldml.github.io/GPy/>`_. Both hyperopt and GPy can serve as backend
 :ref:`search strategies <strategy>` for osprey.
 
 

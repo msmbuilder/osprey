@@ -7,24 +7,31 @@ tags:
   - machine learning
 authors:
   - name: Robert T. McGibbon
-    affiliation: Stanford University
+    affiliation: 1
   - name: Carlos X. Hernández
     orcid: 0000-0002-8146-5904
-    affiliation: Stanford University
+    affiliation: 1
   - name: Matthew P. Harrigan
-    affiliation: Stanford University
+    affiliation: 1
   - name: Steven Kearnes
-    affiliation: Stanford University
+    affiliation: 1
   - name: Mohammad M. Sultan
-    affiliation: Stanford University
+    affiliation: 1
   - name: Stanislaw Jastrzebski
-    affiliation: Jagiellonian University
+    affiliation: 2
   - name: Brooke E. Husic
-    affiliation: Stanford University
+    affiliation: 1
   - name: Vijay S. Pande
-    affiliation: Stanford University
-date: 1 July 2016
+    affiliation: 1
+affiliations:
+  - name: Stanford University
+    index: 1
+  - name: Jagiellonian University
+    index: 2
+date: 5 August 2016
 bibliography: paper.bib
+repository: https://github.com/msmbuilder/osprey
+archive_doi: http://dx.doi.org/10.5281/zenodo.56251
 ---
 
 

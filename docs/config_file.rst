@@ -47,7 +47,7 @@ Search Space
 The search space describes the space of hyperparameters to search over
 to find the best model. It is specified as the product space of
 bounded intervals for different variables, which can either be of type
-``int``, ``float``, ``jump``, or ``enum``. Variables of type ``float`` can also
+``int``, ``float``, or ``enum``. Variables of type ``float`` can also
 be warped into log-space, which means that the optimization will be
 performed on the log of the parameter instead of the parameter itself.
 
@@ -67,15 +67,35 @@ Example: ::
      type: enum
 
 
+You can also transform ``float`` and ``int`` variables into enumerables by
+declaring a ``jump`` variable:
+
+Example: ::
+
+    search_space:
+      logistic__C:
+        min: 1e-3
+        max: 1e3
+        num: 10
+        type: jump
+        var_type: float
+        warp: log
+
+In the example above, we have declared a ``jump`` variable ``C`` for the
+``logistic`` estimator. This variable is essentially an ``enum`` with
+10 possible ``float`` values that are evenly spaced apart in log-space within
+the given ``min`` and ``max`` range.
+
+
 .. _strategy:
 
 Strategy
 --------
 
-Three probablistic search strategies are supported. First, random search
-(``strategy: {name: random}``) can be used, which samples hyperparameters randomly
-from the search space at each model-building iteration. Random search has
-`been shown to be <http://www.jmlr.org/papers/volume13/bergstra12a/bergstra12a.pdf>`_ significantly more effiicent than pure grid search. Example: ::
+Three probablistic search strategies and grid search are supported. First,
+random search (``strategy: {name: random}``) can be used, which samples
+hyperparameters randomly from the search space at each model-building iteration.
+Random search has `been shown to be <http://www.jmlr.org/papers/volume13/bergstra12a/bergstra12a.pdf>`_ significantly more effiicent than pure grid search. Example: ::
 
   strategy:
     name: random
@@ -87,7 +107,7 @@ package `hyperopt <https://github.com/hyperopt/hyperopt>`_ be installed. Example
   strategy:
     name: hyperopt_tpe
 
-Finally, ``osprey`` supports a Gaussian process expected improvement search
+``osprey`` supports a Gaussian process expected improvement search
 strategy, using the package `GPy <https://github.com/SheffieldML/GPy>`_, with
 ``strategy: {name: gp}``.
 ``url`` param. Example: ::
@@ -95,6 +115,14 @@ strategy, using the package `GPy <https://github.com/SheffieldML/GPy>`_, with
   strategy:
     name: gp
 
+Finally, and perhaps simplest of all, is the
+`grid search strategy <https://en.wikipedia.org/wiki/Hyperparameter_optimization#Grid_search>`_
+(``strategy: {name: grid}``). Example: ::
+
+    strategy:
+      name: grid
+
+Please note that grid search only supports ``enum`` and ``jump`` variables.
 
 .. _dataset_loader:
 

@@ -48,24 +48,109 @@ class NumpyDatasetLoader(BaseDatasetLoader):
 class HDF5DatasetLoader(BaseDatasetLoader):
     short_name = 'hdf5'
 
-    def __init__(self, filenames, stride=1):
+    def __init__(self, filenames, y_col=None, stride=1, concat=True):
         self.filenames = filenames
+        self.y_col = y_col
         self.stride = stride
+        self.concat = concat
 
-    def transform(self, arr):
-        return arr[::self.stride, :]
+    def transform(self, X):
+        n_rows = X.shape[0]
+        X = np.atleast_2d(X)
+        if X.shape[0] != n_rows:
+            X = X.T
+        if self.y_col is not None:
+            cols = range(X.shape[1])
+            x_idx = [i for i, val in enumerate(cols) if val != self.y_col]
+            y_idx = [i for i, val in enumerate(cols) if val == self.y_col]
+            return X[::self.stride, x_idx], X[::self.stride, y_idx].ravel()
+        return X[::self.stride, :], None
+
+    def loader(self, fn):
+        from mdtraj import io
+        dataset = io.loadh(fn)
+        for key in dataset.iterkeys():
+            yield dataset[key]
 
     def load(self):
-        from mdtraj import io
         X = []
         y = []
         filenames = sorted(glob.glob(expand_path(self.filenames)))
-        for i, fn in enumerate(filenames):
-            dataset = io.loadh(fn)
-            for key in dataset.iterkeys():
-                X.append(self.transform(dataset[key]))
-                y.append(i)
-        return X, y
+        for fn in filenames:
+            for data in self.loader(fn):
+                data = self.transform(data)
+                X.append(data[0])
+                y.append(data[1])
+
+        if self.concat:
+            X = np.concatenate(X, axis=0)
+            y = np.concatenate(y, axis=0)
+
+        if self.y_col is not None:
+            return X, y
+        return X, None
+
+
+class DSVDatasetLoader(BaseDatasetLoader):
+    short_name = 'dsv'
+
+    def __init__(self, filenames, y_col=None, delimiter=',', skip_header=0,
+                 skip_footer=0, filling_values=np.nan, usecols=None, stride=1,
+                 concat=True):
+        self.filenames = filenames
+        self.y_col = y_col
+        self.delimiter = delimiter
+        self.skip_header = skip_header
+        self.skip_footer = skip_footer
+        self.filling_values = filling_values
+        if usecols and isinstance(usecols, str):
+            usecols = list(map(int, usecols.strip().split(',')))
+        elif usecols and isinstance(usecols, (tuple, set)):
+            usecols = sorted(list(usecols))
+        if usecols and y_col:
+            if y_col not in usecols:
+                usecols.append(y_col)
+        self.usecols = usecols
+        self.stride = stride
+        self.concat = concat
+
+    def transform(self, X):
+        n_rows = X.shape[0]
+        X = np.atleast_2d(X)
+        if X.shape[0] != n_rows:
+            X = X.T
+        if self.y_col is not None:
+            cols = list(range(X.shape[1]))
+            if self.usecols:
+                cols = self.usecols
+            x_idx = [i for i, val in enumerate(cols) if val != self.y_col]
+            y_idx = [i for i, val in enumerate(cols) if val == self.y_col]
+            return X[::self.stride, x_idx], X[::self.stride, y_idx].ravel()
+        return X[::self.stride, :], None
+
+    def loader(self, fn):
+        return np.genfromtxt(fn, delimiter=self.delimiter,
+                             skip_header=self.skip_header,
+                             skip_footer=self.skip_footer,
+                             filling_values=self.filling_values,
+                             usecols=self.usecols)
+
+    def load(self):
+        X = []
+        y = []
+        filenames = sorted(glob.glob(expand_path(self.filenames)))
+        for fn in filenames:
+            data = self.transform(self.loader(fn))
+            X.append(data[0])
+            y.append(data[1])
+
+        if self.concat:
+            X = np.concatenate(X, axis=0)
+            y = np.concatenate(y, axis=0)
+
+        if self.y_col is not None:
+            return X, y
+        return X, None
 
 
 class MDTrajDatasetLoader(BaseDatasetLoader):

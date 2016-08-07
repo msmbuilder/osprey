@@ -7,8 +7,9 @@ import numpy as np
 import sklearn.datasets
 from sklearn.externals.joblib import dump
 
-from osprey.dataset_loaders import (FilenameDatasetLoader, JoblibDatasetLoader,
-                                    HDF5DatasetLoader, MDTrajDatasetLoader,
+from osprey.dataset_loaders import (DSVDatasetLoader, FilenameDatasetLoader,
+                                    JoblibDatasetLoader, HDF5DatasetLoader,
+                                    MDTrajDatasetLoader,
                                     MSMBuilderDatasetLoader,
                                     NumpyDatasetLoader, SklearnDatasetLoader)
 
@@ -82,20 +83,63 @@ def test_HDF5DatasetLoader_1():
         os.chdir(dirname)
 
         # one file
-        io.saveh('f1.h5', **{'test': np.zeros((10, 2))})
-        loader = HDF5DatasetLoader('f1.h5')
+        io.saveh('f1.h5', **{'test': np.zeros((10, 3))})
+        loader = HDF5DatasetLoader('f1.h5', concat=False)
         X, y = loader.load()
-        assert np.all(X == np.zeros((10, 2)))
-        assert y[0] == 0
+        assert np.all(X == np.zeros((10, 3)))
+        assert y is None
 
         # two files
-        io.saveh('f2.h5', **{'test': np.ones((10, 2))})
-        loader = HDF5DatasetLoader('f*.h5')
+        io.saveh('f2.h5', **{'test': np.ones((10, 3))})
+        loader = HDF5DatasetLoader('f*.h5', concat=False)
         X, y = loader.load()
         assert isinstance(X, list)
-        assert np.all(X[0] == np.zeros((10, 2)))
-        assert np.all(X[1] == np.ones((10, 2)))
-        assert y[1] == 1
+        assert np.all(X[0] == np.zeros((10, 3)))
+        assert np.all(X[1] == np.ones((10, 3)))
+        assert y is None
+
+        # concat and stride and y_col
+        loader = HDF5DatasetLoader('f*.h5', y_col=2, stride=2, concat=True)
+        X, y = loader.load()
+        assert X.shape[0] == 10 and X.shape[1] == 2
+        assert y.shape[0] == 10
+
+    finally:
+        os.chdir(cwd)
+        shutil.rmtree(dirname)
+
+
+def test_DSVDatasetLoader_1():
+
+    assert DSVDatasetLoader.short_name == 'dsv'
+
+    cwd = os.path.abspath(os.curdir)
+    dirname = tempfile.mkdtemp()
+    try:
+        os.chdir(dirname)
+
+        # one file
+        np.savetxt('f1.csv', np.zeros((10, 4)), fmt='%f,%f,%f,%f')
+        loader = DSVDatasetLoader('f1.csv', concat=False)
+        X, y = loader.load()
+        assert np.all(X == np.zeros((10, 4)))
+        assert y is None
+
+        # two files
+        np.savetxt('f2.csv', np.ones((10, 4)), fmt='%f,%f,%f,%f')
+        loader = DSVDatasetLoader('f*.csv', concat=False)
+        X, y = loader.load()
+        assert isinstance(X, list)
+        assert np.all(X[0] == np.zeros((10, 4)))
+        assert np.all(X[1] == np.ones((10, 4)))
+        assert y is None
+
+        # y_col and usecols and concat and stride
+        loader = DSVDatasetLoader('f*.csv', y_col=3, usecols=(0, 2),
+                                  stride=2, concat=True)
+        X, y = loader.load()
+        assert X.shape[0] == 10 and X.shape[1] == 2
+        assert y.shape[0] == 10
 
     finally:
         os.chdir(cwd)

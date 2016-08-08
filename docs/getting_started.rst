@@ -7,21 +7,23 @@ Introduction
 
 Getting started with Osprey is as simple as setting up a single ``YAML``
 configuration file. This configuration file will contain your model
-estimators (``estimator``), hyperparameter search strategy
-(``strategy``), hyperparameter search space (``search_space``), dataset
-information (``dataset_loader``), cross-validation strategy (``cv``),
-and a path to a ``SQL``-like database (``trials``). This page will go
-over how to set up a basic Osprey toy project and then a more realistic
-example for a `molecular
-dynamics <https://en.wikipedia.org/wiki/Molecular_dynamics>`__ dataset.
+estimators, hyperparameter search strategy, hyperparameter search space,
+dataset information, cross-validation strategy, and a path to a
+``SQL``-like database. You can use the command ``osprey skeleton`` to
+generate an example configuration file.
 
-``scikit-learn`` Example
-------------------------
+First, we will show how to use Osprey for a simple scikit-learn
+classification task. Then, we will show how one might use Osprey to model a
+`molecular dynamics <https://en.wikipedia.org/wiki/Molecular_dynamics>`_
+dataset.
 
-First, we'll begin with a basic C-Support Vector Classification example
-using ``scikit-learn`` to introduce the basic ``YAML`` fields for Osprey. To
-tell Osprey that we want to use ``sklearn``'s ``SVC`` as our estimator,
-we can type:
+SVM Classification with ``scikit-learn``
+----------------------------------------
+
+Let's train a basic C-Support Vector Classification example using
+``scikit-learn`` and introduce the basic ``YAML`` fields for Osprey. To
+tell Osprey that we want to use ``sklearn``'s ``SVC`` as our estimator, we
+can type:
 
 .. code:: yaml
 
@@ -88,8 +90,8 @@ we can start an osprey job in the command-line by invoking:
     $ osprey worker config.yaml
 
 
-``msmbuilder`` Example
-----------------------
+Molecular Dynamics with ``msmbuilder``
+--------------------------------------
 
 Now that we understand the basics, we can move on to a more practical example.
 This section will go over how to set up a Osprey configuration for

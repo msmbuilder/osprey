@@ -7,6 +7,13 @@ for submitting multiple parallel ``osprey worker`` s to a cluster batch scheduli
 system. Depending on what scheduling software your cluster runs, you can use these
 scripts as a jumping off point.
 
+GNU Parallel
+------------
+
+.. code-block:: bash
+
+    seq 1 100 | parallel --delay 1 'osprey worker config.yaml &> osprey.{}.log'
+
 
 Example PBS/TORQUE Script
 -------------------------

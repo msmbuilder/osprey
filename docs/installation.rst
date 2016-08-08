@@ -51,17 +51,17 @@ Or clone the repo yourself and run `setup.py`:
 
 Dependencies
 ------------
-- `six>=1.10.0`
-- `pyyaml>=3.11`
-- `numpy>=1.10.4`
-- `scipy>=0.17.0`
-- `scikit-learn>=0.17.0`
-- `sqlalchemy>=1.0.10`
-- `bokeh>=0.12.0`
-- `matplotlib>=1.5.0`
-- `GPy` (optional, required for `gp` strategy)
-- `hyperopt` (optional, required for `hyperopt_tpe` strategy)
-- `nose` (optional, for testing)
+- ``six>=1.10.0``
+- ``pyyaml>=3.11``
+- ``numpy>=1.10.4``
+- ``scipy>=0.17.0``
+- ``scikit-learn>=0.17.0``
+- ``sqlalchemy>=1.0.10``
+- ``bokeh>=0.12.0``
+- ``matplotlib>=1.5.0``
+- ``GPy`` (optional, required for ``gp`` strategy)
+- ``hyperopt`` (optional, required for ``hyperopt_tpe`` strategy)
+- ``nose`` (optional, for testing)
 
 You can grab most of them with conda. ::
 

@@ -48,7 +48,7 @@ class NumpyDatasetLoader(BaseDatasetLoader):
 class HDF5DatasetLoader(BaseDatasetLoader):
     short_name = 'hdf5'
 
-    def __init__(self, filenames, y_col=None, stride=1, concat=True):
+    def __init__(self, filenames, y_col=None, stride=1, concat=False):
         self.filenames = filenames
         self.y_col = y_col
         self.stride = stride
@@ -85,9 +85,12 @@ class HDF5DatasetLoader(BaseDatasetLoader):
         if self.concat:
             X = np.concatenate(X, axis=0)
             y = np.concatenate(y, axis=0)
-
+        if num_samples(X) == 1:
+            X = X[0]
+            y = y[0]
         if self.y_col is not None:
             return X, y
+
         return X, None
 
 
@@ -96,7 +99,7 @@ class DSVDatasetLoader(BaseDatasetLoader):
 
     def __init__(self, filenames, y_col=None, delimiter=',', skip_header=0,
                  skip_footer=0, filling_values=np.nan, usecols=None, stride=1,
-                 concat=True):
+                 concat=False):
         self.filenames = filenames
         self.y_col = y_col
         self.delimiter = delimiter
@@ -147,9 +150,12 @@ class DSVDatasetLoader(BaseDatasetLoader):
         if self.concat:
             X = np.concatenate(X, axis=0)
             y = np.concatenate(y, axis=0)
-
+        if num_samples(X) == 1:
+            X = X[0]
+            y = y[0]
         if self.y_col is not None:
             return X, y
+
         return X, None
 
 

@@ -12,10 +12,38 @@ dataset information, cross-validation strategy, and a path to a
 ``SQL``-like database. You can use the command ``osprey skeleton`` to
 generate an example configuration file.
 
-First, we will show how to use Osprey for a simple scikit-learn
-classification task. Then, we will show how one might use Osprey to model a
-`molecular dynamics <https://en.wikipedia.org/wiki/Molecular_dynamics>`_
+First, we will describe how to prepare your dataset for Osprey. Then, we will
+show how to use Osprey for a simple scikit-learn classification task. And
+finally, we will show how one might use Osprey to model a
+`molecular dynamics (MD) <https://en.wikipedia.org/wiki/Molecular_dynamics>`_
 dataset.
+
+
+Formatting Your Dataset
+-----------------------
+
+Osprey supports a wide variety of file formats (see :ref:`here
+<config_file#dataset-loader>` for a full list); however, some of these offer
+more flexibility than others. In general, your data should be formatted as a
+two-dimensional array, where columns represent different features or variables
+and rows are individual observations. This is a fairly natural format for
+delimiter-separated value files (e.g ``.csv``, ``.tsv``), which Osprey handles
+natively using ``DSVDatasetLoader``. If you choose to save your dataset as a
+``.pkl``, ``.npz``, or ``.npy`` file, it's as simple as saving your datasets as
+2d NumPy arrays. Note that each file should only contain a single NumPy array.
+If you'd like to store multiple arrays to a single file for Osprey to read, we
+recommend storing your data in an HDF5 file.
+
+When working with datasets with labels or a response variable, there are slight
+differences in how your data should be stored. With delimiter-separated value,
+NumPY files, and HDF5 files, you can simply append these as an additional
+column and then select its index as the ``y_col`` parameter in the corresponding
+dataset loader. With Pickle and JobLib files, you should instead save each as a
+separate value in a ``dict`` object and declare the corresponding keys
+(``x_name`` and ``y_name``) in the ``JoblibDatasetLoader``. Please note that if
+you wish to use multiple response variables the ``JoblibDatasetLoader`` is the
+only dataset loader currently equipped to do so.
+
 
 SVM Classification with ``scikit-learn``
 ----------------------------------------
@@ -82,8 +110,8 @@ results will be saved:
     trials:
         uri: sqlite:///osprey-trials.db
 
-Once this all has been written to a ``YAML`` file (e.g. ``config.yaml``),
-we can start an osprey job in the command-line by invoking:
+Once this all has been written to a ``YAML`` file (in this example
+``config.yaml``), we can start an osprey job in the command-line by invoking:
 
 .. code:: bash
 

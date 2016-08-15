@@ -122,19 +122,58 @@ Finally, and perhaps simplest of all, is the
     strategy:
       name: grid
 
-Please note that grid search only supports ``enum`` and ``jump`` variables.
+Please note, that grid search only supports ``enum`` and ``jump`` variables.
 
 .. _dataset_loader:
 
 Dataset Loader
 --------------
 
+Osprey supports a wide variety of file formats. These include `pickle` files,
+``numpy`` files, delimiter-separated values files (e.g. ``.csv``, ``.tsv`),
+``hdf5`` files, and most molecular trajectory file formats (see `mdtraj.org <http://mdtraj.org/1.7.2/load_functions.html#format-specific-loading-functions>`_ for reference).
+For more information about formatting your dataset for use with Osprey, please
+refer to our :ref:`"Getting Started" <getting_started>` page.
+
+Below is an example of using the ``dsv`` loader to load multiple ``.csv`` files
+into Osprey:
+
 Example: ::
 
   dataset_loader:
-    name: joblib
+    name: dsv
     params:
-      filenames: ~/path/to/file.pkl
+      filenames: /path/to/files/*.csv, /another/path/to/myfile.csv
+      delimiter: ','
+      skip_header: 2
+      skip_footer: 1
+      y_col: 42
+      usecols: 0, 1, 2, 3, 4, 5
+      concat: True
+
+Notice that we can pass a glob string and/or a comma-separated list of paths to
+``filenames`` to tell Osprey where our data is located. ``delimiter`` defines
+the separator pattern used to parse the data files (default: ``','``).
+``skip_header`` and ``skip_footer`` tell Osprey how many lines to ignore at the
+beginning and end of the files, respectively (default: ``0``). ``y_col`` is used
+to specify which column to select as a response variable (default: ``None``).
+``usecols`` can be used to specify which columns to use as explanatory variables
+(default: uses all columns). And finally, ``concat`` specifies whether or not to
+treat all loaded files as a single dataset (defaut: ``False``).
+
+Here's a complete list of supported file formats, along with their loader
+``name`` mappings:
+
+* ``numpy``: `NumPy <http://docs.scipy.org/doc/numpy/neps/npy-format.html>`_ format
+* ``msmbuilder``: `MSMBuilder dataset <http://msmbuilder.org/development/persistence.html>`_ format
+* ``hdf5``: `HDF5 <https://www.hdfgroup.org/HDF5/whatishdf5.html>`_ format
+* ``dsv``: `Delimiter-separated value (DSV) <https://en.wikipedia.org/wiki/Delimiter-separated_values>`_ format
+* ``joblib``: Pickle and `Joblib <https://pythonhosted.org/joblib/persistence.html>`_ formats
+
+In addition, we provide two additional loaders:
+
+* ``sklearn_dataset``: Allows users to load any ````scikit-learn`` dataset <http://scikit-learn.org/stable/datasets/#toy-datasets>`_
+* ``filename``: Allows users to pass a set of filenames to the Osprey estimator. Useful for custom dataset loading.
 
 .. _cross_validation:
 

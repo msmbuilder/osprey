@@ -133,7 +133,7 @@ Osprey supports a wide variety of file formats. These include `pickle` files,
 ``numpy`` files, delimiter-separated values files (e.g. ``.csv``, ``.tsv`),
 ``hdf5`` files, and most molecular trajectory file formats (see `mdtraj.org <http://mdtraj.org/1.7.2/load_functions.html#format-specific-loading-functions>`_ for reference).
 For more information about formatting your dataset for use with Osprey, please
-refer to our :ref:`"Getting Started" <getting_started>` page.
+refer to our "`Getting Started <./getting_started.html>`_" page.
 
 Below is an example of using the ``dsv`` loader to load multiple ``.csv`` files
 into Osprey:

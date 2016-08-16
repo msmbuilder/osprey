@@ -252,7 +252,7 @@ class EnumVariable(namedtuple('EnumVariable', ('name', 'choices'))):
             index = next(i for i, c in enumerate(self.choices) if c == value)
         except StopIteration:
             raise ValueError('%s not in %s' % (value, self.choices))
-        return float(index) / (len(self.choices) - 1)
+        return float(index) / max(len(self.choices) - 1, 1)
 
     def point_from_gp(self, gpvalue):
-        return self.choices[int(np.round(gpvalue * (len(self.choices) - 1)))]
+        return self.choices[int(np.round(gpvalue * max(len(self.choices) - 1, 1)))]

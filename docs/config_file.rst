@@ -216,7 +216,9 @@ Example: ::
   random_seed: 42
 
 Please note that this makes parallel trials redundant and, thus, not
-recommended when scaling across multiple jobs.
+recommended when scaling across multiple jobs. However, a workaround
+would be to create multiple copies of the configuration file, each
+with a unique random seed, for each independent worker to run.
 
 Trials Storage
 --------------

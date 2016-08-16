@@ -331,7 +331,7 @@ as a ``pandas.DataFrame``:
     from osprey.config import Config
 
     # Load Configuation File
-    my_config = 'path/to/config.xml'
+    my_config = 'path/to/config.yaml'
     config = Config(my_config)
 
     # Retrieve Trial Results

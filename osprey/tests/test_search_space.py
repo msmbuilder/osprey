@@ -165,3 +165,9 @@ def test_gp_4():
     assert 0 == v.point_to_gp('a')
     assert 0.5 == v.point_to_gp('b')
     assert 1 == v.point_to_gp('c')
+
+
+def test_gp_5():
+    v = EnumVariable('name', ['a'])
+    assert 'a' == v.point_from_gp(v.point_to_gp('a'))
+    assert 0 == v.point_to_gp('a')

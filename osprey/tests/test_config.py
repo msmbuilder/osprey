@@ -1,17 +1,23 @@
 from __future__ import print_function, absolute_import, division
 import numpy as np
 import os
+import shutil
+import subprocess
 import tempfile
+from distutils.spawn import find_executable
 
 from six.moves import cPickle
 from sklearn.cluster import KMeans
 
 from osprey.config import Config
+from osprey.trials import Trial
 from osprey.search_space import IntVariable, FloatVariable, EnumVariable
 from osprey.strategies import RandomSearch, HyperoptTPE, GP
 
 
 os.environ['OSPREYRC'] = ' '
+
+OSPREY_BIN = find_executable('osprey')
 
 
 def test_estimator_pickle():
@@ -148,3 +154,29 @@ def test_stratified_cv():
     cv = config.cv(range(100), np.random.randint(2, size=100))
     assert isinstance(cv, StratifiedShuffleSplit)
     assert cv.n_iter == 10
+
+
+def test_trial_results():
+    assert OSPREY_BIN is not None
+    cwd = os.path.abspath(os.curdir)
+    dirname = tempfile.mkdtemp()
+
+    try:
+        os.chdir(dirname)
+        subprocess.check_call([OSPREY_BIN, 'skeleton', '-t', 'random_example',
+                              '-f', 'config.yaml'])
+        subprocess.check_call([OSPREY_BIN, 'worker', 'config.yaml', '-n', '5'])
+        assert os.path.exists('osprey-trials.db')
+
+        config = Config('config.yaml')
+
+        df = config.trial_results()
+
+        assert df.shape[0] == 5
+
+        for key in Trial.__table__.columns.keys():
+            assert key in df.columns
+
+    finally:
+        os.chdir(cwd)
+        shutil.rmtree(dirname)

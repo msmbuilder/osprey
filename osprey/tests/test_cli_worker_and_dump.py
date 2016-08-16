@@ -6,7 +6,6 @@ import json
 import shutil
 import subprocess
 import tempfile
-from shutil import copyfile
 from distutils.spawn import find_executable
 from numpy.testing.decorators import skipif
 

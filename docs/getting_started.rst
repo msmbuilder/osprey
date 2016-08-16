@@ -21,8 +21,8 @@ dataset. And finally, we'll show how to query and use your final Osprey results.
 Formatting Your Dataset
 -----------------------
 
-Osprey supports a wide variety of file formats (see :ref:`here
-<config_file#dataset-loader>` for a full list); however, some of these offer
+Osprey supports a wide variety of file formats (see `here
+<./config_file.html#dataset-loader>`_ for a full list); however, some of these offer
 more flexibility than others. In general, your data should be formatted as a
 two-dimensional array, where columns represent different features or variables
 and rows are individual observations. This is a fairly natural format for

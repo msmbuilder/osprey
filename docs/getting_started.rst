@@ -326,9 +326,9 @@ access the SQL-like database. Here's an example of loading your Osprey results
 as a ``pandas.DataFrame``:
 
 .. code:: python
+
     # Imports
     from osprey.config import Config
-    from pandas import DataFrame, Index
 
     # Load Configuation File
     my_config = 'path/to/config.xml'

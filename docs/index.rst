@@ -31,7 +31,7 @@ To get started, run ``osprey skeleton`` to create an example config file, and
 then boot up one or more parallel instances of ``osprey worker``.
 
 If you happen to run into any issues while using Osprey or would like suggest a
-new feature, please take a moment to read our :ref:`contributing <contributing>`
+new feature, please take a moment to read our "`Contributing <./contributing.html>`_"
 section.
 
 

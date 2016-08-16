@@ -172,7 +172,7 @@ Here's a complete list of supported file formats, along with their loader
 
 In addition, we provide two additional loaders:
 
-* ``sklearn_dataset``: Allows users to load any ````scikit-learn`` dataset <http://scikit-learn.org/stable/datasets/#toy-datasets>`_
+* ``sklearn_dataset``: Allows users to load any ``scikit-learn`` `dataset <http://scikit-learn.org/stable/datasets/#toy-datasets>`_
 * ``filename``: Allows users to pass a set of filenames to the Osprey estimator. Useful for custom dataset loading.
 
 .. _cross_validation:

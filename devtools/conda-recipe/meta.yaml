@@ -25,6 +25,7 @@ requirements:
     - sqlalchemy
     - bokeh
     - matplotlib
+    - pandas
 
 test:
 

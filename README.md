@@ -122,6 +122,7 @@ Dependencies
 - `sqlalchemy>=1.0.10`
 - `bokeh>=0.12.0`
 - `matplotlib>=1.5.0`
+- `pandas>=0.18.0`
 - `GPy` (optional, required for `gp` strategy)
 - `hyperopt` (optional, required for `hyperopt_tpe` strategy)
 - `nose` (optional, for testing)

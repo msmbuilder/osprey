@@ -32,12 +32,13 @@ from six.moves import reduce
 from pkg_resources import resource_filename
 
 from .entry_point import load_entry_point
-from .utils import dict_merge, in_directory, prepend_syspath, num_samples
+from .utils import (dict_merge, in_directory, prepend_syspath, num_samples,
+                    trials_to_dict)
 from .search_space import SearchSpace
 from .strategies import BaseStrategy
 from .dataset_loaders import BaseDatasetLoader
 from .cross_validators import BaseCVFactory
-from .trials import make_session
+from .trials import Trial, make_session
 from .subclass_factory import init_subclass_by_name
 from . import eval_scopes
 
@@ -299,6 +300,28 @@ class Config(object):
         with in_directory(dirname(abspath(self.path))):
             value = make_session(uri, project_name=project_name)
         return value
+
+    def trial_results(self, table_name=None, success_only=True):
+        from pandas import DataFrame
+
+        db = self.trials()
+        columns = Trial.__table__.columns
+
+        if not table_name:
+            table_name = Trial.__tablename__
+
+        cmd = 'SELECT * FROM %s' % table_name
+
+        if success_only:
+            cmd += ' WHERE (status LIKE "SUCCEEDED");'
+
+        query = db.execute(cmd)
+        results = query.fetchall()
+
+        if not results:
+            return None
+
+        return DataFrame(trials_to_dict(results, columns))
 
     @contextlib.contextmanager
     def trialscontext(self):

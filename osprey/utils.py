@@ -5,10 +5,20 @@ import scipy.sparse as sp
 import os.path
 import sys
 import contextlib
+import json
 from datetime import datetime
 from sklearn.pipeline import Pipeline
+from six import StringIO
+
 
 from .eval_scopes import import_all_estimators
+from .trials import JSONEncoded
+
+__all__ = ['dict_merge', 'in_directory', 'prepend_syspath', 'prepend_syspath',
+           'Unbuffered', 'format_timedelta', 'current_pretty_time',
+           'short_format_time', 'mock_module', 'join_quoted', 'expand_path',
+           'is_msmbuilder_estimator', 'num_samples', 'check_arrays',
+           'trials_to_dict']
 
 
 def dict_merge(base, top):
@@ -326,3 +336,15 @@ def check_arrays(*arrays, **options):
         checked_arrays.append(array)
 
     return checked_arrays
+
+
+def trials_to_dict(trials, columns):
+    for trial in trials:
+        d = {}
+        for i, item in enumerate(columns.items()):
+            key, val = item
+            new_val = trial[i]
+            if isinstance(val.type, JSONEncoded):
+                new_val = json.load(StringIO(new_val))
+            d[key] = new_val
+        yield d

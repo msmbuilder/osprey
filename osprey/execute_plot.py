@@ -6,7 +6,7 @@ from .plot import plot_1, plot_2, plot_3, plot_4
 
 try:
     import bokeh.plotting as bk
-    from bokeh.io import vplot
+    from bokeh.models.layouts import Column
 except ImportError:
     raise RuntimeError(
         'This command requires the Bokeh library (http://bokeh.pydata.org/) '
@@ -34,7 +34,7 @@ def execute(args, parser):
             plt = plt if isinstance(plt, list) else [plt]
             plots.extend(plt)
 
-    p = vplot(*plots)
+    p = Column(*plots)
     if args.browser:
         bk.show(p)
     else:

@@ -15,4 +15,6 @@ def configure_parser(sub_parsers):
     p.add_argument('config', help='Path to worker config file (yaml)')
     p.add_argument('-n', '--n-iters', default=1, type=int, help='Number of '
                    'trials to run sequentially.')
+    p.add_argument('-s', '--seed', default=None, type=int, help='Random seed '
+                   'for worker to use.')
     p.set_defaults(func=func)

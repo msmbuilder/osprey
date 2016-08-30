@@ -114,7 +114,13 @@ Once this all has been written to a ``YAML`` file (in this example
 
 .. code:: bash
 
-    $ osprey worker config.yaml
+    $ osprey worker --n-iters 10 --seed 42 config.yaml
+
+The ``--n-iters`` option allows you to specify how many iterations
+to perform for hyperparameter optimization in this particular worker. The
+``--seed`` option allows you to define a random seed to produce a fully
+reproducible Osprey worker (Note: This overrides the ``random_seed`` option
+  in the configuration file).
 
 
 Molecular Dynamics with ``msmbuilder``
@@ -223,7 +229,7 @@ we can start an osprey job in the command-line by invoking:
 
 .. code:: bash
 
-    $ osprey worker config.yaml
+    $ osprey worker --n-iters 10 --seed 42 config.yaml
 
 
 Working with Osprey Results

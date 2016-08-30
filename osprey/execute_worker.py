@@ -35,7 +35,7 @@ def execute(args, parser):
     strategy = config.strategy()
     config_sha1 = config.sha1()
     scoring = config.scoring()
-    random_seed = config.random_seed()
+    random_seed = args.seed if args.seed is not None else config.random_seed()
     project_name = config.project_name()
 
     if is_msmbuilder_estimator(estimator):

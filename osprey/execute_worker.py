@@ -30,12 +30,16 @@ def execute(args, parser):
     print_header()
 
     config = Config(args.config)
+    random_seed = args.seed if args.seed is not None else config.random_seed()
     estimator = config.estimator()
+    if 'random_state' in estimator.get_params().keys():
+        estimator.set_params(random_state=random_seed)
+    np.random.seed(random_seed)
     searchspace = config.search_space()
     strategy = config.strategy()
     config_sha1 = config.sha1()
     scoring = config.scoring()
-    random_seed = args.seed if args.seed is not None else config.random_seed()
+
     project_name = config.project_name()
 
     if is_msmbuilder_estimator(estimator):
@@ -74,12 +78,11 @@ def execute(args, parser):
 
         trial_id, params = initialize_trial(
             strategy, searchspace, estimator, config_sha1=config_sha1,
-            project_name=project_name,
-            sessionbuilder=config.trialscontext)
+            project_name=project_name, sessionbuilder=config.trialscontext)
 
         s = run_single_trial(
             estimator=estimator, params=params, trial_id=trial_id,
-            scoring=scoring, random_seed=random_seed, X=X, y=y, cv=cv,
+            scoring=scoring, X=X, y=y, cv=cv,
             sessionbuilder=config.trialscontext)
 
         statuses[i] = s
@@ -123,15 +126,14 @@ def initialize_trial(strategy, searchspace, estimator, config_sha1,
     return trial_id, params
 
 
-def run_single_trial(estimator, params, trial_id, scoring, random_seed,
-                     X, y, cv, sessionbuilder):
+def run_single_trial(estimator, params, trial_id, scoring, X, y, cv,
+                     sessionbuilder):
 
     status = None
 
     try:
         score = fit_and_score_estimator(
-            estimator, params, cv=cv, scoring=scoring, random_seed=random_seed,
-            X=X, y=y, verbose=1)
+            estimator, params, cv=cv, scoring=scoring, X=X, y=y, verbose=1)
         with sessionbuilder() as session:
             trial = session.query(Trial).get(trial_id)
             trial.mean_test_score = score['mean_test_score']

@@ -16,10 +16,10 @@ New Features
 + Added random seed via CLI (`#196 <https://github.com/msmbuilder/osprey/pull/196>`_)
 + Added ``DSVDatasetLoader`` (`#175 <https://github.com/msmbuilder/osprey/pull/175>`_)
 + Added ``random_seed`` as a configurable parameter (`#164 <https://github.com/msmbuilder/osprey/pull/164>`_)
-+
 
 Bug Fixes
 ~~~~~~~~~~~~
++ Fixed issue where ``random_seed`` was not passed to estimator (`#198 <https://github.com/msmbuilder/osprey/pull/198>`_)
 + Fixed ``bokeh.io.vplot`` deprecation warning (`#192 <https://github.com/msmbuilder/osprey/pull/192>`_)
 + Fixed ungraceful failures when using GP with a single choice in
   search space (`#191 <https://github.com/msmbuilder/osprey/pull/191>`_)

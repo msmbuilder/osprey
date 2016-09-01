@@ -114,6 +114,7 @@ You can dump the database to JSON or CSV with `osprey dump`.
 
 Dependencies
 ------------
+- `python>=2.7.11`
 - `six>=1.10.0`
 - `pyyaml>=3.11`
 - `numpy>=1.10.4`

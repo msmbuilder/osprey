@@ -51,6 +51,7 @@ Or clone the repo yourself and run `setup.py`:
 
 Dependencies
 ------------
+- ``python>=2.7.11``
 - ``six>=1.10.0``
 - ``pyyaml>=3.11``
 - ``numpy>=1.10.4``

@@ -19,8 +19,8 @@ if LooseVersion(sklearn.__version__) < LooseVersion('0.16.1'):
 
 
 def fit_and_score_estimator(estimator, parameters, cv, X, y=None, scoring=None,
-                            random_seed=None, iid=True, n_jobs=1,
-                            verbose=1, pre_dispatch='2*n_jobs'):
+                            iid=True, n_jobs=1, verbose=1,
+                            pre_dispatch='2*n_jobs'):
     """Fit and score an estimator with cross-validation
 
     This function is basically a copy of sklearn's
@@ -39,8 +39,6 @@ def fit_and_score_estimator(estimator, parameters, cv, X, y=None, scoring=None,
         The scores on the training and test sets, as well as the mean test set
         score.
     """
-
-    np.random.seed(random_seed)
 
     scorer = check_scoring(estimator, scoring=scoring)
     n_samples = num_samples(X)

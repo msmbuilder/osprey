@@ -177,7 +177,8 @@ class HyperoptTPE(BaseStrategy):
 class GP(BaseStrategy):
     short_name = 'gp'
 
-    def __init__(self, seeds=1, max_feval=5E4, max_iter=1E5):
+    def __init__(self, seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
+        self.seed = seed
         self.seeds = seeds
         self.max_feval = max_feval
         self.max_iter = max_iter
@@ -304,4 +305,3 @@ class GridSearch(BaseStrategy):
         # so user should pick correctly number of evaluations
         self.current += 1
         return self.param_grid[self.current % len(self.param_grid)]
-

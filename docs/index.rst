@@ -48,6 +48,7 @@ section.
    contributing
    config_file
    batch_submission
+   changelog
 
 .. raw:: html
 

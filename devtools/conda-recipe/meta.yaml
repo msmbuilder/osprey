@@ -1,6 +1,6 @@
 package:
   name: osprey
-  version: "1.1.0dev0"
+  version: "1.1.0"
 
 source:
   path: ../../

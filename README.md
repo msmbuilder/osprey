@@ -157,7 +157,7 @@ If you use Osprey in your research, please cite:
                   Stanislaw Jastrzebski and
                   Brooke E. Husic and
                   Vijay S. Pande},
-  title        = {osprey: Osprey 1.0.0},
+  title        = {Osprey 1.0.0},
   month        = jun,
   year         = 2016,
   doi          = {10.5281/zenodo.56251},

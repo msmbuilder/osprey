@@ -5,8 +5,8 @@ from distutils.spawn import find_executable
 from setuptools import setup, find_packages
 from basesetup import write_version_py
 
-VERSION = '1.1.0'
-ISRELEASED = True
+VERSION = '1.2.0dev'
+ISRELEASED = False
 __version__ = VERSION
 
 

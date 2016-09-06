@@ -3,8 +3,8 @@
 Changelog
 =========
 
-v1.1.0dev
-------------------
+v1.1.0
+------
 
 API Changes
 ~~~~~~~~~~~
@@ -27,6 +27,6 @@ Bug Fixes
 
 
 v1.0.0
-------------------
+------
 
 This is the first stable version of Osprey

@@ -158,10 +158,10 @@ If you use Osprey in your research, please cite:
                   Stanislaw Jastrzebski and
                   Brooke E. Husic and
                   Vijay S. Pande},
-  title        = {Osprey 1.0.0},
-  month        = jun,
+  title        = {Osprey: Hyperparameter Optimization for Machine Learning},
+  month        = sep,
   year         = 2016,
-  doi          = {10.5281/zenodo.56251},
-  url          = {http://dx.doi.org/10.5281/zenodo.56251}
+  doi          = {10.21105/joss.000341},
+  url          = {http://dx.doi.org/10.21105/joss.00034}
 }
 ```

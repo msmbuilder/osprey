@@ -39,13 +39,13 @@ To grab the latest version from github, run:
 
 .. code-block:: bash
 
-  $ pip install git+git://github.com/pandegroup/osprey.git
+  $ pip install git+git://github.com/msmbuilder/osprey.git
 
 Or clone the repo yourself and run `setup.py`:
 
 .. code-block:: bash
 
-  $ git clone https://github.com/pandegroup/osprey.git
+  $ git clone https://github.com/msmbuilder/osprey.git
   $ cd osprey && python setup.py install
 
 

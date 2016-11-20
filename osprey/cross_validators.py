@@ -62,6 +62,17 @@ class LeaveOneOutFactory(BaseCVFactory):
         return model_selection.LeaveOneOut()
 
 
+class LeavePOutFactory(BaseCVFactory):
+    __doc__ = model_selection.LeavePOut.__doc__
+    short_name = ['lpo', 'LeavePOut']
+
+    def __init__(self, p=3):
+        self.p = p
+
+    def create(self, X, y=None):
+        return model_selection.LeavePOut(p=self.p)
+
+
 class StratifiedShuffleSplitFactory(BaseCVFactory):
     __doc__ = model_selection.StratifiedShuffleSplit.__doc__
     short_name = ['stratifiedshufflesplit', 'StratifiedShuffleSplit']
@@ -95,6 +106,18 @@ class StratifiedKFoldFactory(BaseCVFactory):
                                                shuffle=self.shuffle,
                                                random_state=self.random_state
                                                )
+
+
+class TimeSeriesSplitFactory(BaseCVFactory):
+    __doc__ = model_selection.TimeSeriesSplit.__doc__
+    short_name = ['timeseriessplit', 'TimeSeriesSplit']
+
+    def __init__(self, n_splits=3):
+        self.n_splits = n_splits
+
+    def create(self, X, y=None):
+        return model_selection.TimeSeriesSplit(
+            n_splits=self.n_splits)
 
 
 class FixedCVFactory(BaseCVFactory):

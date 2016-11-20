@@ -136,24 +136,24 @@ def test_random_seed():
 
 
 def test_cv_1():
-    from sklearn.cross_validation import ShuffleSplit
+    from sklearn.model_selection import ShuffleSplit
     for name in ['shufflesplit', 'ShuffleSplit']:
         config = Config.fromdict({
-            'cv': {'name': name, 'params': {'n_iter': 10}}
+            'cv': {'name': name, 'params': {'n_splits': 10}}
         }, check_fields=False)
         cv = config.cv(range(100))
         assert isinstance(cv, ShuffleSplit)
-        assert cv.n_iter == 10
+        assert cv.n_splits == 10
 
 
 def test_stratified_cv():
-    from sklearn.cross_validation import StratifiedShuffleSplit
+    from sklearn.model_selection import StratifiedShuffleSplit
     config = Config.fromdict({
-        'cv': {'name': 'stratifiedshufflesplit', 'params': {'n_iter': 10}}
+        'cv': {'name': 'stratifiedshufflesplit', 'params': {'n_splits': 10}}
     }, check_fields=False)
     cv = config.cv(range(100), np.random.randint(2, size=100))
     assert isinstance(cv, StratifiedShuffleSplit)
-    assert cv.n_iter == 10
+    assert cv.n_splits == 10
 
 
 def test_trial_results():

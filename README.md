@@ -4,7 +4,8 @@ Osprey
 [![Coverage Status](https://coveralls.io/repos/github/msmbuilder/osprey/badge.svg?branch=master)](https://coveralls.io/github/msmbuilder/osprey?branch=master)
 [![PyPi version](https://badge.fury.io/py/osprey.svg)](https://pypi.python.org/pypi/osprey/)
 [![License](https://img.shields.io/badge/license-ASLv2.0-red.svg?style=flat)]  (http://www.apache.org/licenses/LICENSE-2.0)
-[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.61670.svg)](http://dx.doi.org/10.5281/zenodo.61670)
+[![DOI](http://joss.theoj.org/papers/10.21105/joss.00034/status.svg)](http://dx.doi.org/10.21105/joss.00034)
+[![Research software impact](http://depsy.org/api/package/pypi/osprey/badge.svg)](http://depsy.org/package/python/osprey)
 [![Documentation](https://img.shields.io/badge/docs-latest-blue.svg?style=flat)] (http://msmbuilder.org/osprey)
 
 ![Logo](http://msmbuilder.org/osprey/development/_static/osprey.svg)
@@ -157,10 +158,10 @@ If you use Osprey in your research, please cite:
                   Stanislaw Jastrzebski and
                   Brooke E. Husic and
                   Vijay S. Pande},
-  title        = {Osprey 1.0.0},
-  month        = jun,
+  title        = {Osprey: Hyperparameter Optimization for Machine Learning},
+  month        = sep,
   year         = 2016,
-  doi          = {10.5281/zenodo.56251},
-  url          = {http://dx.doi.org/10.5281/zenodo.56251}
+  doi          = {10.21105/joss.000341},
+  url          = {http://dx.doi.org/10.21105/joss.00034}
 }
 ```

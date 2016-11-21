@@ -30,7 +30,7 @@ def execute(args, parser):
                                                  weighted_std))
         print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
         if isinstance(config.estimator(), Pipeline):
-            print('PipelineStep\tParamter \t Value')
+            print('PipelineStep\tParameter \t Value')
             for i in config.estimator().steps:
                 print(i[0])
                 for param in sorted(parameter_dict.keys()):

@@ -343,7 +343,7 @@ class Config(object):
         cv = self.get_section('cv')
         if isinstance(cv, int):
             cv_name = 'kfold'
-            cv_params = {'n_folds': cv}
+            cv_params = {'n_splits': cv}
         else:
             cv_name = self.get_value('cv/name')
             cv_params = self.get_value('cv/params', default={})

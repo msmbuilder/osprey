@@ -191,7 +191,7 @@ To access the other iterators, use the ``name`` and ``params`` keywords: ::
   cv:
     name: shufflesplit
     params:
-      n_iter: 5
+      n_splits: 5
       test_size: 0.5
       random_state: 42
 

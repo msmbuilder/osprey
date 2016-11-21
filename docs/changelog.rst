@@ -3,6 +3,22 @@
 Changelog
 =========
 
+v1.2.0dev
+---------
+
+API Changes
+~~~~~~~~~~~
++ ``n_folds`` and ``n_iter`` parameters have been renamed to ``n_splits`` to
+  conform to the ``sklearn`` API.
+
+New Features
+~~~~~~~~~~~~
++ Added support for ``TimeSeriesSplit`` and ``LeavePOut`` cross-validators.
+
+Bug Fixes
+~~~~~~~~~
+
+
 v1.1.0
 ------
 
@@ -18,7 +34,7 @@ New Features
 + Added ``random_seed`` as a configurable parameter (`#164 <https://github.com/msmbuilder/osprey/pull/164>`_)
 
 Bug Fixes
-~~~~~~~~~~~~
+~~~~~~~~~
 + Fixed issue where ``random_seed`` was not passed to estimator (`#198 <https://github.com/msmbuilder/osprey/pull/198>`_)
 + Fixed ``bokeh.io.vplot`` deprecation warning (`#192 <https://github.com/msmbuilder/osprey/pull/192>`_)
 + Fixed ungraceful failures when using GP with a single choice in

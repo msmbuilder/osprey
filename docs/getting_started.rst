@@ -199,7 +199,7 @@ the amount of unique data available in your training and test sets:
     cv:
       name: shufflesplit
     params:
-      n_iter: 5
+      n_splits: 5
       test_size: 0.5
 
 We'll be using MDTraj to load our trajectories. Osprey already includes an

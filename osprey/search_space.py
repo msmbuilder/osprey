@@ -154,7 +154,7 @@ class IntVariable(namedtuple('IntVariable', ('name', 'min', 'max', 'warp'))):
         if self.warp is None:
             return random.randint(self.min, self.max+1)
         elif self.warp == 'log':
-            return np.exp(random.uniform(np.log(self.min), np.log(self.max+1)))
+            return int(np.exp(random.uniform(np.log(self.min), np.log(self.max+1))))
         raise ValueError('unknown warp: %s' % self.warp)
 
     def to_hyperopt(self):
@@ -170,7 +170,7 @@ class IntVariable(namedtuple('IntVariable', ('name', 'min', 'max', 'warp'))):
             return (value - self.min) / (self.max - self.min)
         elif self.warp == 'log':
             rng = np.log(self.max) - np.log(self.min)
-            return (np.log(value) - np.log(self.min)) / rng
+            return int((np.log(value) - np.log(self.min)) / rng)
 
         raise ValueError('unknown warp: %s' % self.warp)
 

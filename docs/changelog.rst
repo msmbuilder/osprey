@@ -14,6 +14,8 @@ API Changes
 New Features
 ~~~~~~~~~~~~
 + Added support for ``TimeSeriesSplit`` and ``LeavePOut`` cross-validators.
++ Improved ``osprey dump`` JSON output. The hyperparameters for each run are now stored along all
+the other settings in the same dictionary, allowing for subsequent easier loading and plotting.
 
 Bug Fixes
 ~~~~~~~~~

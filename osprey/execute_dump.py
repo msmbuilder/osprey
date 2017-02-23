@@ -15,7 +15,14 @@ def execute(args, parser):
 
     if args.output == 'json':
         items = [curr.to_dict() for curr in session.query(Trial).all()]
-        value = json.dumps(items)
+        new_items = []
+        # Instead of saving the parameters on their own nested dict,
+        # save them along the rest of elements
+        for item in items:
+            parameters = item.pop('parameters')  # remove dict
+            item.update(parameters)  # update original dict with the parameters
+            new_items.append(item)
+        value = json.dumps(new_items)
 
     elif args.output == 'csv':
         buf = cStringIO()

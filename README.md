@@ -3,10 +3,10 @@ Osprey
 [![Build Status](https://travis-ci.org/msmbuilder/osprey.svg?branch=master)](https://travis-ci.org/msmbuilder/osprey)
 [![Coverage Status](https://coveralls.io/repos/github/msmbuilder/osprey/badge.svg?branch=master)](https://coveralls.io/github/msmbuilder/osprey?branch=master)
 [![PyPi version](https://badge.fury.io/py/osprey.svg)](https://pypi.python.org/pypi/osprey/)
-[![License](https://img.shields.io/badge/license-ASLv2.0-red.svg?style=flat)]  (http://www.apache.org/licenses/LICENSE-2.0)
+[![License](https://img.shields.io/badge/license-ASLv2.0-red.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
 [![DOI](http://joss.theoj.org/papers/10.21105/joss.00034/status.svg)](http://dx.doi.org/10.21105/joss.00034)
 [![Research software impact](http://depsy.org/api/package/pypi/osprey/badge.svg)](http://depsy.org/package/python/osprey)
-[![Documentation](https://img.shields.io/badge/docs-latest-blue.svg?style=flat)] (http://msmbuilder.org/osprey)
+[![Documentation](https://img.shields.io/badge/docs-latest-blue.svg?style=flat)](http://msmbuilder.org/osprey)
 
 ![Logo](http://msmbuilder.org/osprey/development/_static/osprey.svg)
 

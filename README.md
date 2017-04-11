@@ -140,7 +140,7 @@ We also welcome any feature requests and highly encourage users to
 for bug fixes and improvements.
 
 For more detailed information, please refer to our
-[documentation](http://msmbuilder.org/osprey/contributing.html).
+[documentation](http://msmbuilder.org/osprey/development/contributing.html).
 
 
 Citing

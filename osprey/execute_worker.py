@@ -23,6 +23,10 @@ from .utils import Unbuffered, format_timedelta, current_pretty_time
 from .utils import is_msmbuilder_estimator, num_samples
 
 
+class MaxParamSuggestionRetriesExceeded(Exception):
+    pass
+
+
 def execute(args, parser):
     start_time = datetime.now()
     sys.stdout = Unbuffered(sys.stdout)
@@ -31,6 +35,7 @@ def execute(args, parser):
 
     config = Config(args.config)
     random_seed = args.seed if args.seed is not None else config.random_seed()
+    max_param_suggestion_retries = config.max_param_suggestion_retries()
     estimator = config.estimator()
     if 'random_state' in estimator.get_params().keys():
         estimator.set_params(random_state=random_seed)
@@ -76,9 +81,14 @@ def execute(args, parser):
         print('Beginning iteration %50s' % ('%d / %d' % (i+1, args.n_iters)))
         print('-'*70)
 
-        trial_id, params = initialize_trial(
-            strategy, searchspace, estimator, config_sha1=config_sha1,
-            project_name=project_name, sessionbuilder=config.trialscontext)
+        try:
+            trial_id, params = initialize_trial(
+                strategy, searchspace, estimator, config_sha1=config_sha1,
+                project_name=project_name, sessionbuilder=config.trialscontext,
+                max_param_suggestion_retries=max_param_suggestion_retries)
+        except MaxParamSuggestionRetriesExceeded:
+            print('The search strategy failed to suggest a new set of params not already present in the database after {} attempts'.format(max_param_suggestion_retries))
+            break
 
         s = run_single_trial(
             estimator=estimator, params=params, trial_id=trial_id,
@@ -91,7 +101,17 @@ def execute(args, parser):
 
 
 def initialize_trial(strategy, searchspace, estimator, config_sha1,
-                     project_name, sessionbuilder):
+                     project_name, sessionbuilder, max_param_suggestion_retries):
+
+    def build_full_params(xparams):
+        # make sure we get _all_ the parameters, including defaults on the
+        # estimator class, to save in the database
+        params = clone(estimator).set_params(**xparams).get_params()
+        params = dict((k, v) for k, v in iteritems(params)
+                      if not isinstance(v, BaseEstimator) and
+                      (k != 'steps'))
+
+        return params
 
     with sessionbuilder() as session:
         # requery the history ever iteration, because another worker
@@ -103,20 +123,25 @@ def initialize_trial(strategy, searchspace, estimator, config_sha1,
         print('History contains: %d trials' % len(history))
         print('Choosing next hyperparameters with %s...' % strategy.short_name)
         start = time.time()
-        params = strategy.suggest(history, searchspace)
+
+        if max_param_suggestion_retries is None:
+            params = strategy.suggest(history, searchspace)
+            full_params = build_full_params(params)
+        else:
+            for num_retries in range(max_param_suggestion_retries):
+                params = strategy.suggest(history, searchspace)
+                full_params = build_full_params(params)
+                if not strategy.is_repeated_suggestion(full_params, history):
+                    break
+            else:
+                raise MaxParamSuggestionRetriesExceeded
+
         print('  %r' % params)
         print('(%s took %.3f s)\n' % (strategy.short_name,
                                       time.time() - start))
         assert len(params) == searchspace.n_dims
 
-        # make sure we get _all_ the parameters, including defaults on the
-        # estimator class, to save in the database
-        params = clone(estimator).set_params(**params).get_params()
-        params = dict((k, v) for k, v in iteritems(params)
-                      if not isinstance(v, BaseEstimator) and
-                      (k != 'steps'))
-
-        t = Trial(status='PENDING', parameters=params, host=gethostname(),
+        t = Trial(status='PENDING', parameters=full_params, host=gethostname(),
                   user=getuser(), started=datetime.now(),
                   config_sha1=config_sha1)
         session.add(t)

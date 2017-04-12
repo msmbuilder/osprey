@@ -4,3 +4,5 @@ trials:
 scoring: !!null
 
 random_seed: !!null
+
+max_param_suggestion_retries: !!null

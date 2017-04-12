@@ -32,6 +32,34 @@ def test_grid():
     assert suggestions == [(1, 3), (1, 4), (2, 3), (2, 4)], "Didn't examine whole space correctly"
 
 
+def test_check_repeated_params():
+    searchspace = SearchSpace()
+    searchspace.add_enum('x', [1, 2])
+    searchspace.add_jump('y', min=3, max=4, num=2)
+
+    history = []
+    grid_search1 = GridSearch()
+    for _ in range(4):
+        params = grid_search1.suggest(history, searchspace)
+        history.append((params, 0.0, 'SUCCEEDED'))
+
+    grid_search2 = GridSearch()
+    for _ in range(4):
+        params = grid_search2.suggest(history, searchspace)
+        assert grid_search2.is_repeated_suggestion(params, history)
+
+    history = []
+    grid_search3 = GridSearch()
+    for _ in range(4):
+        params = grid_search3.suggest(history, searchspace)
+        history.append((params, 0.0, 'FAILED'))
+
+    grid_search4 = GridSearch()
+    for _ in range(4):
+        params = grid_search4.suggest(history, searchspace)
+        assert not grid_search4.is_repeated_suggestion(params, history)
+
+
 def hyperopt_x2_iterates(n_iters=100):
     iterates = []
     trials = Trials()

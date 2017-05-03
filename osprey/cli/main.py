@@ -47,7 +47,7 @@ def args_func(args, p):
             message = """\
 An unexpected error has occurred with osprey (version %s), please
 consider sending the following traceback to the osprey GitHub issue tracker at:
-        https://github.com/pandegroup/osprey/issues
+        https://github.com/msmbuilder/osprey/issues
 """
             print(message % __version__, file=sys.stderr)
         raise  # as if we did not catch it

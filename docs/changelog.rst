@@ -3,6 +3,28 @@
 Changelog
 =========
 
+v1.2.0dev
+---------
+
+API Changes
+~~~~~~~~~~~
++ ``n_folds`` and ``n_iter`` parameters have been renamed to ``n_splits`` to
+  conform to the ``sklearn`` API.
+
+New Features
+~~~~~~~~~~~~
++ Added support for ``TimeSeriesSplit`` and ``LeavePOut`` cross-validators.
++ Improved ``osprey dump`` JSON output. The hyperparameters for each run are now stored along all
+  the other settings in the same dictionary, allowing for subsequent easier loading and plotting.
++ Added ``max_param_suggestion_retries`` entry to the config file. This limits the number of times that
+  ``strategy.suggest`` is called when attempting to produce a trial with a set of params not previously
+  tested in the history. 
+
+
+Bug Fixes
+~~~~~~~~~
+
+
 v1.1.0
 ------
 
@@ -18,7 +40,7 @@ New Features
 + Added ``random_seed`` as a configurable parameter (`#164 <https://github.com/msmbuilder/osprey/pull/164>`_)
 
 Bug Fixes
-~~~~~~~~~~~~
+~~~~~~~~~
 + Fixed issue where ``random_seed`` was not passed to estimator (`#198 <https://github.com/msmbuilder/osprey/pull/198>`_)
 + Fixed ``bokeh.io.vplot`` deprecation warning (`#192 <https://github.com/msmbuilder/osprey/pull/192>`_)
 + Fixed ungraceful failures when using GP with a single choice in

@@ -8,7 +8,8 @@ import sklearn
 from sklearn.base import is_classifier, clone
 from sklearn.metrics.scorer import check_scoring
 from sklearn.externals.joblib import Parallel, delayed
-from sklearn.cross_validation import check_cv, _safe_split, _score
+from sklearn.model_selection import check_cv
+from sklearn.model_selection._validation import _safe_split, _score
 
 from .utils import check_arrays, num_samples
 from .utils import short_format_time, is_msmbuilder_estimator
@@ -49,7 +50,7 @@ def fit_and_score_estimator(estimator, parameters, cv, X, y=None, scoring=None,
             raise ValueError('Target variable (y) has a different number '
                              'of samples (%i) than data (X: %i samples)'
                              % (len(y), n_samples))
-    cv = check_cv(cv, X, y, classifier=is_classifier(estimator))
+    cv = check_cv(cv=cv, y=y, classifier=is_classifier(estimator))
 
     out = Parallel(
         n_jobs=n_jobs, verbose=verbose, pre_dispatch=pre_dispatch
@@ -57,9 +58,9 @@ def fit_and_score_estimator(estimator, parameters, cv, X, y=None, scoring=None,
         delayed(_fit_and_score)(clone(estimator), X, y, scorer,
                                 train, test, verbose, parameters,
                                 fit_params=None)
-        for train, test in cv)
+        for train, test in cv.split(X, y))
 
-    assert len(out) == len(cv)
+    assert len(out) == cv.n_splits
 
     train_scores, test_scores = [], []
     n_train_samples, n_test_samples = [], []

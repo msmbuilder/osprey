@@ -191,7 +191,7 @@ To access the other iterators, use the ``name`` and ``params`` keywords: ::
   cv:
     name: shufflesplit
     params:
-      n_iter: 5
+      n_splits: 5
       test_size: 0.5
       random_state: 42
 
@@ -219,6 +219,20 @@ Please note that this makes parallel trials redundant and, thus, not
 recommended when scaling across multiple jobs. However, a workaround
 would be to create multiple copies of the configuration file, each
 with a unique random seed, for each independent worker to run.
+
+
+Max Parameter Suggestion Retries
+--------------------------------
+By default Osprey will create trials that were previously tested. This can
+occur for example when restarting a grid search. By setting the optional
+``max_param_suggestion_retries`` parameter, Osprey will exit if it fails to 
+generate a parameter set that is not already in the database after
+``max_param_suggestion_retries`` attempts.
+
+Example: ::
+
+   max_param_suggestion_retries: 10
+
 
 Trials Storage
 --------------

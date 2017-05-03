@@ -53,6 +53,7 @@ FIELDS = {
     'cv':              (int, dict),
     'scoring':         (str, type(None)),
     'random_seed':     (int, type(None)),
+    'max_param_suggestion_retries': (int, type(None)),
 }
 
 
@@ -110,7 +111,7 @@ class Config(object):
         missing_fields = set(FIELDS.keys()).difference(self.config.keys())
         if len(missing_fields) > 0:
             raise RuntimeError('The following required fields are missing from'
-                               'the config file (%s): %s' % (
+                               ' the config file (%s): %s' % (
                                    ', '.join(missing_fields), self.path))
 
     @classmethod
@@ -339,11 +340,16 @@ class Config(object):
         assert isinstance(random_seed, (int, type(None)))
         return random_seed
 
+    def max_param_suggestion_retries(self):
+        max_param_suggestion_retries = self.get_section('max_param_suggestion_retries')
+        assert isinstance(max_param_suggestion_retries, (int, type(None)))
+        return max_param_suggestion_retries
+
     def cv(self, X, y=None):
         cv = self.get_section('cv')
         if isinstance(cv, int):
             cv_name = 'kfold'
-            cv_params = {'n_folds': cv}
+            cv_params = {'n_splits': cv}
         else:
             cv_name = self.get_value('cv/name')
             cv_params = self.get_value('cv/params', default={})

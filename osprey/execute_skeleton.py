@@ -7,7 +7,8 @@ TEMPLATES = {'msmbuilder': 'msmbuilder_skeleton_config.yaml',
              'sklearn': 'sklearn_skeleton_config.yaml',
              'random_example': 'random_example.yaml',
              'gp_example': 'sklearn_skeleton_config.yaml',
-             'grid_example': 'grid_example.yaml'}
+             'grid_example': 'grid_example.yaml',
+             'msmb_feat_select': 'msmb_feat_select_skeleton_config.yaml'}
 
 
 def execute(args, parser):

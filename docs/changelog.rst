@@ -24,6 +24,9 @@ New Features
 Bug Fixes
 ~~~~~~~~~
 
++ Fixed issue that was causing crashes when there was an attempt to write estimator parameters (e.g. numpy arrays) which
+couldn't be serialized by JSON.
+
 
 v1.1.0
 ------

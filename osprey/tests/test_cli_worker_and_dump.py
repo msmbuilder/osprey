@@ -43,7 +43,7 @@ def test_msmbuilder_skeleton():
 
 
 @skipif(not HAVE_MSMBUILDER, 'this test requires MSMBuilder')
-def test_msmbuilder2_skeleton():
+def test_msmb_feat_select_skeleton():
     from msmbuilder.example_datasets import FsPeptide
     assert OSPREY_BIN is not None
     cwd = os.path.abspath(os.curdir)
@@ -52,7 +52,7 @@ def test_msmbuilder2_skeleton():
 
     try:
         os.chdir(dirname)
-        subprocess.check_call([OSPREY_BIN, 'skeleton', '-t', 'msmbuilder2',
+        subprocess.check_call([OSPREY_BIN, 'skeleton', '-t', 'msmb_feat_select',
                               '-f', 'config.yaml'])
         subprocess.check_call([OSPREY_BIN, 'worker', 'config.yaml', '-n', '1'])
         assert os.path.exists('osprey-trials.db')

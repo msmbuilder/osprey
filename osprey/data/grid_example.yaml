@@ -1,5 +1,7 @@
 estimator:
   entry_point: sklearn.svm.SVC
+  params:
+    kernel: poly
 
 strategy:
   name: grid
@@ -19,6 +21,13 @@ search_space:
     warp: log
     var_type: float
     type: jump
+
+  degree:
+     min: 1
+     max: 5
+     num: 5
+     var_type: int
+     type: jump
 
 cv: 5
 

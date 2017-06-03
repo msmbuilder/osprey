@@ -24,6 +24,8 @@ New Features
 Bug Fixes
 ~~~~~~~~~
 
++ Fixed crashes when using ``jump`` variables of type ``int``.
+
 
 v1.1.0
 ------

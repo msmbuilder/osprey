@@ -21,6 +21,7 @@ from .trials import Trial
 from .fit_estimator import fit_and_score_estimator
 from .utils import Unbuffered, format_timedelta, current_pretty_time
 from .utils import is_msmbuilder_estimator, num_samples
+from .utils import is_json_serializable
 
 
 class MaxParamSuggestionRetriesExceeded(Exception):
@@ -108,7 +109,7 @@ def initialize_trial(strategy, searchspace, estimator, config_sha1,
         # estimator class, to save in the database
         params = clone(estimator).set_params(**xparams).get_params()
         params = dict((k, v) for k, v in iteritems(params)
-                      if not isinstance(v, BaseEstimator) and
+                      if is_json_serializable(v) and
                       (k != 'steps'))
 
         return params

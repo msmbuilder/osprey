@@ -42,6 +42,30 @@ def test_msmbuilder_skeleton():
         shutil.rmtree(dirname)
 
 
+@skipif(not HAVE_MSMBUILDER, 'this test requires MSMBuilder')
+def test_msmb_feat_select_skeleton():
+    from msmbuilder.example_datasets import FsPeptide
+    assert OSPREY_BIN is not None
+    cwd = os.path.abspath(os.curdir)
+    dirname = tempfile.mkdtemp()
+    FsPeptide(dirname).get()
+
+    try:
+        os.chdir(dirname)
+        subprocess.check_call([OSPREY_BIN, 'skeleton', '-t', 'msmb_feat_select',
+                              '-f', 'config.yaml'])
+        subprocess.check_call([OSPREY_BIN, 'worker', 'config.yaml', '-n', '1'])
+        assert os.path.exists('osprey-trials.db')
+
+        yield _test_dump_1
+
+        yield _test_plot_1
+
+    finally:
+        os.chdir(cwd)
+        shutil.rmtree(dirname)
+
+
 def test_sklearn_skeleton():
     assert OSPREY_BIN is not None
     cwd = os.path.abspath(os.curdir)

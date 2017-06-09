@@ -42,6 +42,11 @@ from .trials import Trial, make_session
 from .subclass_factory import init_subclass_by_name
 from . import eval_scopes
 
+try:
+    import GPy
+except:
+    GPy = None
+    pass
 
 FIELDS = {
     'estimator':       ['pickle', 'eval', 'eval_scope', 'entry_point',
@@ -269,6 +274,31 @@ class Config(object):
     def strategy(self):
         strategy_name = self.get_value('strategy/name')
         strategy_params = self.get_value('strategy/params', default={})
+
+        # Default value before being turned into entry points
+        try:
+            strategy_params['kernels']
+        except KeyError:
+            strategy_params['kernels'] = ['GPy.kern.Matern52']
+
+        # Cast kernels as list
+        kernels_str = strategy_params['kernels']
+        if isinstance(kernels_str, six.string_types):
+            kernels_str = [kernels_str]
+
+        # Turn strings into entry points.
+        # Put instantiation and associated checking in Strategy()
+        kernels = []
+        for kernel_str in kernels_str:
+            kernel = load_entry_point(kernel_str, 'strategy/params/kernels')
+            # TODO: Presumably GPy check has already been done here
+            if issubclass(kernel, GPy.kern.src.kern.Kern):
+                kernels.append(kernel)
+            else:
+                raise RuntimeError('strategy/params/kernel must load a'
+                                   'GPy derived Kernel')
+
+        strategy_params['kernels'] = kernels
 
         strat = init_subclass_by_name(BaseStrategy, strategy_name,
                                       strategy_params)

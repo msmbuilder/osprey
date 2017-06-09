@@ -198,7 +198,7 @@ class HyperoptTPE(BaseStrategy):
 class GP(BaseStrategy):
     short_name = 'gp'
 
-    def __init__(self, seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
+    def __init__(self, independent=False, kernels=None, seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
         self.seed = seed
         self.seeds = seeds
         self.max_feval = max_feval

@@ -19,6 +19,9 @@ try:
     from GPy.util.linalg import tdot
     from GPy.models import GPRegression
     from scipy.optimize import minimize
+    # If the GPy modules fail we won't do this unnecessarily.
+    from .entry_point import load_entry_point
+    KERNEL_BASE_CLASS = kern.src.kern.Kern
 except:
     # GPy is optional, but required for gp
     GPRegression = kern = minimize = None
@@ -198,7 +201,7 @@ class HyperoptTPE(BaseStrategy):
 class GP(BaseStrategy):
     short_name = 'gp'
 
-    def __init__(self, kernels=None, seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
+    def __init__(self, kernels, seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
         self.seed = seed
         self.seeds = seeds
         self.max_feval = max_feval
@@ -209,21 +212,22 @@ class GP(BaseStrategy):
         self._kerns = None
         self._kernf = None
         self._kernb = None
+        print(kernels)
 
     def _create_kernel(self, V):
 
         # # Turn into entry points.
-        # # TODO check if Import checking for GPy has been done.
+        # # TODO use eval to allow user to specify variables for kernels (e.g. V) in config file.
         # kernels = []
         # for kernel in kernels:
         #     kernel_ep = load_entry_point(kernel[0], 'strategy/params/kernels')
-        #     if issubclass(kernel_ep, GPy.kern.src.kern.Kern):
+        #     if issubclass(kernel_ep, KERNEL_BASE_CLASS):
+        #
         #
         #     if not isinstance(kernel)
         #         raise RuntimeError('strategy/params/kernel must load a'
         #                            'GPy derived Kernel')
-        #
-        # strategy_params['kernels'] = kernels
+
 
         # all_kernels = []
         # for kernel in self._kernels:

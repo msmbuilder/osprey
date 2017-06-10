@@ -216,19 +216,16 @@ class GP(BaseStrategy):
         # TODO use eval to allow user to specify internal variables for kernels (e.g. V) in config file.
         kernels = []
         for kern in self._kerns:
-            try:
-                kwargs = kern['kwargs']
-                options = kern['options']
-                name = kern['name']
-            except KeyError as e:
-                raise RuntimeError(e.message)
-
+            params = kern['params']
+            options = kern['options']
+            name = kern['name']
             kernel_ep = load_entry_point(name, 'strategy/params/kernels')
             if issubclass(kernel_ep, KERNEL_BASE_CLASS):
                 if options['independent']:
-                    kernel = np.sum([kernel_ep(1, **kwargs, active_dims=[i]) for i in range(self.n_dims)])
+                    #TODO Catch errors here?  Estimator entry points don't catch instantiation errors
+                    kernel = np.sum([kernel_ep(1, **params, active_dims=[i]) for i in range(self.n_dims)])
                 else:
-                    kernel = kernel_ep(self.n_dims, **kwargs)
+                    kernel = kernel_ep(self.n_dims, **params)
             if not isinstance(kernel, KERNEL_BASE_CLASS):
                 raise RuntimeError('strategy/params/kernel must load a'
                                    'GPy derived Kernel')

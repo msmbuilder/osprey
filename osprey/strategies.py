@@ -223,7 +223,7 @@ class GP(BaseStrategy):
             if issubclass(kernel_ep, KERNEL_BASE_CLASS):
                 if options['independent']:
                     #TODO Catch errors here?  Estimator entry points don't catch instantiation errors
-                    kernel = np.sum([kernel_ep(1, **params, active_dims=[i]) for i in range(self.n_dims)])
+                    kernel = np.sum([kernel_ep(1, active_dims=[i], **params) for i in range(self.n_dims)])
                 else:
                     kernel = kernel_ep(self.n_dims, **params)
             if not isinstance(kernel, KERNEL_BASE_CLASS):

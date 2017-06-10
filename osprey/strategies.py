@@ -209,41 +209,33 @@ class GP(BaseStrategy):
         self.model = None
         self.n_dims = None
         self.kernel = None
-        self._kerns = None
+        self._kerns = kernels
         self._kernf = None
         self._kernb = None
-        print(kernels)
 
-    def _create_kernel(self, V):
+    def _create_kernel(self):
 
-        # # Turn into entry points.
-        # # TODO use eval to allow user to specify variables for kernels (e.g. V) in config file.
-        # kernels = []
-        # for kernel in kernels:
-        #     kernel_ep = load_entry_point(kernel[0], 'strategy/params/kernels')
-        #     if issubclass(kernel_ep, KERNEL_BASE_CLASS):
-        #
-        #
-        #     if not isinstance(kernel)
-        #         raise RuntimeError('strategy/params/kernel must load a'
-        #                            'GPy derived Kernel')
+        # Turn into entry points.
+        # TODO use eval to allow user to specify internal variables for kernels (e.g. V) in config file.
+        kernels = []
+        for kern in self._kerns:
+            kwargs = kern['kwargs']
+            options = kern['options']
+            name = kern['name']
 
+            kernel_ep = load_entry_point(name, 'strategy/params/kernels')
+            if issubclass(kernel_ep, KERNEL_BASE_CLASS):
+                if options['independent']:
+                    kernel = np.sum([kernel_ep(1, **kwargs, active_dims=[i]) for i in range(self.n_dims)])
+                else:
+                    kernel = kernel_ep(self.n_dims, **kwargs)
+            if not isinstance(kernel, KERNEL_BASE_CLASS):
+                raise RuntimeError('strategy/params/kernel must load a'
+                                   'GPy derived Kernel')
+            kernels.append(kernel)
 
-        # all_kernels = []
-        # for kernel in self._kernels:
-        #     if self._is_independent:
-        #         all_kernels.extend([kernel(1, ARD=True, active_dims=[i]) for i in range(self.n_dims)])
-        #     else:
-        #         all_kernels.extend(kernel(self.n_dims, ARD=True))
-        #     print(all_kernels)
-        # self.kernel = np.sum(all_kernels)
-        # print(self.kernel)
+        self.kernel = np.sum(kernels)
 
-        self._kerns = [RBF(1, ARD=True, active_dims=[i])
-                       for i in range(self.n_dims)]
-        self._kernf = Fixed(self.n_dims, tdot(V))
-        self._kernb = Bias(self.n_dims)
-        self.kernel = np.sum(self._kerns) + self._kernf + self._kernb
 
     def _fit_model(self, X, Y):
         model = GPRegression(X, Y, self.kernel)

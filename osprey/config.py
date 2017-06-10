@@ -275,19 +275,20 @@ class Config(object):
         strategy_name = self.get_value('strategy/name')
         strategy_params = self.get_value('strategy/params', default={})
 
-        # Default values
-        try:
-            strategy_params['kernels']
-        except KeyError:
-            strategy_params['kernels'] = [['GPy.kern.Matern52', {'ARD': True}, {'independent': False}]]
+        if strategy_name == 'gp':
+            # Default values
+            try:
+                strategy_params['kernels']
+            except KeyError:
+                strategy_params['kernels'] = [['GPy.kern.Matern52', {'ARD': True}, {'independent': False}]]
 
-        # Check entries are of correct form
-        kernels = strategy_params['kernels']
-        if not isinstance(kernels, list):
-            raise RuntimeError('Must provide enumeration of Kernels')
-        for kernel in kernels:
-            if not isinstance(kernel, list) or len(kernel) != 3:
-                raise RuntimeError('Each kernel must be list: [entry point, {kwargs}, {options}]')
+            # Check entries are of correct form
+            kernels = strategy_params['kernels']
+            if not isinstance(kernels, list):
+                raise RuntimeError('Must provide enumeration of Kernels')
+            for kernel in kernels:
+                if not isinstance(kernel, list) or len(kernel) != 3:
+                    raise RuntimeError('Each kernel must be list: [entry point, {kwargs}, {options}]')
 
         strat = init_subclass_by_name(BaseStrategy, strategy_name,
                                       strategy_params)

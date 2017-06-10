@@ -198,7 +198,7 @@ class HyperoptTPE(BaseStrategy):
 class GP(BaseStrategy):
     short_name = 'gp'
 
-    def __init__(self, independent=False, kernels=None, seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
+    def __init__(self, kernels=None, seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
         self.seed = seed
         self.seeds = seeds
         self.max_feval = max_feval
@@ -211,6 +211,30 @@ class GP(BaseStrategy):
         self._kernb = None
 
     def _create_kernel(self, V):
+
+        # # Turn into entry points.
+        # # TODO check if Import checking for GPy has been done.
+        # kernels = []
+        # for kernel in kernels:
+        #     kernel_ep = load_entry_point(kernel[0], 'strategy/params/kernels')
+        #     if issubclass(kernel_ep, GPy.kern.src.kern.Kern):
+        #
+        #     if not isinstance(kernel)
+        #         raise RuntimeError('strategy/params/kernel must load a'
+        #                            'GPy derived Kernel')
+        #
+        # strategy_params['kernels'] = kernels
+
+        # all_kernels = []
+        # for kernel in self._kernels:
+        #     if self._is_independent:
+        #         all_kernels.extend([kernel(1, ARD=True, active_dims=[i]) for i in range(self.n_dims)])
+        #     else:
+        #         all_kernels.extend(kernel(self.n_dims, ARD=True))
+        #     print(all_kernels)
+        # self.kernel = np.sum(all_kernels)
+        # print(self.kernel)
+
         self._kerns = [RBF(1, ARD=True, active_dims=[i])
                        for i in range(self.n_dims)]
         self._kernf = Fixed(self.n_dims, tdot(V))

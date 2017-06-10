@@ -275,30 +275,19 @@ class Config(object):
         strategy_name = self.get_value('strategy/name')
         strategy_params = self.get_value('strategy/params', default={})
 
-        # Default value before being turned into entry points
+        # Default values
         try:
             strategy_params['kernels']
         except KeyError:
-            strategy_params['kernels'] = ['GPy.kern.Matern52']
+            strategy_params['kernels'] = [['GPy.kern.Matern52', {'ARD': True}, {'independent': False}]]
 
-        # Cast kernels as list
-        kernels_str = strategy_params['kernels']
-        if isinstance(kernels_str, six.string_types):
-            kernels_str = [kernels_str]
-
-        # Turn strings into entry points.
-        # Put instantiation and associated checking in Strategy()
-        kernels = []
-        for kernel_str in kernels_str:
-            kernel = load_entry_point(kernel_str, 'strategy/params/kernels')
-            # TODO: Presumably GPy check has already been done here
-            if issubclass(kernel, GPy.kern.src.kern.Kern):
-                kernels.append(kernel)
-            else:
-                raise RuntimeError('strategy/params/kernel must load a'
-                                   'GPy derived Kernel')
-
-        strategy_params['kernels'] = kernels
+        # Check entries are of correct form
+        kernels = strategy_params['kernels']
+        if not isinstance(kernels, list):
+            raise RuntimeError('Must provide enumeration of Kernels')
+        for kernel in kernels:
+            if not isinstance(kernel, list) or len(kernel) != 3:
+                raise RuntimeError('Each kernel must be list: [entry point, {kwargs}, {options}]')
 
         strat = init_subclass_by_name(BaseStrategy, strategy_name,
                                       strategy_params)

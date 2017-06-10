@@ -216,9 +216,13 @@ class GP(BaseStrategy):
         # TODO use eval to allow user to specify internal variables for kernels (e.g. V) in config file.
         kernels = []
         for kern in self._kerns:
-            kwargs = kern['kwargs']
-            options = kern['options']
-            name = kern['name']
+            try:
+                kwargs = kern['kwargs']
+                options = kern['options']
+                name = kern['name']
+            except KeyError as e:
+                raise RuntimeError(e.message)
+
             kernel_ep = load_entry_point(name, 'strategy/params/kernels')
             if issubclass(kernel_ep, KERNEL_BASE_CLASS):
                 if options['independent']:

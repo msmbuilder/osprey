@@ -19,6 +19,9 @@ try:
     from GPy.util.linalg import tdot
     from GPy.models import GPRegression
     from scipy.optimize import minimize
+    # If the GPy modules fail we won't do this unnecessarily.
+    from .entry_point import load_entry_point
+    KERNEL_BASE_CLASS = kern.src.kern.Kern
 except:
     # GPy is optional, but required for gp
     GPRegression = kern = minimize = None
@@ -198,7 +201,7 @@ class HyperoptTPE(BaseStrategy):
 class GP(BaseStrategy):
     short_name = 'gp'
 
-    def __init__(self, seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
+    def __init__(self, kernels, seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
         self.seed = seed
         self.seeds = seeds
         self.max_feval = max_feval
@@ -206,16 +209,28 @@ class GP(BaseStrategy):
         self.model = None
         self.n_dims = None
         self.kernel = None
-        self._kerns = None
-        self._kernf = None
-        self._kernb = None
+        self._kerns = kernels
 
-    def _create_kernel(self, V):
-        self._kerns = [RBF(1, ARD=True, active_dims=[i])
-                       for i in range(self.n_dims)]
-        self._kernf = Fixed(self.n_dims, tdot(V))
-        self._kernb = Bias(self.n_dims)
-        self.kernel = np.sum(self._kerns) + self._kernf + self._kernb
+    def _create_kernel(self):
+        # Turn into entry points.
+        # TODO use eval to allow user to specify internal variables for kernels (e.g. V) in config file.
+        kernels = []
+        for kern in self._kerns:
+            params = kern['params']
+            options = kern['options']
+            name = kern['name']
+            kernel_ep = load_entry_point(name, 'strategy/params/kernels')
+            if issubclass(kernel_ep, KERNEL_BASE_CLASS):
+                if options['independent']:
+                    #TODO Catch errors here?  Estimator entry points don't catch instantiation errors
+                    kernel = np.sum([kernel_ep(1, **params, active_dims=[i]) for i in range(self.n_dims)])
+                else:
+                    kernel = kernel_ep(self.n_dims, **params)
+            if not isinstance(kernel, KERNEL_BASE_CLASS):
+                raise RuntimeError('strategy/params/kernel must load a'
+                                   'GPy derived Kernel')
+            kernels.append(kernel)
+        self.kernel = np.sum(kernels)
 
     def _fit_model(self, X, Y):
         model = GPRegression(X, Y, self.kernel)
@@ -231,9 +246,9 @@ class GP(BaseStrategy):
             init = self._get_random_point()
 
         def z(x):
+            # TODO Could use options dict to specify what type of kernel to create when
             y = x.copy().reshape(-1, self.n_dims)
-            s, v = self.model.predict(y, kern=(np.sum(self._kerns).copy() +
-                                               self._kernb.copy()))
+            s, v = self.model.predict(y)
             return -(s+v).flatten()
 
         return minimize(z, init, bounds=self.n_dims*[(0., 1.)],
@@ -296,7 +311,8 @@ class GP(BaseStrategy):
         self.n_dims = searchspace.n_dims
 
         X, Y, V, ignore = self._get_data(history, searchspace)
-        self._create_kernel(V)
+        # TODO make _create_kernel accept optional args.
+        self._create_kernel()
         self._fit_model(X, Y)
 
         suggestion = self._optimize()

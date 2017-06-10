@@ -42,6 +42,11 @@ from .trials import Trial, make_session
 from .subclass_factory import init_subclass_by_name
 from . import eval_scopes
 
+try:
+    import GPy
+except:
+    GPy = None
+    pass
 
 FIELDS = {
     'estimator':       ['pickle', 'eval', 'eval_scope', 'entry_point',
@@ -269,6 +274,24 @@ class Config(object):
     def strategy(self):
         strategy_name = self.get_value('strategy/name')
         strategy_params = self.get_value('strategy/params', default={})
+
+        if strategy_name == 'gp':
+            # TODO there must be a better way to do conditional defaults.
+            # Default values
+            try:
+                strategy_params['kernels']
+            except KeyError:
+                strategy_params['kernels'] = [{'name': 'GPy.kern.Matern52',
+                                               'params': {'ARD': True},
+                                               'options': {'independent': False}}]
+            # Check entries are of correct form
+            kernels = strategy_params['kernels']
+            if not isinstance(kernels, list):
+                raise RuntimeError('Must provide enumeration of kernels')
+            for kernel in kernels:
+                if sorted(list(kernel.keys())) != ['name', 'options', 'params']:
+                    raise RuntimeError(
+                        'strategy/params/kernels must contain keys: "name", "options", "params"')
 
         strat = init_subclass_by_name(BaseStrategy, strategy_name,
                                       strategy_params)

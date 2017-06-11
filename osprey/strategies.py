@@ -215,6 +215,7 @@ class GP(BaseStrategy):
         self._kernb = None
         self.acquisition_function = acquisition
         self._acquisition_function = None
+        self._set_acquisition()
 
     def _create_kernel(self, V):
         self._kerns = [RBF(1, ARD=True, active_dims=[i])
@@ -233,7 +234,9 @@ class GP(BaseStrategy):
                          for i in range(self.n_dims)])
 
     def _ei(self, x):
-        y_mean, y_var = self.model.predict(x.copy().reshape(-1, self.n_dims))
+        y_mean, y_var = self.model.predict(x, kern=(np.sum(self._kerns).copy() +
+                                                    self._kernb.copy()))
+        print(y_mean, y_var)
         y_std = np.sqrt(y_var)
         y_best = self.model.Y.max(axis=0)
         z = (y_mean - y_best)/y_std
@@ -241,13 +244,16 @@ class GP(BaseStrategy):
         return result
 
     def _ucb(self, x, kappa=1.0):
-        y_mean, y_var = self.model.predict(x.copy().reshape(-1, self.n_dims))
+        y_mean, y_var = self.model.predict(x, kern=(np.sum(self._kerns).copy() +
+                                                    self._kernb.copy()))
         y_std = np.sqrt(y_var)
         result = y_mean + kappa*y_std
         return result
 
     def _osprey(self, x):
-        y_mean, y_var = self.model.predict(x.copy().reshape(-1, self.n_dims))
+        y_mean, y_var = self.model.predict(x, kern=(np.sum(self._kerns).copy() +
+                                                    self._kernb.copy()))
+        print(y_mean, y_var)
         return (y_mean+y_var).flatten()
 
     def _optimize(self, init=None):
@@ -257,6 +263,7 @@ class GP(BaseStrategy):
 
         def z(x):
             # TODO make spread of points around x and take mean value.
+            x = x.copy().reshape(-1, self.n_dims)
             af = self._acquisition_function(x)
             return (-1)*af
         res = minimize(z, init, bounds=self.n_dims*[(0., 1.)],
@@ -264,8 +271,7 @@ class GP(BaseStrategy):
         return res.x
 
     def _set_acquisition(self):
-        # TODO move variable checking to a place consistent with other params
-        if len(self.acquisition_function) > 1:
+        if isinstance(self.acquisition_function, list):
             raise RuntimeError('Must specify only one acquisition function')
         if sorted(self.acquisition_function.keys()) != ['name', 'params']:
             raise RuntimeError('strategy/params/acquisition must contain keys'
@@ -274,11 +280,11 @@ class GP(BaseStrategy):
             raise RuntimeError('strategy/params/acquisition name must be one of '
                                '"ei", "ucb", "osprey"')
 
-        f = eval('_'+self.acquisition_function['name'])
+        f = eval('self._'+self.acquisition_function['name'])
 
-        # This seems slightly convoluted.
         def g(x):
             return f(x, **self.acquisition_function['params'])
+
         self._acquisition_function = g
 
     def _get_data(self, history, searchspace):
@@ -340,10 +346,8 @@ class GP(BaseStrategy):
         X, Y, V, ignore = self._get_data(history, searchspace)
 
         # TODO make _create_kernel accept optional args.
-        self._create_kernel()
-        self._set_acquisition()
+        self._create_kernel(V)
         self._fit_model(X, Y)
-
         suggestion = self._optimize()
 
         if suggestion in ignore or self._is_within(suggestion, X):

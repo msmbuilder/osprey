@@ -202,7 +202,7 @@ class HyperoptTPE(BaseStrategy):
 class GP(BaseStrategy):
     short_name = 'gp'
 
-    def __init__(self, seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
+    def __init__(self, acquisition={'name':'ei', 'params': {}}, seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
         self.seed = seed
         self.seeds = seeds
         self.max_feval = max_feval
@@ -213,6 +213,8 @@ class GP(BaseStrategy):
         self._kerns = None
         self._kernf = None
         self._kernb = None
+        self.acquisition_function = acquisition
+        self._acquisition_function = None
 
     def _create_kernel(self, V):
         self._kerns = [RBF(1, ARD=True, active_dims=[i])
@@ -230,7 +232,7 @@ class GP(BaseStrategy):
         return np.array([np.random.uniform(low=0., high=1.)
                          for i in range(self.n_dims)])
 
-    def _expected_improvement(self, x):
+    def _ei(self, x):
         y_mean, y_var = self.model.predict(x.copy().reshape(-1, self.n_dims))
         y_std = np.sqrt(y_var)
         y_best = self.model.Y.max(axis=0)
@@ -238,11 +240,15 @@ class GP(BaseStrategy):
         result = y_std*(z*norm.cdf(z) + norm.pdf(z))
         return result
 
-    def _upper_conf_bound(self, x, kappa=1.0):
+    def _ucb(self, x, kappa=1.0):
         y_mean, y_var = self.model.predict(x.copy().reshape(-1, self.n_dims))
         y_std = np.sqrt(y_var)
         result = y_mean + kappa*y_std
         return result
+
+    def _osprey(self, x):
+        y_mean, y_var = self.model.predict(x.copy().reshape(-1, self.n_dims))
+        return (y_mean+y_var).flatten()
 
     def _optimize(self, init=None):
         # TODO start minimization from a range of points and take minimum
@@ -251,12 +257,29 @@ class GP(BaseStrategy):
 
         def z(x):
             # TODO make spread of points around x and take mean value.
-            # TODO Could use options dict to specify what type of kernel to create when
-            af = self._expected_improvement(x)
+            af = self._acquisition_function(x)
             return (-1)*af
         res = minimize(z, init, bounds=self.n_dims*[(0., 1.)],
                         options={'maxiter': self.max_iter, 'disp': 0})
         return res.x
+
+    def _set_acquisition(self):
+        # TODO move variable checking to a place consistent with other params
+        if len(self.acquisition_function) > 1:
+            raise RuntimeError('Must specify only one acquisition function')
+        if sorted(self.acquisition_function.keys()) != ['name', 'params']:
+            raise RuntimeError('strategy/params/acquisition must contain keys'
+                               '"name" and "params"')
+        if self.acquisition_function['name'] not in ['ei', 'ucb', 'osprey']:
+            raise RuntimeError('strategy/params/acquisition name must be one of '
+                               '"ei", "ucb", "osprey"')
+
+        f = eval('_'+self.acquisition_function['name'])
+
+        # This seems slightly convoluted.
+        def g(x):
+            return f(x, **self.acquisition_function['params'])
+        self._acquisition_function = g
 
     def _get_data(self, history, searchspace):
         X = []
@@ -318,6 +341,7 @@ class GP(BaseStrategy):
 
         # TODO make _create_kernel accept optional args.
         self._create_kernel()
+        self._set_acquisition()
         self._fit_model(X, Y)
 
         suggestion = self._optimize()

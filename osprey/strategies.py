@@ -19,6 +19,10 @@ try:
     from GPy.util.linalg import tdot
     from GPy.models import GPRegression
     from scipy.optimize import minimize
+    from scipy.stats import norm
+    # If the GPy modules fail we won't do this unnecessarily.
+    from .entry_point import load_entry_point
+    KERNEL_BASE_CLASS = kern.src.kern.Kern
 except:
     # GPy is optional, but required for gp
     GPRegression = kern = minimize = None
@@ -226,18 +230,33 @@ class GP(BaseStrategy):
         return np.array([np.random.uniform(low=0., high=1.)
                          for i in range(self.n_dims)])
 
+    def _expected_improvement(self, x):
+        y_mean, y_var = self.model.predict(x.copy().reshape(-1, self.n_dims))
+        y_std = np.sqrt(y_var)
+        y_best = self.model.Y.max(axis=0)
+        z = (y_mean - y_best)/y_std
+        result = y_std*(z*norm.cdf(z) + norm.pdf(z))
+        return result
+
+    def _upper_conf_bound(self, x, kappa=1.0):
+        y_mean, y_var = self.model.predict(x.copy().reshape(-1, self.n_dims))
+        y_std = np.sqrt(y_var)
+        result = y_mean + kappa*y_std
+        return result
+
     def _optimize(self, init=None):
+        # TODO start minimization from a range of points and take minimum
         if not init:
             init = self._get_random_point()
 
         def z(x):
-            y = x.copy().reshape(-1, self.n_dims)
-            s, v = self.model.predict(y, kern=(np.sum(self._kerns).copy() +
-                                               self._kernb.copy()))
-            return -(s+v).flatten()
-
-        return minimize(z, init, bounds=self.n_dims*[(0., 1.)],
-                        options={'maxiter': self.max_iter, 'disp': 0}).x
+            # TODO make spread of points around x and take mean value.
+            # TODO Could use options dict to specify what type of kernel to create when
+            af = self._expected_improvement(x)
+            return (-1)*af
+        res = minimize(z, init, bounds=self.n_dims*[(0., 1.)],
+                        options={'maxiter': self.max_iter, 'disp': 0})
+        return res.x
 
     def _get_data(self, history, searchspace):
         X = []
@@ -296,7 +315,9 @@ class GP(BaseStrategy):
         self.n_dims = searchspace.n_dims
 
         X, Y, V, ignore = self._get_data(history, searchspace)
-        self._create_kernel(V)
+
+        # TODO make _create_kernel accept optional args.
+        self._create_kernel()
         self._fit_model(X, Y)
 
         suggestion = self._optimize()

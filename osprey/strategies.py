@@ -201,7 +201,10 @@ class HyperoptTPE(BaseStrategy):
 class GP(BaseStrategy):
     short_name = 'gp'
 
-    def __init__(self, kernels, seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
+    def __init__(self, kernels=[{'name': 'GPy.kern.Matern52',
+                                'params': {'ARD': True},
+                                'options': {'independent': False}}],
+                 seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
         self.seed = seed
         self.seeds = seeds
         self.max_feval = max_feval
@@ -212,6 +215,15 @@ class GP(BaseStrategy):
         self._kerns = kernels
 
     def _create_kernel(self):
+        # Check kernels
+        kernels = self._kerns
+        if not isinstance(kernels, list):
+            raise RuntimeError('Must provide enumeration of kernels')
+        for kernel in kernels:
+            if sorted(list(kernel.keys())) != ['name', 'options', 'params']:
+                raise RuntimeError(
+                    'strategy/params/kernels must contain keys: "name", "options", "params"')
+
         # Turn into entry points.
         # TODO use eval to allow user to specify internal variables for kernels (e.g. V) in config file.
         kernels = []

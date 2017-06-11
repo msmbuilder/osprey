@@ -114,10 +114,7 @@ def test_gp():
     history = [(searchspace.rvs(), np.random.random(), 'SUCCEEDED')
                for _ in range(4)]
 
-    kerns = [{'name': 'GPy.kern.Matern52', 'params': {'ARD': True},
-             'options': {'independent': False}}]
-
-    params = GP(kernels=kerns).suggest(history, searchspace)
+    params = GP().suggest(history, searchspace)
     for k, v in iteritems(params):
         assert k in searchspace.variables
         if isinstance(searchspace[k], EnumVariable):

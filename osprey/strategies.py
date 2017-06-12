@@ -233,27 +233,26 @@ class GP(BaseStrategy):
         return np.array([np.random.uniform(low=0., high=1.)
                          for i in range(self.n_dims)])
 
-    def _ei(self, x):
-        y_mean, y_var = self.model.predict(x, kern=(np.sum(self._kerns).copy() +
-                                                    self._kernb.copy()))
-        print(y_mean, y_var)
+    def _is_var_positive(self, var):
+
+        if np.any(var < 0):
+            # RuntimeError may be overkill
+            raise RuntimeError('Negative variance predicted from regression model.')
+        else:
+            return True
+
+    def _ei(self, x, y_mean, y_var):
         y_std = np.sqrt(y_var)
         y_best = self.model.Y.max(axis=0)
         z = (y_mean - y_best)/y_std
         result = y_std*(z*norm.cdf(z) + norm.pdf(z))
         return result
 
-    def _ucb(self, x, kappa=1.0):
-        y_mean, y_var = self.model.predict(x, kern=(np.sum(self._kerns).copy() +
-                                                    self._kernb.copy()))
-        y_std = np.sqrt(y_var)
-        result = y_mean + kappa*y_std
+    def _ucb(self, x, y_mean, y_var, kappa=1.0):
+        result = y_mean + kappa*np.sqrt(y_var)
         return result
 
-    def _osprey(self, x):
-        y_mean, y_var = self.model.predict(x, kern=(np.sum(self._kerns).copy() +
-                                                    self._kernb.copy()))
-        print(y_mean, y_var)
+    def _osprey(self, x, y_mean, y_var):
         return (y_mean+y_var).flatten()
 
     def _optimize(self, init=None):
@@ -264,8 +263,16 @@ class GP(BaseStrategy):
         def z(x):
             # TODO make spread of points around x and take mean value.
             x = x.copy().reshape(-1, self.n_dims)
-            af = self._acquisition_function(x)
+            y_mean, y_var = self.model.predict(x, kern=(np.sum(self._kerns).copy() +
+                                                        self._kernb.copy()))
+            # for testing as this kernel seems to always give negative variance.
+            # TODO remove this.
+            y_var = np.abs(y_var)
+
+            if self._is_var_positive(y_var):
+                af = self._acquisition_function(x, y_mean=y_mean, y_var=y_var)
             return (-1)*af
+
         res = minimize(z, init, bounds=self.n_dims*[(0., 1.)],
                         options={'maxiter': self.max_iter, 'disp': 0})
         return res.x

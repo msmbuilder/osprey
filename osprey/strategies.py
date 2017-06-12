@@ -261,6 +261,10 @@ class GP(BaseStrategy):
             # TODO Could use options dict to specify what type of kernel to create when
             y = x.copy().reshape(-1, self.n_dims)
             s, v = self.model.predict(y)
+            if v < 0:
+                print('*** Negative variance: {} ***'.format(v))
+            elif v > 0:
+                print('*** Positive variance: {} ***'.format(v))
             return -(s+v).flatten()
 
         return minimize(z, init, bounds=self.n_dims*[(0., 1.)],

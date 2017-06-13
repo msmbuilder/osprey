@@ -202,11 +202,8 @@ class HyperoptTPE(BaseStrategy):
 class GP(BaseStrategy):
     short_name = 'gp'
 
-    def __init__(self, kernels=[{'name': 'GPy.kern.Matern52',
-                                'params': {'ARD': True},
-                                'options': {'independent': False}}],
-                         acquisition={'name':'osprey', 'params': {}},
-                         seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
+    def __init__(self, kernels=None,
+                 seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
         self.seed = seed
         self.seeds = seeds
         self.max_feval = max_feval
@@ -214,6 +211,9 @@ class GP(BaseStrategy):
         self.model = None
         self.n_dims = None
         self.kernel = None
+        if kernels is None:
+            kernels = [{'name': 'GPy.kern.Matern52', 'params': {'ARD': True},
+                        'options': {'independent': False}}]
         self._kerns = kernels
         self.acquisition_function = acquisition
         self._acquisition_function = None

@@ -201,9 +201,7 @@ class HyperoptTPE(BaseStrategy):
 class GP(BaseStrategy):
     short_name = 'gp'
 
-    def __init__(self, kernels=[{'name': 'GPy.kern.Matern52',
-                                'params': {'ARD': True},
-                                'options': {'independent': False}}],
+    def __init__(self, kernels=None,
                  seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
         self.seed = seed
         self.seeds = seeds
@@ -212,6 +210,9 @@ class GP(BaseStrategy):
         self.model = None
         self.n_dims = None
         self.kernel = None
+        if kernels is None:
+            kernels = [{'name': 'GPy.kern.Matern52', 'params': {'ARD': True},
+                        'options': {'independent': False}}]
         self._kerns = kernels
 
     def _create_kernel(self):
@@ -261,10 +262,6 @@ class GP(BaseStrategy):
             # TODO Could use options dict to specify what type of kernel to create when
             y = x.copy().reshape(-1, self.n_dims)
             s, v = self.model.predict(y)
-            if v < 0:
-                print('*** Negative variance: {} ***'.format(v))
-            elif v > 0:
-                print('*** Positive variance: {} ***'.format(v))
             return -(s+v).flatten()
 
         return minimize(z, init, bounds=self.n_dims*[(0., 1.)],

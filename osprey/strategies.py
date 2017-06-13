@@ -203,6 +203,7 @@ class GP(BaseStrategy):
     short_name = 'gp'
 
     def __init__(self, kernels=None,
+                 acquisition=None,
                  seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
         self.seed = seed
         self.seeds = seeds
@@ -215,6 +216,8 @@ class GP(BaseStrategy):
             kernels = [{'name': 'GPy.kern.Matern52', 'params': {'ARD': True},
                         'options': {'independent': False}}]
         self._kerns = kernels
+        if acquisition is None:
+            acquisition = {'name': 'osprey', 'params': {}}
         self.acquisition_function = acquisition
         self._acquisition_function = None
         self._set_acquisition()

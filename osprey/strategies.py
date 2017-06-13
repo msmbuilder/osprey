@@ -202,7 +202,7 @@ class HyperoptTPE(BaseStrategy):
 class GP(BaseStrategy):
     short_name = 'gp'
 
-    def __init__(self, acquisition={'name':'ei', 'params': {}}, seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
+    def __init__(self, acquisition={'name':'osprey', 'params': {}}, seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
         self.seed = seed
         self.seeds = seeds
         self.max_feval = max_feval
@@ -265,12 +265,16 @@ class GP(BaseStrategy):
             x = x.copy().reshape(-1, self.n_dims)
             y_mean, y_var = self.model.predict(x, kern=(np.sum(self._kerns).copy() +
                                                         self._kernb.copy()))
-            # for testing as this kernel seems to always give negative variance.
+            # This code is for debug/testing phase only.
+            # Ideally we should test for negative variance regardless of the AF.
+            # However, we want to recover the original functionality of Osprey, hence the conditional block.
             # TODO remove this.
-            y_var = np.abs(y_var)
-
-            if self._is_var_positive(y_var):
+            if self.acquisition_function['name'] == 'osprey':
                 af = self._acquisition_function(x, y_mean=y_mean, y_var=y_var)
+            elif self.acquisition_function['name'] in ['ei', 'ucb']:
+                # y_var = np.abs(y_var)
+                if self._is_var_positive(y_var):
+                    af = self._acquisition_function(x, y_mean=y_mean, y_var=y_var)
             return (-1)*af
 
         res = minimize(z, init, bounds=self.n_dims*[(0., 1.)],
@@ -281,7 +285,7 @@ class GP(BaseStrategy):
         if isinstance(self.acquisition_function, list):
             raise RuntimeError('Must specify only one acquisition function')
         if sorted(self.acquisition_function.keys()) != ['name', 'params']:
-            raise RuntimeError('strategy/params/acquisition must contain keys'
+            raise RuntimeError('strategy/params/acquisition must contain keys '
                                '"name" and "params"')
         if self.acquisition_function['name'] not in ['ei', 'ucb', 'osprey']:
             raise RuntimeError('strategy/params/acquisition name must be one of '
@@ -289,8 +293,8 @@ class GP(BaseStrategy):
 
         f = eval('self._'+self.acquisition_function['name'])
 
-        def g(x):
-            return f(x, **self.acquisition_function['params'])
+        def g(x, y_mean, y_var):
+            return f(x, y_mean, y_var, **self.acquisition_function['params'])
 
         self._acquisition_function = g
 

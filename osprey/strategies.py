@@ -202,9 +202,7 @@ class HyperoptTPE(BaseStrategy):
 class GP(BaseStrategy):
     short_name = 'gp'
 
-    def __init__(self, kernels=None,
-                 acquisition=None,
-                 seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
+    def __init__(self, kernels=None, acquisition=None, seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
         self.seed = seed
         self.seeds = seeds
         self.max_feval = max_feval
@@ -291,8 +289,7 @@ class GP(BaseStrategy):
         def z(x):
             # TODO make spread of points around x and take mean value.
             x = x.copy().reshape(-1, self.n_dims)
-            y_mean, y_var = self.model.predict(x, kern=(np.sum(self._kerns).copy() +
-                                                        self._kernb.copy()))
+            y_mean, y_var = self.model.predict(x)
             # This code is for debug/testing phase only.
             # Ideally we should test for negative variance regardless of the AF.
             # However, we want to recover the original functionality of Osprey, hence the conditional block.

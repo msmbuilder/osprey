@@ -8,6 +8,7 @@ strategy:
     kernels:
       - { name : GPy.kern.Matern52, params : {ARD : True}, options : {independent : False} }
       - { name : GPy.kern.White, params : {}, options: {independent : False} }
+    acquisition: { name : ei, params : {}}
 
 search_space:
   C:

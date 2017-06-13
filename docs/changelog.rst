@@ -20,7 +20,8 @@ New Features
   ``strategy.suggest`` is called when attempting to produce a trial with a set of params not previously
   tested in the history.
 + Added ability to specifiy arbitrary kernels for gaussian process strategy.
-
++ Added the ability to specify three different acquisition functions for the gaussian processes strategy: expected
+improvement `ei`, upper confidence bound, `ucb` and the original Osprey function (the default), `osprey`.
 
 Bug Fixes
 ~~~~~~~~~

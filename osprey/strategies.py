@@ -19,6 +19,7 @@ try:
     from GPy.util.linalg import tdot
     from GPy.models import GPRegression
     from scipy.optimize import minimize
+    from scipy.stats import norm
     # If the GPy modules fail we won't do this unnecessarily.
     from .entry_point import load_entry_point
     KERNEL_BASE_CLASS = kern.src.kern.Kern
@@ -204,7 +205,8 @@ class GP(BaseStrategy):
     def __init__(self, kernels=[{'name': 'GPy.kern.Matern52',
                                 'params': {'ARD': True},
                                 'options': {'independent': False}}],
-                 seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
+                         acquisition={'name':'osprey', 'params': {}},
+                         seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
         self.seed = seed
         self.seeds = seeds
         self.max_feval = max_feval
@@ -213,6 +215,9 @@ class GP(BaseStrategy):
         self.n_dims = None
         self.kernel = None
         self._kerns = kernels
+        self.acquisition_function = acquisition
+        self._acquisition_function = None
+        self._set_acquisition()
 
     def _create_kernel(self):
         # Check kernels
@@ -253,18 +258,70 @@ class GP(BaseStrategy):
         return np.array([np.random.uniform(low=0., high=1.)
                          for i in range(self.n_dims)])
 
+    def _is_var_positive(self, var):
+
+        if np.any(var < 0):
+            # RuntimeError may be overkill
+            raise RuntimeError('Negative variance predicted from regression model.')
+        else:
+            return True
+
+    def _ei(self, x, y_mean, y_var):
+        y_std = np.sqrt(y_var)
+        y_best = self.model.Y.max(axis=0)
+        z = (y_mean - y_best)/y_std
+        result = y_std*(z*norm.cdf(z) + norm.pdf(z))
+        return result
+
+    def _ucb(self, x, y_mean, y_var, kappa=1.0):
+        result = y_mean + kappa*np.sqrt(y_var)
+        return result
+
+    def _osprey(self, x, y_mean, y_var):
+        return (y_mean+y_var).flatten()
+
     def _optimize(self, init=None):
+        # TODO start minimization from a range of points and take minimum
         if not init:
             init = self._get_random_point()
 
         def z(x):
-            # TODO Could use options dict to specify what type of kernel to create when
-            y = x.copy().reshape(-1, self.n_dims)
-            s, v = self.model.predict(y)
-            return -(s+v).flatten()
+            # TODO make spread of points around x and take mean value.
+            x = x.copy().reshape(-1, self.n_dims)
+            y_mean, y_var = self.model.predict(x, kern=(np.sum(self._kerns).copy() +
+                                                        self._kernb.copy()))
+            # This code is for debug/testing phase only.
+            # Ideally we should test for negative variance regardless of the AF.
+            # However, we want to recover the original functionality of Osprey, hence the conditional block.
+            # TODO remove this.
+            if self.acquisition_function['name'] == 'osprey':
+                af = self._acquisition_function(x, y_mean=y_mean, y_var=y_var)
+            elif self.acquisition_function['name'] in ['ei', 'ucb']:
+                # y_var = np.abs(y_var)
+                if self._is_var_positive(y_var):
+                    af = self._acquisition_function(x, y_mean=y_mean, y_var=y_var)
+            return (-1)*af
 
-        return minimize(z, init, bounds=self.n_dims*[(0., 1.)],
-                        options={'maxiter': self.max_iter, 'disp': 0}).x
+        res = minimize(z, init, bounds=self.n_dims*[(0., 1.)],
+                        options={'maxiter': self.max_iter, 'disp': 0})
+        return res.x
+
+    def _set_acquisition(self):
+        if isinstance(self.acquisition_function, list):
+            raise RuntimeError('Must specify only one acquisition function')
+        if sorted(self.acquisition_function.keys()) != ['name', 'params']:
+            raise RuntimeError('strategy/params/acquisition must contain keys '
+                               '"name" and "params"')
+        if self.acquisition_function['name'] not in ['ei', 'ucb', 'osprey']:
+            raise RuntimeError('strategy/params/acquisition name must be one of '
+                               '"ei", "ucb", "osprey"')
+
+        f = eval('self._'+self.acquisition_function['name'])
+
+        def g(x, y_mean, y_var):
+            return f(x, y_mean, y_var, **self.acquisition_function['params'])
+
+        self._acquisition_function = g
 
     def _get_data(self, history, searchspace):
         X = []
@@ -326,7 +383,6 @@ class GP(BaseStrategy):
         # TODO make _create_kernel accept optional args.
         self._create_kernel()
         self._fit_model(X, Y)
-
         suggestion = self._optimize()
 
         if suggestion in ignore or self._is_within(suggestion, X):

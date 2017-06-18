@@ -92,8 +92,10 @@ class RandomSearch(BaseStrategy):
 class HyperoptTPE(BaseStrategy):
     short_name = 'hyperopt_tpe'
 
-    def __init__(self, seed=None):
+    def __init__(self, seed=None, gamma=0.25, seeds=20):
         self.seed = seed
+        self.gamma = gamma
+        self.seeds = seeds
 
     def suggest(self, history, searchspace):
         """
@@ -175,18 +177,23 @@ class HyperoptTPE(BaseStrategy):
         trials.refresh()
         chosen_params_container = []
 
+        def suggest(*args, **kwargs):
+            return tpe.suggest(*args, **kwargs, gamma=self.gamma, n_startup_jobs=self.seeds)
+
         def mock_fn(x):
             # http://stackoverflow.com/a/3190783/1079728
             # to get around no nonlocal keywork in python2
             chosen_params_container.append(x)
             return 0
 
-        fmin(fn=mock_fn, algo=tpe.suggest, space=hp_searchspace, trials=trials,
+        fmin(fn=mock_fn, algo=suggest, space=hp_searchspace, trials=trials,
              max_evals=len(trials.trials)+1,
              **self._hyperopt_fmin_random_kwarg(random))
         chosen_params = chosen_params_container[0]
 
         return chosen_params
+
+
 
     @staticmethod
     def _hyperopt_fmin_random_kwarg(random):

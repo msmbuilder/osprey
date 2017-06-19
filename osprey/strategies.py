@@ -29,6 +29,12 @@ except:
     pass
 from .search_space import EnumVariable
 
+try:
+    from SALib.sample import sobol_sequence as ss
+except:
+    ss = None
+    pass
+
 DEFAULT_TIMEOUT = socket._GLOBAL_DEFAULT_TIMEOUT
 
 
@@ -75,6 +81,26 @@ class BaseStrategy(object):
             return True
         else:
             return False
+
+
+class SobolSearch(BaseStrategy):
+    short_name = 'sobol'
+    SKIP = int(1e4)
+
+    def __init__(self, length=1000):
+        self.sequence = None
+        self.length = length
+        self.n_dims = 0
+
+    def _set_sequence(self):
+        pass
+
+    def suggest(self, history, searchspace):
+        if 'SALib' not in sys.modules:
+            raise ImportError('No module named SALib')
+
+        if self.sequence is None:
+            self._set_sequence()
 
 
 class RandomSearch(BaseStrategy):

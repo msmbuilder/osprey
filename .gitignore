@@ -59,3 +59,5 @@ MANIFEST
 
 #Notebooks
 .ipynb_checkpoints
+
+*.npy

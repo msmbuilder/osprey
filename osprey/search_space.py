@@ -255,4 +255,11 @@ class EnumVariable(namedtuple('EnumVariable', ('name', 'choices'))):
         return float(index) / max(len(self.choices) - 1, 1)
 
     def point_from_gp(self, gpvalue):
-        return self.choices[int(np.round(gpvalue * max(len(self.choices) - 1, 1)))]
+        # hack to get the case where there's only a single choice.
+        try:
+            return self.choices[int(np.round(gpvalue * max(len(self.choices) - 1, 1)))]
+        except IndexError:
+            print('!!! len choices: ',len(self.choices))
+            print('!!! gpvalue: ', gpvalue)
+            print('!!! rounded choice: ', np.round(gpvalue * max(len(self.choices) - 1, 1)))
+            return self.choices[0]

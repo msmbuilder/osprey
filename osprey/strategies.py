@@ -358,10 +358,19 @@ class GP(BaseStrategy):
                 if self._is_var_positive(y_var):
                     af = self._acquisition_function(x, y_mean=y_mean, y_var=y_var)
             return (-1)*af
+        #
+        afs = []
+        cands = []
+        for i in range(1000):
+            init = self._get_random_point()
+            res = minimize(z, init, bounds=self.n_dims*[(0., 1.)],
+                            options={'maxiter': self.max_iter, 'disp': 0})
+            cands.append(res.x)
+            afs.append(res.fun)
+        afs = np.array(afs)
+        best_cand = cands[int(np.argmin(afs))]
 
-        res = minimize(z, init, bounds=self.n_dims*[(0., 1.)],
-                        options={'maxiter': self.max_iter, 'disp': 0})
-        return res.x
+        return best_cand
 
     def _set_acquisition(self):
         if isinstance(self.acquisition_function, list):

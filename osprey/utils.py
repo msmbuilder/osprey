@@ -21,6 +21,20 @@ __all__ = ['dict_merge', 'in_directory', 'prepend_syspath', 'prepend_syspath',
            'trials_to_dict']
 
 
+def is_json_serializable(obj):
+    """
+    Checks to see if obj(ect) is Json serializable
+
+    Returns
+    -------
+    Bool
+    """
+    try:
+        json.dumps(obj)
+        return True
+    except TypeError:
+        return False
+
 def dict_merge(base, top):
     """Recursively merge two dictionaries, with the elements from `top`
     taking precedence over elements from `top`.

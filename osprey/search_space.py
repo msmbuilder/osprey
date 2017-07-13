@@ -59,7 +59,7 @@ class SearchSpace(object):
             raise ValueError('variable %s: warp=%s is not supported. use '
                              'None or "log",' % (name, warp))
 
-        self.variables[name] = EnumVariable(name, list(choices))
+        self.variables[name] = EnumVariable(name, choices.tolist())
 
     def add_int(self, name, min, max, warp=None):
         """An integer-valued dimension bounded between `min` <= x <= `max`.

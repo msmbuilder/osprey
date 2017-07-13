@@ -5,6 +5,7 @@ strategy:
   name: gp
   params:
     seeds: 5
+    acquisition: { name : ei, params : {}}
 
 search_space:
   C:

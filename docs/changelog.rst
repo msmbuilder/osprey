@@ -18,7 +18,9 @@ New Features
   the other settings in the same dictionary, allowing for subsequent easier loading and plotting.
 + Added ``max_param_suggestion_retries`` entry to the config file. This limits the number of times that
   ``strategy.suggest`` is called when attempting to produce a trial with a set of params not previously
-  tested in the history. 
+  tested in the history.
++ Added ``n_jobs`` flag for ``osprey worker`` to control how many threads are
+  used for cross-validation.
 
 
 Bug Fixes

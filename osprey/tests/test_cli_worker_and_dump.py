@@ -98,8 +98,8 @@ def test_random_example():
         os.chdir(dirname)
         subprocess.check_call([OSPREY_BIN, 'skeleton', '-t', 'random_example',
                               '-f', 'config.yaml'])
-        subprocess.check_call([OSPREY_BIN, 'worker', 'config.yaml', '-n', '1',
-                               '-s', '23'])
+        subprocess.check_call([OSPREY_BIN, 'worker', 'config.yaml', '-n', '2',
+                               '-s', '23', '-j', '2'])
         assert os.path.exists('osprey-trials.db')
 
         subprocess.check_call([OSPREY_BIN, 'current_best', 'config.yaml'])

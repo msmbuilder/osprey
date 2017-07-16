@@ -176,7 +176,8 @@ class IntVariable(namedtuple('IntVariable', ('name', 'min', 'max', 'warp'))):
 
     def point_from_gp(self, gpvalue):
         if self.warp is None:
-            return int(min(self.min + gpvalue * (self.max - self.min + 1), self.max))
+            # int(np.floor(min(xmin + gpvalue * (xmax - xmin + 1), xmax)))
+            return int(np.floor(min(self.min + gpvalue * (self.max - self.min + 1), self.max)))
         elif self.warp == 'log':
             rng = np.log(self.max) - np.log(self.min)
             outvalue = np.exp(np.log(self.min) + gpvalue * rng)

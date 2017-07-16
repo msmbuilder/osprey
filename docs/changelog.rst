@@ -18,16 +18,19 @@ New Features
   the other settings in the same dictionary, allowing for subsequent easier loading and plotting.
 + Added ``max_param_suggestion_retries`` entry to the config file. This limits the number of times that
   ``strategy.suggest`` is called when attempting to produce a trial with a set of params not previously
-  tested in the history.
-+ Added ability to specifiy arbitrary kernels for gaussian process strategy.
+  tested in the history. 
++ Added ``n_jobs`` flag for ``osprey worker`` to control how many threads are
+  used for cross-validation.
 + Added the ability to specify three different acquisition functions for the gaussian processes strategy: expected
 improvement `ei`, upper confidence bound, `ucb` and the original Osprey function (the default), `osprey`.
+
 
 Bug Fixes
 ~~~~~~~~~
 + Fixed issue that was causing crashes when there was an attempt to write estimator parameters (e.g. numpy arrays) which
 couldn't be serialized by JSON.
 + Fixed crashes when using ``jump`` variables of type ``int``.
++ Fixed error in the way integer variables were selected from results of Gaussian processes search strategy.
 
 
 v1.1.0

@@ -21,6 +21,7 @@ New Features
   tested in the history. 
 + Added ``n_jobs`` flag for ``osprey worker`` to control how many threads are
   used for cross-validation.
++ Added ability to specifiy arbitrary kernels for gaussian process strategy.
 + Added the ability to specify three different acquisition functions for the gaussian processes strategy: expected
 improvement `ei`, upper confidence bound, `ucb` and the original Osprey function (the default), `osprey`.
 

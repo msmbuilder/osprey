@@ -30,6 +30,7 @@ Bug Fixes
 + Fixed issue that was causing crashes when there was an attempt to write estimator parameters (e.g. numpy arrays) which
 couldn't be serialized by JSON.
 + Fixed crashes when using ``jump`` variables of type ``int``.
++ Fixed error in the way integer variables were selected from results of Gaussian processes search strategy.
 
 
 v1.1.0

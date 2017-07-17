@@ -259,11 +259,12 @@ class HyperoptTPE(BaseStrategy):
 class GP(BaseStrategy):
     short_name = 'gp'
 
-    def __init__(self, kernels=None, acquisition=None, seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
+    def __init__(self, kernels=None, acquisition=None, seed=None, seeds=1, n_iter=50, max_feval=5E4, max_iter=1E5):
         self.seed = seed
         self.seeds = seeds
         self.max_feval = max_feval
         self.max_iter = max_iter
+        self.n_iter = n_iter
         self.model = None
         self.n_dims = None
         self.kernel = None
@@ -339,10 +340,11 @@ class GP(BaseStrategy):
         return (y_mean+y_var).flatten()
 
     def _optimize(self, init=None):
-        # TODO start minimization from a range of points and take minimum
         if not init:
+            # TODO make this get sobol points?
             init = self._get_random_point()
 
+        # Objective function
         def z(x):
             # TODO make spread of points around x and take mean value.
             x = x.copy().reshape(-1, self.n_dims)
@@ -358,19 +360,23 @@ class GP(BaseStrategy):
                 if self._is_var_positive(y_var):
                     af = self._acquisition_function(x, y_mean=y_mean, y_var=y_var)
             return (-1)*af
-        #
-        afs = []
-        cands = []
-        for i in range(1000):
+
+        # Optimization loop
+        acquisition_fns = []
+        candidates = []
+        for i in range(self.n_iter):
             init = self._get_random_point()
             res = minimize(z, init, bounds=self.n_dims*[(0., 1.)],
                             options={'maxiter': self.max_iter, 'disp': 0})
-            cands.append(res.x)
-            afs.append(res.fun)
-        afs = np.array(afs)
-        best_cand = cands[int(np.argmin(afs))]
+            candidates.append(res.x)
+            acquisition_fns.append(res.fun)
 
-        return best_cand
+        # Choose the best
+        acquisition_fns = np.array(acquisition_fns).flatten()
+        candidates = np.array(candidates)
+        best_index = int(np.argmin(acquisition_fns))
+        best_candidate = candidates[best_index]
+        return best_candidate
 
     def _set_acquisition(self):
         if isinstance(self.acquisition_function, list):

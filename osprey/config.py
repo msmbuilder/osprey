@@ -44,7 +44,7 @@ from . import eval_scopes
 
 FIELDS = {
     'estimator':       ['pickle', 'eval', 'eval_scope', 'entry_point',
-                        'params'],
+                        'params', 'module'],
     'dataset_loader':  ['name', 'params'],
     'trials':          ['uri', 'project_name'],
     'search_space':    dict,
@@ -150,7 +150,18 @@ class Config(object):
             pickle: path-to-pickle-file.pkl
             eval: "Pipeline([('cluster': KMeans())])"
             entry_point: sklearn.linear_model.LogisticRegression
+            module: myestimator
         """
+        module_path = self.get_value('estimator/module')
+        if module_path is not None:
+            with prepend_syspath(dirname(abspath(self.path))):
+                estimator_module = importlib.import_module(module_path)
+            estimator = estimator_module.estimator()
+            if not isinstance(estimator, sklearn.base.BaseEstimator):
+                raise RuntimeError('estimator/pickle must load a '
+                                   'sklearn-derived Estimator')
+            return estimator
+
         evalstring = self.get_value('estimator/eval')
         if evalstring is not None:
             got = self.get_value('estimator/eval_scope')

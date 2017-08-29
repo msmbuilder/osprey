@@ -310,7 +310,8 @@ class GP(BaseStrategy):
 
     def _fit_model(self, X, Y):
         model = GPRegression(X, Y, self.kernel)
-        model.optimize(messages=False, max_f_eval=self.max_feval)
+        model.optimize_restarts(num_restarts=20, verbose=False)
+        # model.optimize(messages=False, max_f_eval=self.max_feval)
         self.model = model
 
     def _get_random_point(self):

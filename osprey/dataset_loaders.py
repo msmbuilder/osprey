@@ -311,7 +311,7 @@ class MullPotentialDatasetLoader(BaseDatasetLoader):
     short_name = 'muller'
 
     def __init__(self, random_state=None):
-        self.random_state = np.random.RandomState(random_state)
+        self.random_state = random_state
 
     def load(self):
         from msmbuilder.example_datasets import MullerPotential

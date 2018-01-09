@@ -8,7 +8,7 @@ import importlib
 from sklearn.base import BaseEstimator
 
 
-__all__ = ['msmbuilder', 'import_all_estimators']
+__all__ = ['msmbuilder', 'import_all_estimators', 'pyemma']
 
 
 def msmbuilder():
@@ -18,6 +18,17 @@ def msmbuilder():
         from sklearn.pipeline import Pipeline
 
     scope = import_all_estimators(msmbuilder)
+    scope['Pipeline'] = Pipeline
+    return scope
+
+
+def pyemma():
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
+        import pyemma
+        from sklearn.pipeline import Pipeline
+
+    scope = import_all_estimators(pyemma)
     scope['Pipeline'] = Pipeline
     return scope
 
@@ -48,5 +59,4 @@ def import_all_estimators(pkg):
         except ImportError as e:
             print('Import Error', c, e)
             continue
-
     return result

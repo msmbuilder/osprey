@@ -10,7 +10,6 @@ try:
     import pandas as pd
     import bokeh.plotting as bk
     from bokeh.models import HoverTool
-    from bokeh.models.sources import ColumnDataSource
 except ImportError:
     raise RuntimeError(
         'This command requires the Bokeh library (http://bokeh.pydata.org/) '
@@ -33,7 +32,7 @@ def build_scatter_tooltip(x, y, tt, add_line=True, radius=3, title='My Plot',
     p = bk.figure(title=title, tools=TOOLS)
 
     p.circle(
-        x, y, radius=radius, source=ColumnDataSource(tt),
+        x, y, radius=radius, source=tt,
         fill_alpha=0.6, line_color=None)
 
     if add_line:
@@ -101,7 +100,7 @@ def plot_3(data, ss, *args):
     df_params['score'] = scores
     p.circle(
         X[:, 0], X[:, 1], color=mapped_colors, radius=1,
-        source=ColumnDataSource(df_params), fill_alpha=0.6,
+        source=df_params, fill_alpha=0.6,
         line_color=None)
     cp = p
     hover = cp.select(dict(type=HoverTool))

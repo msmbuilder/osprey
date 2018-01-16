@@ -279,3 +279,39 @@ class SklearnDatasetLoader(BaseDatasetLoader):
         y = bunch[self.y_name]
 
         return X, y
+
+
+class FsPeptideDatasetLoader(BaseDatasetLoader):
+    short_name = 'fspeptide'
+
+    def __init__(self):
+        pass
+
+    def load(self):
+        from msmbuilder.example_datasets import FsPeptide
+
+        trajectories = FsPeptide(verbose=False).get().trajectories
+        return trajectories, None
+
+
+class AlanineDipeptideDatasetLoader(BaseDatasetLoader):
+    short_name = 'alaninedipeptide'
+
+    def __init__(self):
+        pass
+
+    def load(self):
+        from msmbuilder.example_datasets import AlanineDipeptide
+
+        trajectories = AlanineDipeptide(verbose=False).get().trajectories
+        return trajectories, None
+
+
+class MullPotentialDatasetLoader(BaseDatasetLoader):
+    short_name = 'muller'
+
+    def __init__(self, random_state=None):
+        self.random_state = random_state
+
+    def load(self):
+        from msmbuilder.example_datasets import MullerPotential

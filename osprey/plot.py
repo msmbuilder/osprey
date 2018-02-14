@@ -6,11 +6,11 @@ from matplotlib import cm
 from matplotlib.colors import rgb2hex
 from sklearn.manifold import TSNE
 
-from bokeh.models.sources import ColumnDataSource
 try:
     import pandas as pd
     import bokeh.plotting as bk
     from bokeh.models import HoverTool
+    from bokeh.models.sources import ColumnDataSource
 except ImportError:
     raise RuntimeError(
         'This command requires the Bokeh library (http://bokeh.pydata.org/) '

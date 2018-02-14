@@ -6,6 +6,7 @@ from matplotlib import cm
 from matplotlib.colors import rgb2hex
 from sklearn.manifold import TSNE
 
+from bokeh.models.sources import ColumnDataSource
 try:
     import pandas as pd
     import bokeh.plotting as bk
@@ -27,12 +28,16 @@ def nonconstant_parameters(data):
     return filtered
 
 
-def build_scatter_tooltip(x, y, tt, add_line=True, radius=3, title='My Plot',
+def build_scatter_tooltip(x, y, tt, add_line=True, radius=.1, title='My Plot',
                           xlabel='Iteration number', ylabel='Score'):
     p = bk.figure(title=title, tools=TOOLS)
 
+    tt['x'] = x
+    tt['y'] = y
+    tt['radius'] = radius
+
     p.circle(
-        x, y, radius=radius, source=tt,
+        x='x', y='y', radius='radius', source=tt,
         fill_alpha=0.6, line_color=None)
 
     if add_line:
@@ -98,9 +103,13 @@ def plot_3(data, ss, *args):
 
     df_params = nonconstant_parameters(data)
     df_params['score'] = scores
+    df_params['x'] = X[:, 0]
+    df_params['y'] = X[:, 1]
+    df_params['color'] = mapped_colors
+    df_params['radius'] = 1
     p.circle(
-        X[:, 0], X[:, 1], color=mapped_colors, radius=1,
-        source=df_params, fill_alpha=0.6,
+        x='x', y='y', color='color', radius='radius',
+        source=ColumnDataSource(data=df_params), fill_alpha=0.6,
         line_color=None)
     cp = p
     hover = cp.select(dict(type=HoverTool))

@@ -19,7 +19,6 @@ try:
     from GPy.util.linalg import tdot
     from GPy.models import GPRegression
     from scipy.optimize import minimize
-    from scipy.stats import norm
     # If the GPy modules fail we won't do this unnecessarily.
     from .entry_point import load_entry_point
     KERNEL_BASE_CLASS = kern.src.kern.Kern

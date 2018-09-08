@@ -9,14 +9,16 @@ import numpy as np
 
 
 class BaseSurrogate(object):
-    def get_maximum(self):
+    def get_maximum(self, func):
         """
         Parameters
         ----------
+        func : a function to optimize over the model.  Could be identity, -1 (for minimization) or acquisition function
+                func must take parameters of the model e.g. y or noise term (for af).
         Returns
         -------
-        y : The maximum mean value of the model
-        X : The corresponding parameters
+        y = func(X*) : The maximum mean value of the function
+        X* : The corresponding parameters
         """
         raise NotImplementedError()
 
@@ -34,5 +36,6 @@ class BaseSurrogate(object):
         raise NotImplementedError()
 
 
-class GaussianProcess(object):
-    pass
+class MarginalGP(object):
+    def __init__(self, kernels, mean, ):
+        pass

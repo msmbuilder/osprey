@@ -308,10 +308,10 @@ class GP(BaseStrategy):
         self.kernel = np.sum(kernels)
 
     def _fit_model(self, X, Y):
-        model = GPRegression(X, Y, self.kernel)
-        model.optimize_restarts(num_restarts=20, verbose=False)
-        # model.optimize(messages=False, max_f_eval=self.max_feval)
-        self.model = model
+        # model = GPRegression(X, Y, self.kernel)
+        # model.optimize_restarts(num_restarts=20, verbose=False)
+        # # model.optimize(messages=False, max_f_eval=self.max_feval)
+        # self.model = model
 
     def _get_random_point(self):
         return np.array([np.random.uniform(low=0., high=1.)

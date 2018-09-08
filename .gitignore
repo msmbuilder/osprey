@@ -64,4 +64,4 @@ scratch/
 
 *.npy
 
-scratch/
+.idea/

@@ -382,12 +382,12 @@ class Bayesian(BaseStrategy):
 
     def _set_acquisition(self):
         if isinstance(self.acquisition_function, list):
-            raise RuntimeError('Must specify only one acquisition function')
+            raise RuntimeError('Must specify only one acq_name function')
         if sorted(self.acquisition_function.keys()) != ['name', 'params']:
-            raise RuntimeError('strategy/params/acquisition must contain keys '
+            raise RuntimeError('strategy/params/acq_name must contain keys '
                                '"name" and "params"')
         if self.acquisition_function['name'] not in ['ei', 'ucb', 'osprey']:
-            raise RuntimeError('strategy/params/acquisition name must be one of '
+            raise RuntimeError('strategy/params/acq_name name must be one of '
                                '"ei", "ucb", "osprey"')
 
         f = eval('self._'+self.acquisition_function['name'])

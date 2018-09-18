@@ -19,6 +19,8 @@ try:
     from GPy.util.linalg import tdot
     from GPy.models import GPRegression
     from scipy.optimize import minimize
+    from scipy.stats import norm
+
     # If the GPy modules fail we won't do this unnecessarily.
     from .entry_point import load_entry_point
     KERNEL_BASE_CLASS = kern.src.kern.Kern
@@ -255,8 +257,8 @@ class HyperoptTPE(BaseStrategy):
         return kwargs
 
 
-class GP(BaseStrategy):
-    short_name = 'gp'
+class Bayesian(BaseStrategy):
+    short_name = 'Bayes'
 
     def __init__(self, kernels=None, acquisition=None, seed=None, seeds=1, n_iter=50, max_feval=5E4, max_iter=1E5):
         self.seed = seed
@@ -308,10 +310,10 @@ class GP(BaseStrategy):
         self.kernel = np.sum(kernels)
 
     def _fit_model(self, X, Y):
-        # model = GPRegression(X, Y, self.kernel)
-        # model.optimize_restarts(num_restarts=20, verbose=False)
-        # # model.optimize(messages=False, max_f_eval=self.max_feval)
-        # self.model = model
+        model = GPRegression(X, Y, self.kernel)
+        model.optimize_restarts(num_restarts=20, verbose=False)
+        model.optimize(messages=False, max_f_eval=self.max_feval)
+        self.model = model
 
     def _get_random_point(self):
         return np.array([np.random.uniform(low=0., high=1.)

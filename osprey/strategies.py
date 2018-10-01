@@ -29,6 +29,7 @@ except:
     GPRegression = kern = minimize = None
     pass
 from .search_space import EnumVariable
+from .acquisition_functions import AcquisitionFunction
 
 try:
     from SALib.sample import sobol_sequence as ss
@@ -259,6 +260,7 @@ class HyperoptTPE(BaseStrategy):
 
 class Bayesian(BaseStrategy):
     short_name = 'Bayes'
+    # TODO : n_iter, max_iter should be in acquisition params
 
     def __init__(self, kernels=None, acquisition=None, seed=None, seeds=1, n_iter=50, max_feval=5E4, max_iter=1E5):
         self.seed = seed
@@ -273,11 +275,14 @@ class Bayesian(BaseStrategy):
             kernels = [{'name': 'GPy.kern.Matern52', 'params': {'ARD': True},
                         'options': {'independent': False}}]
         self._kerns = kernels
+
         if acquisition is None:
-            acquisition = {'name': 'osprey', 'params': {}}
-        self.acquisition_function = acquisition
-        self._acquisition_function = None
-        self._set_acquisition()
+            acquisition = {'name': 'ei', 'params': {}}
+        self.acquisition = acquisition
+
+        # self.acquisition_function = AcquisitionFunction()
+        # self._acquisition_function = None
+        # self._set_acquisition()
 
     def _create_kernel(self):
         # Check kernels
@@ -315,87 +320,87 @@ class Bayesian(BaseStrategy):
         model.optimize(messages=False, max_f_eval=self.max_feval)
         self.model = model
 
-    def _get_random_point(self):
-        return np.array([np.random.uniform(low=0., high=1.)
-                         for i in range(self.n_dims)])
+    # def _get_random_point(self):
+    #     return np.array([np.random.uniform(low=0., high=1.)
+    #                      for i in range(self.n_dims)])
+    #
+    # def _is_var_positive(self, var):
+    #
+    #     if np.any(var < 0):
+    #         # RuntimeError may be overkill
+    #         raise RuntimeError('Negative variance predicted from regression model.')
+    #     else:
+    #         return True
 
-    def _is_var_positive(self, var):
+    # def _ei(self, x, y_mean, y_var):
+    #     y_std = np.sqrt(y_var)
+    #     y_best = self.model.Y.max(axis=0)
+    #     z = (y_mean - y_best)/y_std
+    #     result = y_std*(z*norm.cdf(z) + norm.pdf(z))
+    #     return result
+    #
+    # def _ucb(self, x, y_mean, y_var, kappa=1.0):
+    #     result = y_mean + kappa*np.sqrt(y_var)
+    #     return result
+    #
+    # def _osprey(self, x, y_mean, y_var):
+    #     return (y_mean+y_var).flatten()
+    #
+    # def _optimize(self, init=None):
+    #     if not init:
+    #         # TODO make this get sobol points?
+    #         init = self._get_random_point()
+    #
+    #     # Objective function
+    #     def z(x):
+    #         # TODO make spread of points around x and take mean value.
+    #         x = x.copy().reshape(-1, self.n_dims)
+    #         y_mean, y_var = self.model.predict(x)
+    #         # This code is for debug/testing phase only.
+    #         # Ideally we should test for negative variance regardless of the AF.
+    #         # However, we want to recover the original functionality of Osprey, hence the conditional block.
+    #         # TODO remove this.
+    #         if self.acquisition_function['name'] == 'osprey':
+    #             af = self._acquisition_function(x, y_mean=y_mean, y_var=y_var)
+    #         elif self.acquisition_function['name'] in ['ei', 'ucb']:
+    #             # y_var = np.abs(y_var)
+    #             if self._is_var_positive(y_var):
+    #                 af = self._acquisition_function(x, y_mean=y_mean, y_var=y_var)
+    #         return (-1)*af
+    #
+    #     # Optimization loop
+    #     acquisition_fns = []
+    #     candidates = []
+    #     for i in range(self.n_iter):
+    #         init = self._get_random_point()
+    #         res = minimize(z, init, bounds=self.n_dims*[(0., 1.)],
+    #                         options={'maxiter': self.max_iter, 'disp': 0})
+    #         candidates.append(res.x)
+    #         acquisition_fns.append(res.fun)
+    #
+    #     # Choose the best
+    #     acquisition_fns = np.array(acquisition_fns).flatten()
+    #     candidates = np.array(candidates)
+    #     best_index = int(np.argmin(acquisition_fns))
+    #     best_candidate = candidates[best_index]
+    #     return best_candidate
 
-        if np.any(var < 0):
-            # RuntimeError may be overkill
-            raise RuntimeError('Negative variance predicted from regression model.')
-        else:
-            return True
-
-    def _ei(self, x, y_mean, y_var):
-        y_std = np.sqrt(y_var)
-        y_best = self.model.Y.max(axis=0)
-        z = (y_mean - y_best)/y_std
-        result = y_std*(z*norm.cdf(z) + norm.pdf(z))
-        return result
-
-    def _ucb(self, x, y_mean, y_var, kappa=1.0):
-        result = y_mean + kappa*np.sqrt(y_var)
-        return result
-
-    def _osprey(self, x, y_mean, y_var):
-        return (y_mean+y_var).flatten()
-
-    def _optimize(self, init=None):
-        if not init:
-            # TODO make this get sobol points?
-            init = self._get_random_point()
-
-        # Objective function
-        def z(x):
-            # TODO make spread of points around x and take mean value.
-            x = x.copy().reshape(-1, self.n_dims)
-            y_mean, y_var = self.model.predict(x)
-            # This code is for debug/testing phase only.
-            # Ideally we should test for negative variance regardless of the AF.
-            # However, we want to recover the original functionality of Osprey, hence the conditional block.
-            # TODO remove this.
-            if self.acquisition_function['name'] == 'osprey':
-                af = self._acquisition_function(x, y_mean=y_mean, y_var=y_var)
-            elif self.acquisition_function['name'] in ['ei', 'ucb']:
-                # y_var = np.abs(y_var)
-                if self._is_var_positive(y_var):
-                    af = self._acquisition_function(x, y_mean=y_mean, y_var=y_var)
-            return (-1)*af
-
-        # Optimization loop
-        acquisition_fns = []
-        candidates = []
-        for i in range(self.n_iter):
-            init = self._get_random_point()
-            res = minimize(z, init, bounds=self.n_dims*[(0., 1.)],
-                            options={'maxiter': self.max_iter, 'disp': 0})
-            candidates.append(res.x)
-            acquisition_fns.append(res.fun)
-
-        # Choose the best
-        acquisition_fns = np.array(acquisition_fns).flatten()
-        candidates = np.array(candidates)
-        best_index = int(np.argmin(acquisition_fns))
-        best_candidate = candidates[best_index]
-        return best_candidate
-
-    def _set_acquisition(self):
-        if isinstance(self.acquisition_function, list):
-            raise RuntimeError('Must specify only one acq_name function')
-        if sorted(self.acquisition_function.keys()) != ['name', 'params']:
-            raise RuntimeError('strategy/params/acq_name must contain keys '
-                               '"name" and "params"')
-        if self.acquisition_function['name'] not in ['ei', 'ucb', 'osprey']:
-            raise RuntimeError('strategy/params/acq_name name must be one of '
-                               '"ei", "ucb", "osprey"')
-
-        f = eval('self._'+self.acquisition_function['name'])
-
-        def g(x, y_mean, y_var):
-            return f(x, y_mean, y_var, **self.acquisition_function['params'])
-
-        self._acquisition_function = g
+    # def _set_acquisition(self):
+    #     if isinstance(self.acquisition_function, list):
+    #         raise RuntimeError('Must specify only one acq_name function')
+    #     if sorted(self.acquisition_function.keys()) != ['name', 'params']:
+    #         raise RuntimeError('strategy/params/acq_name must contain keys '
+    #                            '"name" and "params"')
+    #     if self.acquisition_function['name'] not in ['ei', 'ucb', 'osprey']:
+    #         raise RuntimeError('strategy/params/acq_name name must be one of '
+    #                            '"ei", "ucb", "osprey"')
+    #
+    #     f = eval('self._'+self.acquisition_function['name'])
+    #
+    #     def g(x, y_mean, y_var):
+    #         return f(x, y_mean, y_var, **self.acquisition_function['params'])
+    #
+    #     self._acquisition_function = g
 
     def _get_data(self, history, searchspace):
         X = []
@@ -457,7 +462,14 @@ class Bayesian(BaseStrategy):
         # TODO make _create_kernel accept optional args.
         self._create_kernel()
         self._fit_model(X, Y)
-        suggestion = self._optimize()
+
+        af = AcquisitionFunction(surrogate=self.model,
+                                 acquisition_params=self.acquisition,
+                                 n_dims=self.n_dims,
+                                 n_iter=self.n_iter,
+                                 max_iter=self.max_iter)
+
+        suggestion = af.get_best_candidate()
 
         if suggestion in ignore or self._is_within(suggestion, X):
             return RandomSearch().suggest(history, searchspace)

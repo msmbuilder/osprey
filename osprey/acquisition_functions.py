@@ -43,7 +43,7 @@ class AcquisitionFunction(object):
         return result
 
     @staticmethod
-    def _ucb(y_mean, y_var, kappa=1.0):
+    def _ucb(y_mean, y_var, y_best=None, kappa=1.0):
         result = y_mean + kappa*np.sqrt(y_var)
         return result
 
@@ -59,8 +59,8 @@ class AcquisitionFunction(object):
 
         f = eval('self._' + self.acquisition_params['name'])
 
-        def g(x, y_mean, y_var):
-            return f(x, y_mean, y_var, **self.acquisition_params['params'])
+        def g(y_mean, y_var, y_best):
+            return f(y_mean, y_var, y_best, **self.acquisition_params['params'])
 
         self._acquisition_function = g
 
@@ -70,23 +70,27 @@ class AcquisitionFunction(object):
         ----------
         best_candidate : the best candidate hyper-parameters as defined by
         """
+        # TODO make this best mean response
+        incumbent = self.surrogate.Y.max()
 
         # Objective function
         def z(x):
             # TODO make spread of points around x and take mean value.
             x = x.copy().reshape(-1, self.n_dims)
             y_mean, y_var = self.surrogate.predict(x)
-            af = self._acquisition_function(x, y_mean=y_mean, y_var=y_var)
+            af = self._acquisition_function(y_mean=y_mean, y_var=y_var,
+                                            y_best=incumbent)
             # TODO make -1 dependent on flag in inputs for either max or minimization
             return (-1) * af
 
         # Optimization loop
         af_values = []
         af_args = []
+
         for i in range(self.n_iter):
             init = self._get_random_point()
             res = minimize(z, init, bounds=self.n_dims * [(0., 1.)],
-                           options={'maxiter': self.max_iter, 'disp': 0})
+                           options={'maxiter': int(self.max_iter), 'disp': 0})
             af_args.append(res.x)
             af_values.append(res.fun)
 

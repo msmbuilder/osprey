@@ -1,3 +1,4 @@
+# TODO put in a try/except
 from scipy.optimize import minimize
 from scipy.stats import norm
 import numpy as np
@@ -21,6 +22,9 @@ class AcquisitionFunction(object):
             is chosen from this many candidates.
         max_iter : the maximum number of iterations used the optimizer (for a single run of the optimizer)
         """
+        if not minimize:
+            raise ImportError('No module named SciPy')
+
         self.surrogate = surrogate
         self.n_dims = n_dims
         self.n_iter = n_iter

@@ -28,6 +28,7 @@ class AcquisitionFunction(object):
         self.acquisition_params = acquisition_params
         self._acquisition_function = None
         self._set_acquisition()
+        self.incumbent = None
 
     def _get_random_point(self):
         # returns a random point in the normalized hyperparameter space
@@ -35,17 +36,20 @@ class AcquisitionFunction(object):
         return np.array([np.random.uniform(low=0., high=1.)
                          for _ in range(self.n_dims)])
 
-    @staticmethod
-    def _ei(y_mean, y_var, y_best):
+    def _ei(self, y_mean, y_var):
         y_std = np.sqrt(y_var)
-        z = (y_mean - y_best)/y_std
+        z = (y_mean - self.incumbent)/y_std
         result = y_std*(z*norm.cdf(z) + norm.pdf(z))
         return result
 
     @staticmethod
-    def _ucb(y_mean, y_var, y_best=None, kappa=1.0):
+    def _ucb(y_mean, y_var, kappa=1.0):
         result = y_mean + kappa*np.sqrt(y_var)
         return result
+
+    @staticmethod
+    def _osprey(y_mean, y_var):
+        return (y_mean+y_var).flatten()
 
     def _set_acquisition(self):
         if isinstance(self.acquisition_params, list):
@@ -53,14 +57,14 @@ class AcquisitionFunction(object):
         if sorted(self.acquisition_params.keys()) != ['name', 'params']:
             raise RuntimeError('strategy/params/acq_name must contain keys '
                                '"name" and "params" ONLY')
-        if self.acquisition_params['name'] not in ['ei', 'ucb']:
+        if self.acquisition_params['name'] not in ['ei', 'ucb', 'osprey']:
             raise RuntimeError('strategy/params/acq_name name must be one of '
-                               '"ei", "ucb"')
+                               '"ei", "ucb", "osprey"')
 
         f = eval('self._' + self.acquisition_params['name'])
 
-        def g(y_mean, y_var, y_best):
-            return f(y_mean, y_var, y_best, **self.acquisition_params['params'])
+        def g(y_mean, y_var):
+            return f(y_mean, y_var, **self.acquisition_params['params'])
 
         self._acquisition_function = g
 
@@ -71,15 +75,14 @@ class AcquisitionFunction(object):
         best_candidate : the best candidate hyper-parameters as defined by
         """
         # TODO make this best mean response
-        incumbent = self.surrogate.Y.max()
+        self.incumbent = self.surrogate.Y.max()
 
         # Objective function
         def z(x):
             # TODO make spread of points around x and take mean value.
             x = x.copy().reshape(-1, self.n_dims)
             y_mean, y_var = self.surrogate.predict(x)
-            af = self._acquisition_function(y_mean=y_mean, y_var=y_var,
-                                            y_best=incumbent)
+            af = self._acquisition_function(y_mean=y_mean, y_var=y_var)
             # TODO make -1 dependent on flag in inputs for either max or minimization
             return (-1) * af
 

@@ -12,7 +12,7 @@ from sklearn.cluster import KMeans
 from osprey.config import Config
 from osprey.trials import Trial
 from osprey.search_space import IntVariable, FloatVariable, EnumVariable
-from osprey.strategies import RandomSearch, HyperoptTPE, GP
+from osprey.strategies import RandomSearch, HyperoptTPE, Bayes
 
 
 os.environ['OSPREYRC'] = ' '
@@ -114,11 +114,11 @@ def test_search_engine_hyperopt_tpe():
     assert isinstance(config.strategy(), HyperoptTPE)
 
 
-def test_search_engine_gp():
+def test_search_engine_bayes():
     config = Config.fromdict({
-        'strategy': {'name': 'gp'}
+        'strategy': {'name': 'bayes'}
     }, check_fields=False)
-    assert isinstance(config.strategy(), GP)
+    assert isinstance(config.strategy(), Bayes)
 
 
 def test_scoring():

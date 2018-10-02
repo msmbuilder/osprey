@@ -120,7 +120,7 @@ def test_gp_example():
 
     try:
         os.chdir(dirname)
-        subprocess.check_call([OSPREY_BIN, 'skeleton', '-t', 'gp_example',
+        subprocess.check_call([OSPREY_BIN, 'skeleton', '-t', 'bayes_example',
                               '-f', 'config.yaml'])
         subprocess.check_call([OSPREY_BIN, 'worker', 'config.yaml', '-n', '1'])
         assert os.path.exists('osprey-trials.db')

@@ -109,7 +109,7 @@ class SobolSearch(BaseStrategy):
         # Sobol needs to be reverse-transformed.
         out = {}
         for gpvalue, var in zip(result, searchspace):
-            out[var.name] = var.point_from_gp(float(gpvalue))
+            out[var.name] = var.point_from_unit(float(gpvalue))
         return out
 
     def suggest(self, history, searchspace):
@@ -414,7 +414,7 @@ class Bayesian(BaseStrategy):
                 # not sure how to deal with these yet
                 continue
 
-            point = searchspace.point_to_gp(param_dict)
+            point = searchspace.point_to_unit(param_dict)
             if status == 'SUCCEEDED':
                 X.append(point)
                 Y.append(np.mean(scores))
@@ -430,7 +430,7 @@ class Bayesian(BaseStrategy):
                 np.array(V).reshape(-1, 1),
                 np.array(ignore).reshape(-1, self.n_dims))
 
-    def _from_gp(self, result, searchspace):
+    def _from_unit(self, result, searchspace):
 
         # Note that GP only deals with float-valued variables, so we have
         # a transform step on either side, where int and enum valued variables
@@ -438,7 +438,7 @@ class Bayesian(BaseStrategy):
         # GP needs to be reverse-transformed.
         out = {}
         for gpvalue, var in zip(result, searchspace):
-            out[var.name] = var.point_from_gp(float(gpvalue))
+            out[var.name] = var.point_from_unit(float(gpvalue))
 
         return out
 
@@ -474,7 +474,7 @@ class Bayesian(BaseStrategy):
         if suggestion in ignore or self._is_within(suggestion, X):
             return RandomSearch().suggest(history, searchspace)
 
-        return self._from_gp(suggestion, searchspace)
+        return self._from_unit(suggestion, searchspace)
 
 
 class GridSearch(BaseStrategy):

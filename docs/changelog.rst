@@ -16,12 +16,9 @@ New Features
 + Added support for ``TimeSeriesSplit`` and ``LeavePOut`` cross-validators.
 + Improved ``osprey dump`` JSON output. The hyperparameters for each run are now stored along all
   the other settings in the same dictionary, allowing for subsequent easier loading and plotting.
-+ Added ``n_jobs`` flag for ``osprey worker`` to control how many threads are
-  used for cross-validation.
-+ Added ability to specifiy arbitrary kernels for gaussian process strategy.
-+ Added ``max_param_suggestion_retries`` entry to the config file. This limits the number of times that
-+ Added the ability to specify three different acquisition functions for the gaussian processes strategy: expected
-improvement `ei`, upper confidence bound, `ucb` and the original Osprey function (the default), `osprey`.
++ Added ``max_param_suggestion_retries`` entry to the config file. This limits the number of times that ``strategy.suggest`` is called when attempting to produce a trial with a set of params not previously tested in the history.
++ Added ``n_jobs`` flag for ``osprey worker`` to control how many threads are used for cross-validation.
++ Added the ability to specify three different acquisition functions for the gaussian processes strategy: expected improvement `ei`, upper confidence bound, `ucb` and the original Osprey function (the default), `osprey`.
 
 
 Bug Fixes

@@ -15,23 +15,7 @@ except ImportError:
 
 from .search_space import EnumVariable
 from .acquisition_functions import AcquisitionFunction
-from .surrogate_models import MaximumLikelihoodGaussianProcess
-
-try:
-    from GPy import kern
-    from GPy.kern import RBF, Fixed, Bias
-    from GPy.util.linalg import tdot
-    from GPy.models import GPRegression
-    from scipy.optimize import minimize
-    from scipy.stats import norm
-
-    # If the GPy modules fail we won't do this unnecessarily.
-    from .entry_point import load_entry_point
-    KERNEL_BASE_CLASS = kern.src.kern.Kern
-except ImportError:
-    # GPy is optional, but required for gp
-    GPRegression = kern = minimize = None
-    pass
+from .surrogate_models import MaximumLikelihoodGaussianProcess, GaussianProcessKernel
 
 try:
     from SALib.sample import sobol_sequence as ss
@@ -92,7 +76,7 @@ class SobolSearch(BaseStrategy):
     _SKIP = int(1e4)
 
     def __init__(self, length=1000):
-        #TODO length should be n_trials.  But this doesn't seem to be accessible to strategies without major re-write.
+        # TODO length should be n_trials.  But this doesn't seem to be accessible to strategies without major re-write.
         self.sequence = None
         self.length = length
         self.n_dims = 0
@@ -100,7 +84,7 @@ class SobolSearch(BaseStrategy):
         self.counter = 0
 
     def _set_sequence(self):
-        #TODO could get rid of first part of sequence
+        # TODO could get rid of first part of sequence
         self.sequence = ss.sample(self.length + self._SKIP, self.n_dims)
 
     def _from_unit_cube(self, result, searchspace):
@@ -268,53 +252,14 @@ class Bayesian(BaseStrategy):
         self.max_feval = max_feval
         self.max_iter = max_iter
         self.n_iter = n_iter
-        self.model = None
         self.n_dims = None
-        self.kernel = None
         if kernels is None:
             kernels = [{'name': 'GPy.kern.Matern52', 'params': {'ARD': True},
-                        'options': {'independent': False}}]
-        self._kerns = kernels
-
+                              'options': {'independent': False}}]
+        self.kernel_params = kernels
         if acquisition is None:
             acquisition = {'name': 'ei', 'params': {}}
-        self.acquisition = acquisition
-
-    def _create_kernel(self):
-        # Check kernels
-        kernels = self._kerns
-        if not isinstance(kernels, list):
-            raise RuntimeError('Must provide enumeration of kernels')
-        for kernel in kernels:
-            if sorted(list(kernel.keys())) != ['name', 'options', 'params']:
-                raise RuntimeError(
-                    'strategy/params/kernels must contain keys: "name", "options", "params"')
-
-        # Turn into entry points.
-        # TODO use eval to allow user to specify internal variables for kernels (e.g. V) in config file.
-        kernels = []
-        for kern in self._kerns:
-            params = kern['params']
-            options = kern['options']
-            name = kern['name']
-            kernel_ep = load_entry_point(name, 'strategy/params/kernels')
-            if issubclass(kernel_ep, KERNEL_BASE_CLASS):
-                if options['independent']:
-                    #TODO Catch errors here?  Estimator entry points don't catch instantiation errors
-                    kernel = np.sum([kernel_ep(1, active_dims=[i], **params) for i in range(self.n_dims)])
-                else:
-                    kernel = kernel_ep(self.n_dims, **params)
-            if not isinstance(kernel, KERNEL_BASE_CLASS):
-                raise RuntimeError('strategy/params/kernel must load a'
-                                   'GPy derived Kernel')
-            kernels.append(kernel)
-        self.kernel = np.sum(kernels)
-    #
-    # def _fit_model(self, X, Y):
-    #     model = GPRegression(X, Y, self.kernel)
-    #     model.optimize_restarts(num_restarts=20, verbose=False)
-    #     model.optimize(messages=False, max_f_eval=self.max_feval)
-    #     self.model = model
+        self.acquisition_params = acquisition
 
     def _get_data(self, history, searchspace):
         X = []
@@ -369,17 +314,19 @@ class Bayesian(BaseStrategy):
         X, Y, V, ignore = self._get_data(history, searchspace)
         # TODO make _create_kernel accept optional args.
         # TODO make type of model dependent on input param
-        self._create_kernel()
-        self.model = MaximumLikelihoodGaussianProcess(X=X, Y=Y, kernel=self.kernel,
-                                                      max_feval=self.max_feval)
-        self.model.fit()
 
-        af = AcquisitionFunction(surrogate=self.model,
-                                 acquisition_params=self.acquisition,
+        # Define and fit model
+        kernel = GaussianProcessKernel(self.kernel_params, self.n_dims)
+        model = MaximumLikelihoodGaussianProcess(X=X, Y=Y, kernel=kernel.kernel,
+                                                 max_feval=self.max_feval)
+        model.fit()
+
+        # Define acquisition function and get best candidate
+        af = AcquisitionFunction(surrogate=model,
+                                 acquisition_params=self.acquisition_params,
                                  n_dims=self.n_dims,
                                  n_iter=self.n_iter,
                                  max_iter=self.max_iter)
-
         suggestion = af.get_best_candidate()
 
         if suggestion in ignore or self._is_within(suggestion, X):

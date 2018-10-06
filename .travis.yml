@@ -30,7 +30,7 @@ deploy:
      skip_cleanup: true
      local-dir: docs/_deploy/
      on:
-       branch: master
+       branch: development
        condition: "$CONDA_PY = 3.5"
      region: us-east-1
      detect_encoding: true

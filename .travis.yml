@@ -8,7 +8,7 @@ env:
 
 branches:
   only:
-    - Refactor
+    - master
 
 install:
     - source devtools/travis-ci/install_miniconda.sh

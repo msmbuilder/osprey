@@ -148,6 +148,7 @@ def test_DSVDatasetLoader_1():
 
 def test_MDTrajDatasetLoader_1():
     from msmbuilder.example_datasets import FsPeptide
+    # TODO this need .get to work when the files haven't already been downloaded.
     fs_pept = FsPeptide()
     
     loader = MDTrajDatasetLoader(os.path.join(fs_pept.data_dir, '*.xtc'),

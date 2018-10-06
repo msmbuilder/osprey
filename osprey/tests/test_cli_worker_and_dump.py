@@ -9,18 +9,22 @@ import tempfile
 from distutils.spawn import find_executable
 from numpy.testing.decorators import skipif
 
-try:
-    __import__('msmbuilder')
-    HAVE_MSMBUILDER = True
-except:
-    HAVE_MSMBUILDER = False
+# try:
+#     __import__('msmbuilder')
+#     HAVE_MSMBUILDER = True
+# except:
+#     HAVE_MSMBUILDER = False
 
 OSPREY_BIN = find_executable('osprey')
 
 
-@skipif(not HAVE_MSMBUILDER, 'this test requires MSMBuilder')
+# @skipif(not HAVE_MSMBUILDER, 'this test requires MSMBuilder')
 def test_msmbuilder_skeleton():
-    from msmbuilder.example_datasets import FsPeptide
+    try:
+        from msmbuilder.example_datasets import FsPeptide
+    except ImportError as e:
+        raise SkipTest(e)
+
     assert OSPREY_BIN is not None
     cwd = os.path.abspath(os.curdir)
     dirname = tempfile.mkdtemp()
@@ -42,9 +46,13 @@ def test_msmbuilder_skeleton():
         shutil.rmtree(dirname)
 
 
-@skipif(not HAVE_MSMBUILDER, 'this test requires MSMBuilder')
+# @skipif(not HAVE_MSMBUILDER, 'this test requires MSMBuilder')
 def test_msmb_feat_select_skeleton():
-    from msmbuilder.example_datasets import FsPeptide
+    try:
+        from msmbuilder.example_datasets import FsPeptide
+    except ImportError as e:
+        raise SkipTest(e)
+
     assert OSPREY_BIN is not None
     cwd = os.path.abspath(os.curdir)
     dirname = tempfile.mkdtemp()

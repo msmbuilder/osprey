@@ -242,8 +242,8 @@ class HyperoptTPE(BaseStrategy):
         return kwargs
 
 
-class Bayesian(BaseStrategy):
-    short_name = 'Bayes'
+class Bayes(BaseStrategy):
+    short_name = 'bayes'
     # TODO : n_iter, max_iter should be in acquisition params
 
     def __init__(self, kernels=None, acquisition=None, seed=None, seeds=1, n_iter=50, max_feval=5E4, max_iter=1E5):
@@ -314,7 +314,6 @@ class Bayesian(BaseStrategy):
         X, Y, V, ignore = self._get_data(history, searchspace)
         # TODO make _create_kernel accept optional args.
         # TODO make type of model dependent on input param
-
         # Define and fit model
         kernel = GaussianProcessKernel(self.kernel_params, self.n_dims)
         model = MaximumLikelihoodGaussianProcess(X=X, Y=Y, kernel=kernel.kernel,

@@ -246,13 +246,16 @@ class Bayes(BaseStrategy):
     short_name = 'bayes'
     # TODO : n_iter, max_iter should be in acquisition params
 
-    def __init__(self, kernels=None, acquisition=None, seed=None, seeds=1, n_iter=50, max_feval=5E4, max_iter=1E5):
+    def __init__(self, kernels=None, acquisition=None, surrogate=None, seed=None, seeds=1, n_iter=50, max_feval=5E4, max_iter=1E5):
         self.seed = seed
         self.seeds = seeds
         self.max_feval = max_feval
         self.max_iter = max_iter
         self.n_iter = n_iter
         self.n_dims = None
+        if surrogate is None:
+            surrogate = 'gp'
+        self.surrogate = surrogate
         if kernels is None:
             kernels = [{'name': 'GPy.kern.Matern52', 'params': {'ARD': True},
                               'options': {'independent': False}}]
@@ -313,11 +316,13 @@ class Bayes(BaseStrategy):
 
         X, Y, V, ignore = self._get_data(history, searchspace)
         # TODO make _create_kernel accept optional args.
-        # TODO make type of model dependent on input param
         # Define and fit model
-        kernel = GaussianProcessKernel(self.kernel_params, self.n_dims)
-        model = MaximumLikelihoodGaussianProcess(X=X, Y=Y, kernel=kernel.kernel,
-                                                 max_feval=self.max_feval)
+        if self.surrogate == 'gp':
+            kernel = GaussianProcessKernel(self.kernel_params, self.n_dims)
+            model = MaximumLikelihoodGaussianProcess(X=X, Y=Y, kernel=kernel.kernel,
+                                                     max_feval=self.max_feval)
+        else:
+            raise NotImplementedError('Surrogate model not recognised.  Please choose from: gp')
         model.fit()
 
         # Define acquisition function and get best candidate

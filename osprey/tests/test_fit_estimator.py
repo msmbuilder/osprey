@@ -5,7 +5,7 @@ from nose.plugins.skip import SkipTest
 from six import iteritems
 from sklearn.datasets import make_regression
 from sklearn.linear_model import Lasso
-from sklearn.grid_search import GridSearchCV
+from sklearn.model_selection import GridSearchCV
 
 from osprey.fit_estimator import fit_and_score_estimator
 

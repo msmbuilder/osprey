@@ -5,7 +5,7 @@ import socket
 
 import numpy as np
 from sklearn.utils import check_random_state
-from sklearn.grid_search import ParameterGrid
+from sklearn.model_selection import ParameterGrid
 try:
     from hyperopt import (Trials, tpe, fmin, STATUS_OK, STATUS_RUNNING,
                           STATUS_FAIL)
@@ -17,11 +17,11 @@ from .search_space import EnumVariable
 from .acquisition_functions import AcquisitionFunction
 from .surrogate_models import MaximumLikelihoodGaussianProcess, GaussianProcessKernel
 
-try:
-    from SALib.sample import sobol_sequence as ss
-except ImportError:
-    ss = None
-    pass
+# try:
+#     from SALib.sample import sobol_sequence as ss
+# except ImportError:
+#     ss = None
+#     pass
 
 DEFAULT_TIMEOUT = socket._GLOBAL_DEFAULT_TIMEOUT
 
@@ -71,48 +71,48 @@ class BaseStrategy(object):
             return False
 
 
-class SobolSearch(BaseStrategy):
-    short_name = 'sobol'
-    _SKIP = int(1e4)
-
-    def __init__(self, length=1000):
-        # TODO length should be n_trials.  But this doesn't seem to be accessible to strategies without major re-write.
-        self.sequence = None
-        self.length = length
-        self.n_dims = 0
-        self.offset = 0
-        self.counter = 0
-
-    def _set_sequence(self):
-        # TODO could get rid of first part of sequence
-        self.sequence = ss.sample(self.length + self._SKIP, self.n_dims)
-
-    def _from_unit_cube(self, result, searchspace):
-        # TODO this should be a method common to both Sobol and GP.
-        # Note that Sobol only deals with float-valued variables, so we have
-        # a transform step on either side, where int and enum valued variables
-        # are transformed before calling gp, and then the result suggested by
-        # Sobol needs to be reverse-transformed.
-        out = {}
-        for gpvalue, var in zip(result, searchspace):
-            out[var.name] = var.point_from_unit(float(gpvalue))
-        return out
-
-    def suggest(self, history, searchspace):
-        if 'SALib' not in sys.modules:
-            raise ImportError('No module named SALib')
-
-        if self.sequence is None:
-            self.n_dims = searchspace.n_dims
-            self.offset = len(history) + self._SKIP
-            self._set_sequence()
-        try:
-            points = self.sequence[self.offset+ self.counter]
-            self.counter += 1
-        except IndexError:
-            raise RuntimeError('Increase sobol sequence length')
-
-        return self._from_unit_cube(points, searchspace)
+# class SobolSearch(BaseStrategy):
+#     short_name = 'sobol'
+#     _SKIP = int(1e4)
+#
+#     def __init__(self, length=1000):
+#         # TODO length should be n_trials.  But this doesn't seem to be accessible to strategies without major re-write.
+#         self.sequence = None
+#         self.length = length
+#         self.n_dims = 0
+#         self.offset = 0
+#         self.counter = 0
+#
+#     def _set_sequence(self):
+#         # TODO could get rid of first part of sequence
+#         self.sequence = ss.sample(self.length + self._SKIP, self.n_dims)
+#
+#     def _from_unit_cube(self, result, searchspace):
+#         # TODO this should be a method common to both Sobol and GP.
+#         # Note that Sobol only deals with float-valued variables, so we have
+#         # a transform step on either side, where int and enum valued variables
+#         # are transformed before calling gp, and then the result suggested by
+#         # Sobol needs to be reverse-transformed.
+#         out = {}
+#         for gpvalue, var in zip(result, searchspace):
+#             out[var.name] = var.point_from_unit(float(gpvalue))
+#         return out
+#
+#     def suggest(self, history, searchspace):
+#         if 'SALib' not in sys.modules:
+#             raise ImportError('No module named SALib')
+#
+#         if self.sequence is None:
+#             self.n_dims = searchspace.n_dims
+#             self.offset = len(history) + self._SKIP
+#             self._set_sequence()
+#         try:
+#             points = self.sequence[self.offset+ self.counter]
+#             self.counter += 1
+#         except IndexError:
+#             raise RuntimeError('Increase sobol sequence length')
+#
+#         return self._from_unit_cube(points, searchspace)
 
 
 class RandomSearch(BaseStrategy):

@@ -23,9 +23,10 @@ def test_1():
     g.fit(X, y)
 
     np.testing.assert_almost_equal(
-        out['mean_test_score'], g.cv_results_["mean_validation_score"][0])
+        out['mean_test_score'], g.cv_results_["mean_test_score"][0])
 
-    assert np.all(out['test_scores'] == g.cv_results_["cv_validation_scores"])
+    test_scores = [g.cv_results_["split{}_test_score".format(i)][0] for i in range(cv)]
+    assert np.all(out['test_scores'] == test_scores)
 
 
 def test_2():

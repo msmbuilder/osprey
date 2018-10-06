@@ -258,7 +258,7 @@ class Bayes(BaseStrategy):
                               'options': {'independent': False}}]
         self.kernel_params = kernels
         if acquisition is None:
-            acquisition = {'name': 'ei', 'params': {}}
+            acquisition = {'name': 'osprey', 'params': {}}
         self.acquisition_params = acquisition
 
     def _get_data(self, history, searchspace):

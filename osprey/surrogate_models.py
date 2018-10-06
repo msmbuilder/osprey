@@ -48,8 +48,6 @@ class MaximumLikelihoodGaussianProcess(object):
         :return:
         """
         self.model.optimize_restarts(num_restarts=self.num_restarts, verbose=False)
-        # TODO check whether this is actually needed.
-        self.model.optimize(messages=False, max_f_eval=self.max_feval)
 
     def predict(self, x):
         return self.model.predict(Xnew=x)

@@ -261,6 +261,7 @@ class Bayes(BaseStrategy):
     def __init__(self,
                  acquisition=None,
                  surrogate=None,
+                 kernels=None,
                  seed=None,
                  seeds=1,
                  max_feval=5E4,

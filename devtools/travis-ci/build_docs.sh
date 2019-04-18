@@ -8,14 +8,17 @@ conda create --yes -n docenv python=$CONDA_PY
 source activate docenv
 conda install -yq --use-local osprey
 
+
+# Install doc requirements
+conda install --yes --file docs/requirements.txt
+
+
 # We don't use conda for these:
 # sphinx_rtd_theme's latest releases are not available
 # neither is msmb_theme
 # neither is sphinx > 1.3.1 (fix #1892 autodoc problem)
-pip install -I sphinx==1.3.5 sphinx_rtd_theme==0.1.9 msmb_theme==1.2.0
-
-# Install doc requirements
-conda install --yes --file docs/requirements.txt
+pip install -I sphinx==1.3.5
+pip install -I sphinx_rtd_theme==0.1.9 msmb_theme==1.2.0
 
 # Make docs
 cd docs && make html && cd -

@@ -10,7 +10,7 @@ from distutils.spawn import find_executable
 from numpy.testing.decorators import skipif
 
 try:
-    __import__('msmbuilder')
+    __import__('msmbuilder.example_datasets')
     HAVE_MSMBUILDER = True
 except:
     HAVE_MSMBUILDER = False
@@ -28,8 +28,8 @@ def test_msmbuilder_skeleton():
 
     try:
         os.chdir(dirname)
-        subprocess.check_call([OSPREY_BIN, 'skeleton', '-t', 'msmbuilder',
-                              '-f', 'config.yaml'])
+        subprocess.check_call(
+            [OSPREY_BIN, 'skeleton', '-t', 'msmbuilder', '-f', 'config.yaml'])
         subprocess.check_call([OSPREY_BIN, 'worker', 'config.yaml', '-n', '1'])
         assert os.path.exists('osprey-trials.db')
 
@@ -52,8 +52,10 @@ def test_msmb_feat_select_skeleton():
 
     try:
         os.chdir(dirname)
-        subprocess.check_call([OSPREY_BIN, 'skeleton', '-t', 'msmb_feat_select',
-                              '-f', 'config.yaml'])
+        subprocess.check_call([
+            OSPREY_BIN, 'skeleton', '-t', 'msmb_feat_select', '-f',
+            'config.yaml'
+        ])
         subprocess.check_call([OSPREY_BIN, 'worker', 'config.yaml', '-n', '1'])
         assert os.path.exists('osprey-trials.db')
 
@@ -73,8 +75,8 @@ def test_sklearn_skeleton():
 
     try:
         os.chdir(dirname)
-        subprocess.check_call([OSPREY_BIN, 'skeleton', '-t', 'sklearn',
-                              '-f', 'config.yaml'])
+        subprocess.check_call(
+            [OSPREY_BIN, 'skeleton', '-t', 'sklearn', '-f', 'config.yaml'])
         subprocess.check_call([OSPREY_BIN, 'worker', 'config.yaml', '-n', '1'])
         assert os.path.exists('osprey-trials.db')
         assert os.path.exists('mymodel.pkl')
@@ -97,10 +99,13 @@ def test_random_example():
 
     try:
         os.chdir(dirname)
-        subprocess.check_call([OSPREY_BIN, 'skeleton', '-t', 'random_example',
-                              '-f', 'config.yaml'])
-        subprocess.check_call([OSPREY_BIN, 'worker', 'config.yaml', '-n', '2',
-                               '-s', '23', '-j', '2'])
+        subprocess.check_call([
+            OSPREY_BIN, 'skeleton', '-t', 'random_example', '-f', 'config.yaml'
+        ])
+        subprocess.check_call([
+            OSPREY_BIN, 'worker', 'config.yaml', '-n', '2', '-s', '23', '-j',
+            '2'
+        ])
         assert os.path.exists('osprey-trials.db')
 
         subprocess.check_call([OSPREY_BIN, 'current_best', 'config.yaml'])
@@ -121,8 +126,8 @@ def test_gp_example():
 
     try:
         os.chdir(dirname)
-        subprocess.check_call([OSPREY_BIN, 'skeleton', '-t', 'gp_example',
-                              '-f', 'config.yaml'])
+        subprocess.check_call(
+            [OSPREY_BIN, 'skeleton', '-t', 'gp_example', '-f', 'config.yaml'])
         subprocess.check_call([OSPREY_BIN, 'worker', 'config.yaml', '-n', '1'])
         assert os.path.exists('osprey-trials.db')
 
@@ -144,8 +149,9 @@ def test_grid_example():
 
     try:
         os.chdir(dirname)
-        subprocess.check_call([OSPREY_BIN, 'skeleton', '-t', 'grid_example',
-                              '-f', 'config.yaml'])
+        subprocess.check_call([
+            OSPREY_BIN, 'skeleton', '-t', 'grid_example', '-f', 'config.yaml'
+        ])
         subprocess.check_call([OSPREY_BIN, 'worker', 'config.yaml', '-n', '1'])
         assert os.path.exists('osprey-trials.db')
 

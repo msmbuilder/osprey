@@ -268,7 +268,7 @@ class Bayes(BaseStrategy):
         self.seeds = seeds
         self.max_feval = max_feval
         self.max_iter = max_iter
-        self.n_iter = n_iter
+        # self.n_iter = n_iter
         self.n_dims = None
         if surrogate is None:
             surrogate = 'gp'

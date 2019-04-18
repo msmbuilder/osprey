@@ -30,3 +30,5 @@ trials:
     uri: sqlite:///osprey-trials.db
 
 random_seed: 42
+
+best_model_path: ./mymodel.pkl

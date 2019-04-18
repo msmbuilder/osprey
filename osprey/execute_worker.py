@@ -8,6 +8,7 @@ import traceback
 from socket import gethostname
 from getpass import getuser
 from datetime import datetime
+from pickle import dump
 
 from six import iteritems
 from six.moves import cStringIO
@@ -94,6 +95,7 @@ def execute(args, parser):
         s = run_single_trial(
             estimator=estimator, params=params, trial_id=trial_id,
             scoring=scoring, X=X, y=y, cv=cv, n_jobs=args.n_jobs,
+            best_model_path=config.best_model_path,
             sessionbuilder=config.trialscontext)
 
         statuses[i] = s
@@ -153,7 +155,7 @@ def initialize_trial(strategy, searchspace, estimator, config_sha1,
 
 
 def run_single_trial(estimator, params, trial_id, scoring, X, y, cv, n_jobs,
-                     sessionbuilder):
+                     best_model_path, sessionbuilder):
 
     status = None
 
@@ -205,6 +207,26 @@ def run_single_trial(estimator, params, trial_id, scoring, X, y, cv, n_jobs,
             trial.status = 'FAILED'
             session.commit()
             sys.exit(1)
+
+    if best_model_path and trial.mean_test_score > best_so_far[0]:
+        try:
+            if params is not None:
+                estimator.set_params(**params)
+            if y is None:
+                estimator.fit(X)
+            else:
+                estimator.fit(X, y)
+
+            print('Saving new best model...')
+            with open(best_model_path, 'wb') as f:
+                dump(f, estimator)
+
+        except Exception:
+            print('-'*78, file=sys.stderr)
+            print('Exception encountered while saving model')
+            print('-'*78, file=sys.stderr)
+            traceback.print_exc(file=sys.stderr)
+            print('-'*78, file=sys.stderr)
 
     return status
 

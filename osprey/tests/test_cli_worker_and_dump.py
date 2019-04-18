@@ -77,6 +77,7 @@ def test_sklearn_skeleton():
                               '-f', 'config.yaml'])
         subprocess.check_call([OSPREY_BIN, 'worker', 'config.yaml', '-n', '1'])
         assert os.path.exists('osprey-trials.db')
+        assert os.path.exists('mymodel.pkl')
 
         subprocess.check_call([OSPREY_BIN, 'current_best', 'config.yaml'])
 

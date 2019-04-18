@@ -135,20 +135,6 @@ def test_random_seed():
     assert config.random_seed() == 42
 
 
-def test_best_model_path():
-    config = Config.fromdict({
-        'best_model_path': './mymodel.pkl'
-    }, check_fields=False)
-    assert config.best_model_path() == './mymodel.pkl'
-
-
-def test_project_name():
-    config = Config.fromdict({
-        'trials': {'project_name': 'project'}
-    }, check_fields=False)
-    assert config.project_name() == 'project'
-
-
 def test_cv_1():
     from sklearn.model_selection import ShuffleSplit
     for name in ['shufflesplit', 'ShuffleSplit']:

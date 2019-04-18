@@ -23,9 +23,11 @@ def test_1():
     g.fit(X, y)
 
     np.testing.assert_almost_equal(out['mean_test_score'],
-                                   g.grid_scores_[0].mean_validation_score)
+                                   g.cv_results_['mean_test_score'][0])
 
-    assert np.all(out['test_scores'] == g.grid_scores_[0].cv_validation_scores)
+    test_scores = np.hstack(
+        [g.cv_results_['split{i}_test_score'] for i in range(cv)])
+    assert np.all(out['test_scores'] == test_scores)
 
 
 def test_2():

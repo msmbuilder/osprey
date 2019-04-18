@@ -61,3 +61,7 @@ MANIFEST
 .ipynb_checkpoints
 
 scratch/
+
+*.npy
+
+.idea/*

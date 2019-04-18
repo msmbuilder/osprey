@@ -7,7 +7,6 @@ import importlib
 
 from sklearn.base import BaseEstimator
 
-
 __all__ = ['msmbuilder', 'import_all_estimators']
 
 
@@ -23,7 +22,6 @@ def msmbuilder():
 
 
 def import_all_estimators(pkg):
-
     def estimator_in_module(mod):
         for name, obj in inspect.getmembers(mod):
             if name.startswith('_'):
@@ -48,5 +46,4 @@ def import_all_estimators(pkg):
         except ImportError as e:
             print('Import Error', c, e)
             continue
-
     return result

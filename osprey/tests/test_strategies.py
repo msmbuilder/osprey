@@ -7,7 +7,7 @@ from numpy.testing.decorators import skipif
 
 from osprey.search_space import SearchSpace
 from osprey.search_space import IntVariable, EnumVariable, FloatVariable
-from osprey.strategies import RandomSearch, HyperoptTPE, GP, GridSearch
+from osprey.strategies import RandomSearch, HyperoptTPE, Bayes, GridSearch
 
 try:
     from hyperopt import hp, fmin, tpe, Trials
@@ -102,8 +102,8 @@ def test_1():
 
     np.testing.assert_array_equal(ref, ours)
 
-
-@skipif('GPy' not in sys.modules, 'this test requires hyperopt')
+    
+@skipif('GPy' not in sys.modules, 'this test requires GPy')
 def test_gp():
     searchspace = SearchSpace()
     searchspace.add_float('x', -10, 10)
@@ -113,7 +113,8 @@ def test_gp():
 
     history = [(searchspace.rvs(), np.random.random(), 'SUCCEEDED')
                for _ in range(4)]
-    params = GP().suggest(history, searchspace)
+
+    params = Bayes().suggest(history, searchspace)
     for k, v in iteritems(params):
         assert k in searchspace.variables
         if isinstance(searchspace[k], EnumVariable):

@@ -8,9 +8,9 @@ estimator:
 
     # pick one of these ways to specify
       # path to a file
-    pickle: my-model.pkl
+#    pickle: my-model.pkl
       # importable python class/instances
-    entry_point: msmbuilder.decomposition.tICA
+#    entry_point: msmbuilder.decomposition.tICA
     eval: |
         Pipeline([
                 ('featurizer', DihedralFeaturizer(types=['phi', 'psi'])),
@@ -29,7 +29,7 @@ strategy:
 
     # hyperopt's tree of parzen estimators http://hyperopt.github.io/hyperopt/
     # and random search are curently supported.
-    name: random  # or gp, hyperopt_tpe
+    name: random  # or bayes, hyperopt_tpe
     # params: {}
 
 search_space:

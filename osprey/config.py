@@ -42,7 +42,6 @@ from .trials import Trial, make_session
 from .subclass_factory import init_subclass_by_name
 from . import eval_scopes
 
-
 FIELDS = {
     'estimator':       ['pickle', 'eval', 'eval_scope', 'entry_point',
                         'params', 'module'],
@@ -280,7 +279,6 @@ class Config(object):
     def strategy(self):
         strategy_name = self.get_value('strategy/name')
         strategy_params = self.get_value('strategy/params', default={})
-
         strat = init_subclass_by_name(BaseStrategy, strategy_name,
                                       strategy_params)
         return strat

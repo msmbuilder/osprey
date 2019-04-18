@@ -89,7 +89,7 @@ def plot_3(data, ss, *args):
 
     scores = np.array([d['mean_test_score'] for d in data])
     # maps each parameters to a vector of floats
-    warped = np.array([ss.point_to_gp(d['parameters']) for d in data])
+    warped = np.array([ss.point_to_unit(d['parameters']) for d in data])
 
     # Embed into 2 dimensions with t-SNE
     X = TSNE(n_components=2).fit_transform(warped)

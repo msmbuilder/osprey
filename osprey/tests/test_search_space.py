@@ -128,46 +128,46 @@ def test_5_2():
 
 def test_gp_1():
     v = IntVariable('name', 1, 10, None)
-    assert 2 == v.point_from_gp(v.point_to_gp(2))
-    assert 1 == v.point_from_gp(v.point_to_gp(1))
-    assert 10 == v.point_from_gp(v.point_to_gp(10))
+    assert 2 == v.point_from_unit(v.point_to_unit(2))
+    assert 1 == v.point_from_unit(v.point_to_unit(1))
+    assert 10 == v.point_from_unit(v.point_to_unit(10))
 
-    assert v.point_to_gp(1) == 0
-    assert v.point_to_gp(10) == 1
+    assert v.point_to_unit(1) == 0
+    assert v.point_to_unit(10) == 1
 
 
 def test_gp_2():
     v = FloatVariable('name', 1, 10, None)
-    assert (2-1) / (10-1) == v.point_to_gp(2)
-    assert 0.0 == v.point_to_gp(1)
-    assert 1.0 == v.point_to_gp(10)
-    assert 2.0 == v.point_from_gp(v.point_to_gp(2))
-    assert 1.0 == v.point_from_gp(v.point_to_gp(1))
-    assert 1.0 == v.point_from_gp(v.point_to_gp(0.9))
-    assert 10.0 == v.point_from_gp(v.point_to_gp(10))
-    assert 10.0 == v.point_from_gp(v.point_to_gp(10.1))
+    assert (2-1) / (10-1) == v.point_to_unit(2)
+    assert 0.0 == v.point_to_unit(1)
+    assert 1.0 == v.point_to_unit(10)
+    assert 2.0 == v.point_from_unit(v.point_to_unit(2))
+    assert 1.0 == v.point_from_unit(v.point_to_unit(1))
+    assert 1.0 == v.point_from_unit(v.point_to_unit(0.9))
+    assert 10.0 == v.point_from_unit(v.point_to_unit(10))
+    assert 10.0 == v.point_from_unit(v.point_to_unit(10.1))
 
 
 def test_gp_3():
     v = FloatVariable('name', 1, 10, 'log')
-    assert 2.0 == v.point_from_gp(v.point_to_gp(2))
-    assert 1.0 == v.point_from_gp(v.point_to_gp(1))
-    assert 1.0 == v.point_from_gp(v.point_to_gp(0.9))
-    assert 10.0 == v.point_from_gp(v.point_to_gp(10))
-    assert 10.0 == v.point_from_gp(v.point_to_gp(10.1))
+    assert 2.0 == v.point_from_unit(v.point_to_unit(2))
+    assert 1.0 == v.point_from_unit(v.point_to_unit(1))
+    assert 1.0 == v.point_from_unit(v.point_to_unit(0.9))
+    assert 10.0 == v.point_from_unit(v.point_to_unit(10))
+    assert 10.0 == v.point_from_unit(v.point_to_unit(10.1))
 
 
 def test_gp_4():
     v = EnumVariable('name', ['a', 'b', 'c'])
-    assert 'a' == v.point_from_gp(v.point_to_gp('a'))
-    assert 'b' == v.point_from_gp(v.point_to_gp('b'))
-    assert 'c' == v.point_from_gp(v.point_to_gp('c'))
-    assert 0 == v.point_to_gp('a')
-    assert 0.5 == v.point_to_gp('b')
-    assert 1 == v.point_to_gp('c')
+    assert 'a' == v.point_from_unit(v.point_to_unit('a'))
+    assert 'b' == v.point_from_unit(v.point_to_unit('b'))
+    assert 'c' == v.point_from_unit(v.point_to_unit('c'))
+    assert 0 == v.point_to_unit('a')
+    assert 0.5 == v.point_to_unit('b')
+    assert 1 == v.point_to_unit('c')
 
 
 def test_gp_5():
     v = EnumVariable('name', ['a'])
-    assert 'a' == v.point_from_gp(v.point_to_gp('a'))
-    assert 0 == v.point_to_gp('a')
+    assert 'a' == v.point_from_unit(v.point_to_unit('a'))
+    assert 0 == v.point_to_unit('a')

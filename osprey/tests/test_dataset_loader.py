@@ -2,6 +2,7 @@ from __future__ import print_function, absolute_import, division
 import os
 import shutil
 import tempfile
+from nose.plugins.skip import SkipTest
 
 import numpy as np
 import sklearn.datasets
@@ -158,18 +159,27 @@ def test_DSVDatasetLoader_1():
 
 @skipif(not HAVE_MSMBUILDER, 'this test requires MSMBuilder')
 def test_MDTrajDatasetLoader_1():
-    from msmbuilder.example_datasets import FsPeptide
-    fs_pept = FsPeptide()
+    try:
+        from msmbuilder.example_datasets import FsPeptide
+    except ImportError as e:
+        raise SkipTest(e)
 
-    loader = MDTrajDatasetLoader(os.path.join(fs_pept.data_dir, '*.xtc'),
-                                 topology=os.path.join(fs_pept.data_dir,
-                                                       'fs-peptide.pdb'))
-    X, y = loader.load()
-    assert len(X) == 28
-    assert y is None
+    cwd = os.path.abspath(os.curdir)
+    dirname = tempfile.mkdtemp()
+    fs_pept = FsPeptide(dirname)
+    fs_pept.get()
+    try:
+        loader = MDTrajDatasetLoader(os.path.join(fs_pept.data_dir, '*.xtc'),
+                                     topology=os.path.join(fs_pept.data_dir, 'fs-peptide.pdb'))
+        X, y = loader.load()
+        assert len(X) == 28
+        assert y is None
+    finally:
+        shutil.rmtree(dirname)
 
 
 def test_MSMBuilderDatasetLoader_1():
+    # TODO Why does this work when other msmbuilder imports don't?
     from msmbuilder.dataset import dataset
 
     path = tempfile.mkdtemp()

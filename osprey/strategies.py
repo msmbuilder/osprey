@@ -257,7 +257,6 @@ class HyperoptTPE(BaseStrategy):
 
 class Bayes(BaseStrategy):
     short_name = 'bayes'
-    # TODO : n_iter, max_iter should be in acquisition params
     def __init__(self,
                  acquisition=None,
                  surrogate=None,
@@ -265,13 +264,14 @@ class Bayes(BaseStrategy):
                  seed=None,
                  seeds=1,
                  max_feval=5E4,
-                 max_iter=1E5
+                 max_iter=1E5,
+                 n_iter=50
                 ):
         self.seed = seed
         self.seeds = seeds
         self.max_feval = max_feval
         self.max_iter = max_iter
-        # self.n_iter = n_iter
+        self.n_iter = n_iter
         self.n_dims = None
         if surrogate is None:
             surrogate = 'gp'

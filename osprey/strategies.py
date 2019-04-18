@@ -260,10 +260,12 @@ class Bayes(BaseStrategy):
     # TODO : n_iter, max_iter should be in acquisition params
     def __init__(self,
                  acquisition=None,
+                 surrogate=None,
                  seed=None,
                  seeds=1,
                  max_feval=5E4,
-                 max_iter=1E5):
+                 max_iter=1E5
+                ):
         self.seed = seed
         self.seeds = seeds
         self.max_feval = max_feval

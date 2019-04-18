@@ -300,9 +300,6 @@ class Config(object):
 
         return X, y
 
-    def best_model_path(self):
-        return self.get_value('best_model_path')
-
     def project_name(self):
         return self.get_value('trials/project_name')
 

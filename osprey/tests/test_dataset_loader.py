@@ -7,12 +7,19 @@ from nose.plugins.skip import SkipTest
 import numpy as np
 import sklearn.datasets
 from sklearn.externals.joblib import dump
+from numpy.testing.decorators import skipif
 
 from osprey.dataset_loaders import (DSVDatasetLoader, FilenameDatasetLoader,
                                     JoblibDatasetLoader, HDF5DatasetLoader,
                                     MDTrajDatasetLoader,
                                     MSMBuilderDatasetLoader,
                                     NumpyDatasetLoader, SklearnDatasetLoader)
+
+try:
+    __import__('msmbuilder.example_datasets')
+    HAVE_MSMBUILDER = True
+except:
+    HAVE_MSMBUILDER = False
 
 
 def test_FilenameDatasetLoader_1():
@@ -136,8 +143,11 @@ def test_DSVDatasetLoader_1():
         assert y is None
 
         # y_col and usecols and concat and stride
-        loader = DSVDatasetLoader('f*.csv', y_col=3, usecols=(0, 2),
-                                  stride=2, concat=True)
+        loader = DSVDatasetLoader('f*.csv',
+                                  y_col=3,
+                                  usecols=(0, 2),
+                                  stride=2,
+                                  concat=True)
         X, y = loader.load()
         assert X.shape[0] == 10 and X.shape[1] == 2
         assert y.shape[0] == 10
@@ -147,6 +157,7 @@ def test_DSVDatasetLoader_1():
         shutil.rmtree(dirname)
 
 
+@skipif(not HAVE_MSMBUILDER, 'this test requires MSMBuilder')
 def test_MDTrajDatasetLoader_1():
     try:
         from msmbuilder.example_datasets import FsPeptide
@@ -189,23 +200,23 @@ def test_MSMBuilderDatasetLoader_1():
 
 
 def test_NumpyDatasetLoader_1():
-        cwd = os.path.abspath(os.curdir)
-        dirname = tempfile.mkdtemp()
-        try:
-            os.chdir(dirname)
+    cwd = os.path.abspath(os.curdir)
+    dirname = tempfile.mkdtemp()
+    try:
+        os.chdir(dirname)
 
-            x = np.random.randn(10, 2)
-            np.save('f1.npy', x)
+        x = np.random.randn(10, 2)
+        np.save('f1.npy', x)
 
-            loader = NumpyDatasetLoader('f1.npy')
-            X, y = loader.load()
+        loader = NumpyDatasetLoader('f1.npy')
+        X, y = loader.load()
 
-            assert np.all(X[0] == x)
-            assert y is None
+        assert np.all(X[0] == x)
+        assert y is None
 
-        finally:
-            os.chdir(cwd)
-            shutil.rmtree(dirname)
+    finally:
+        os.chdir(cwd)
+        shutil.rmtree(dirname)
 
 
 def test_SklearnDatasetLoader_1():

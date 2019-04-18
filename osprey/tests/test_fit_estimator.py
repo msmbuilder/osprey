@@ -22,10 +22,11 @@ def test_1():
     g = GridSearchCV(estimator=lasso, param_grid=param_grid, cv=cv)
     g.fit(X, y)
 
-    np.testing.assert_almost_equal(
-        out['mean_test_score'], g.cv_results_["mean_test_score"][0])
+    np.testing.assert_almost_equal(out['mean_test_score'],
+                                   g.cv_results_['mean_test_score'][0])
 
-    test_scores = [g.cv_results_["split{}_test_score".format(i)][0] for i in range(cv)]
+    test_scores = np.hstack(
+        [g.cv_results_['split{}_test_score'.format(i)] for i in range(cv)])
     assert np.all(out['test_scores'] == test_scores)
 
 
@@ -36,7 +37,10 @@ def test_2():
         raise SkipTest(e)
 
     X = [np.random.randint(2, size=10), np.random.randint(2, size=11)]
-    out = fit_and_score_estimator(
-        MarkovStateModel(), {'verbose': False}, cv=2, X=X, y=None, verbose=0)
+    out = fit_and_score_estimator(MarkovStateModel(), {'verbose': False},
+                                  cv=2,
+                                  X=X,
+                                  y=None,
+                                  verbose=0)
     np.testing.assert_array_equal(out['n_train_samples'], [11, 10])
     np.testing.assert_array_equal(out['n_test_samples'], [10, 11])

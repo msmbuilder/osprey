@@ -4,8 +4,8 @@ sudo: false
 
 env:
     matrix:
-        - CONDA_PY=2.7
         - CONDA_PY=3.5
+        - CONDA_PY=3.6
 
 branches:
   only:
@@ -14,6 +14,7 @@ branches:
 install:
     - source devtools/travis-ci/install_miniconda.sh
     - conda config --add channels omnia
+    - conda config --add channels conda-forge
     - conda install -yq python-coveralls
 
 script:
@@ -32,7 +33,7 @@ deploy:
      local-dir: docs/_deploy/
      on:
        branch: master
-       condition: "$CONDA_PY = 3.5"
+       condition: "$CONDA_PY = 3.6"
      region: us-east-1
      detect_encoding: true
      access_key_id: $AWS_ACCESS_KEY

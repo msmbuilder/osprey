@@ -102,8 +102,8 @@ def test_1():
 
     np.testing.assert_array_equal(ref, ours)
 
-# TODO this error message needs changing.
-@skipif('GPy' not in sys.modules, 'this test requires hyperopt')
+    
+@skipif('GPy' not in sys.modules, 'this test requires GPy')
 def test_gp():
     searchspace = SearchSpace()
     searchspace.add_float('x', -10, 10)

@@ -5,7 +5,7 @@ import socket
 
 import numpy as np
 from sklearn.utils import check_random_state
-from sklearn.grid_search import ParameterGrid
+from sklearn.model_selection import ParameterGrid
 try:
     from hyperopt import (Trials, tpe, fmin, STATUS_OK, STATUS_RUNNING,
                           STATUS_FAIL)
@@ -21,9 +21,8 @@ try:
     from scipy.optimize import minimize
     from scipy.stats import norm
     # If the GPy modules fail we won't do this unnecessarily.
-    from .entry_point import load_entry_point
     KERNEL_BASE_CLASS = kern.src.kern.Kern
-except:
+except ImportError:
     # GPy is optional, but required for gp
     GPRegression = kern = minimize = None
     pass
@@ -71,7 +70,8 @@ class BaseStrategy(object):
         -------
         is_repeated_suggestion : bool
         """
-        if any(params == hparams and hstatus == 'SUCCEEDED' for hparams, hscore, hstatus in history):
+        if any(params == hparams and hstatus == 'SUCCEEDED'
+               for hparams, hscore, hstatus in history):
             return True
         else:
             return False
@@ -149,8 +149,10 @@ class HyperoptTPE(BaseStrategy):
                 if isinstance(var, EnumVariable):
                     # get the index in the choices of the parameter, and use
                     # that.
-                    matches = [i for i, c in enumerate(var.choices)
-                               if c == params[var.name]]
+                    matches = [
+                        i for i, c in enumerate(var.choices)
+                        if c == params[var.name]
+                    ]
                     assert len(matches) == 1
                     vals[var.name] = matches
                 else:
@@ -164,13 +166,19 @@ class HyperoptTPE(BaseStrategy):
                     'idxs': dict((k, [i]) for k in hp_searchspace.keys()),
                     'tid': i,
                     'vals': vals,
-                    'workdir': None},
+                    'workdir': None
+                },
                 'result': result,
                 'tid': i,
                 # bunch of fixed fields that hyperopt seems to require
-                'owner': None, 'spec': None, 'state': 2, 'book_time': None,
-                'exp_key': None, 'refresh_time': None, 'version': 0
-                })
+                'owner': None,
+                'spec': None,
+                'state': 2,
+                'book_time': None,
+                'exp_key': None,
+                'refresh_time': None,
+                'version': 0
+            })
 
         trials.refresh()
         chosen_params_container = []
@@ -181,8 +189,11 @@ class HyperoptTPE(BaseStrategy):
             chosen_params_container.append(x)
             return 0
 
-        fmin(fn=mock_fn, algo=tpe.suggest, space=hp_searchspace, trials=trials,
-             max_evals=len(trials.trials)+1,
+        fmin(fn=mock_fn,
+             algo=tpe.suggest,
+             space=hp_searchspace,
+             trials=trials,
+             max_evals=len(trials.trials) + 1,
              **self._hyperopt_fmin_random_kwarg(random))
         chosen_params = chosen_params_container[0]
 
@@ -195,14 +206,19 @@ class HyperoptTPE(BaseStrategy):
             kwargs = {'rstate': random, 'allow_trials_fmin': False}
         elif 'rseed' in inspect.getargspec(fmin).args:
             # 0.0.2 version uses different argument
-            kwargs = {'rseed': random.randint(2**32-1)}
+            kwargs = {'rseed': random.randint(2**32 - 1)}
         return kwargs
 
 
 class GP(BaseStrategy):
     short_name = 'gp'
 
-    def __init__(self, acquisition=None, seed=None, seeds=1, max_feval=5E4, max_iter=1E5):
+    def __init__(self,
+                 acquisition=None,
+                 seed=None,
+                 seeds=1,
+                 max_feval=5E4,
+                 max_iter=1E5):
         self.seed = seed
         self.seeds = seeds
         self.max_feval = max_feval
@@ -220,8 +236,9 @@ class GP(BaseStrategy):
         self._set_acquisition()
 
     def _create_kernel(self, V):
-        self._kerns = [RBF(1, ARD=True, active_dims=[i])
-                       for i in range(self.n_dims)]
+        self._kerns = [
+            RBF(1, ARD=True, active_dims=[i]) for i in range(self.n_dims)
+        ]
         self._kernf = Fixed(self.n_dims, tdot(V))
         self._kernb = Bias(self.n_dims)
         self.kernel = np.sum(self._kerns) + self._kernf + self._kernb
@@ -232,30 +249,31 @@ class GP(BaseStrategy):
         self.model = model
 
     def _get_random_point(self):
-        return np.array([np.random.uniform(low=0., high=1.)
-                         for i in range(self.n_dims)])
+        return np.array(
+            [np.random.uniform(low=0., high=1.) for i in range(self.n_dims)])
 
     def _is_var_positive(self, var):
 
         if np.any(var < 0):
             # RuntimeError may be overkill
-            raise RuntimeError('Negative variance predicted from regression model.')
+            raise RuntimeError(
+                'Negative variance predicted from regression model.')
         else:
             return True
 
     def _ei(self, x, y_mean, y_var):
         y_std = np.sqrt(y_var)
         y_best = self.model.Y.max(axis=0)
-        z = (y_mean - y_best)/y_std
-        result = y_std*(z*norm.cdf(z) + norm.pdf(z))
+        z = (y_mean - y_best) / y_std
+        result = y_std * (z * norm.cdf(z) + norm.pdf(z))
         return result
 
     def _ucb(self, x, y_mean, y_var, kappa=1.0):
-        result = y_mean + kappa*np.sqrt(y_var)
+        result = y_mean + kappa * np.sqrt(y_var)
         return result
 
     def _osprey(self, x, y_mean, y_var):
-        return (y_mean+y_var).flatten()
+        return (y_mean + y_var).flatten()
 
     def _optimize(self, init=None):
         # TODO start minimization from a range of points and take minimum
@@ -265,8 +283,8 @@ class GP(BaseStrategy):
         def z(x):
             # TODO make spread of points around x and take mean value.
             x = x.copy().reshape(-1, self.n_dims)
-            y_mean, y_var = self.model.predict(x, kern=(np.sum(self._kerns).copy() +
-                                                        self._kernb.copy()))
+            y_mean, y_var = self.model.predict(
+                x, kern=(np.sum(self._kerns).copy() + self._kernb.copy()))
             # This code is for debug/testing phase only.
             # Ideally we should test for negative variance regardless of the AF.
             # However, we want to recover the original functionality of Osprey, hence the conditional block.
@@ -276,11 +294,18 @@ class GP(BaseStrategy):
             elif self.acquisition_function['name'] in ['ei', 'ucb']:
                 # y_var = np.abs(y_var)
                 if self._is_var_positive(y_var):
-                    af = self._acquisition_function(x, y_mean=y_mean, y_var=y_var)
-            return (-1)*af
+                    af = self._acquisition_function(x,
+                                                    y_mean=y_mean,
+                                                    y_var=y_var)
+            return (-1) * af
 
-        res = minimize(z, init, bounds=self.n_dims*[(0., 1.)],
-                        options={'maxiter': self.max_iter, 'disp': 0})
+        res = minimize(z,
+                       init,
+                       bounds=self.n_dims * [(0., 1.)],
+                       options={
+                           'maxiter': self.max_iter,
+                           'disp': 0
+                       })
         return res.x
 
     def _set_acquisition(self):
@@ -290,10 +315,11 @@ class GP(BaseStrategy):
             raise RuntimeError('strategy/params/acquisition must contain keys '
                                '"name" and "params"')
         if self.acquisition_function['name'] not in ['ei', 'ucb', 'osprey']:
-            raise RuntimeError('strategy/params/acquisition name must be one of '
-                               '"ei", "ucb", "osprey"')
+            raise RuntimeError(
+                'strategy/params/acquisition name must be one of '
+                '"ei", "ucb", "osprey"')
 
-        f = eval('self._'+self.acquisition_function['name'])
+        f = eval('self._' + self.acquisition_function['name'])
 
         def g(x, y_mean, y_var):
             return f(x, y_mean, y_var, **self.acquisition_function['params'])
@@ -324,8 +350,7 @@ class GP(BaseStrategy):
                 raise RuntimeError('unrecognized status: %s' % status)
 
         return (np.array(X).reshape(-1, self.n_dims),
-                np.array(Y).reshape(-1, 1),
-                np.array(V).reshape(-1, 1),
+                np.array(Y).reshape(-1, 1), np.array(V).reshape(-1, 1),
                 np.array(ignore).reshape(-1, self.n_dims))
 
     def _from_gp(self, result, searchspace):
@@ -380,9 +405,12 @@ class GridSearch(BaseStrategy):
         # Convert searchspace to param_grid
         if self.param_grid is None:
             if not all(isinstance(v, EnumVariable) for v in searchspace):
-                raise RuntimeError("GridSearchStrategy is defined only for all-enum search space")
+                raise RuntimeError(
+                    "GridSearchStrategy is defined only for all-enum search space"
+                )
 
-            self.param_grid = ParameterGrid(dict((v.name, v.choices) for v in searchspace))
+            self.param_grid = ParameterGrid(
+                dict((v.name, v.choices) for v in searchspace))
 
         # NOTE: there is no way of signaling end of parameters to be searched against
         # so user should pick correctly number of evaluations

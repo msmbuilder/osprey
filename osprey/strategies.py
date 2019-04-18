@@ -15,13 +15,8 @@ except ImportError:
 
 from .search_space import EnumVariable
 from .acquisition_functions import AcquisitionFunction
-from .surrogate_models import MaximumLikelihoodGaussianProcess, GaussianProcessKernel
-
-# try:
-#     from SALib.sample import sobol_sequence as ss
-# except ImportError:
-#     ss = None
-#     pass
+from .surrogate_models import (MaximumLikelihoodGaussianProcess,
+                               GaussianProcessKernel)
 
 DEFAULT_TIMEOUT = socket._GLOBAL_DEFAULT_TIMEOUT
 
@@ -70,50 +65,6 @@ class BaseStrategy(object):
             return True
         else:
             return False
-
-
-# class SobolSearch(BaseStrategy):
-#     short_name = 'sobol'
-#     _SKIP = int(1e4)
-#
-#     def __init__(self, length=1000):
-#         # TODO length should be n_trials.  But this doesn't seem to be accessible to strategies without major re-write.
-#         self.sequence = None
-#         self.length = length
-#         self.n_dims = 0
-#         self.offset = 0
-#         self.counter = 0
-#
-#     def _set_sequence(self):
-#         # TODO could get rid of first part of sequence
-#         self.sequence = ss.sample(self.length + self._SKIP, self.n_dims)
-#
-#     def _from_unit_cube(self, result, searchspace):
-#         # TODO this should be a method common to both Sobol and GP.
-#         # Note that Sobol only deals with float-valued variables, so we have
-#         # a transform step on either side, where int and enum valued variables
-#         # are transformed before calling gp, and then the result suggested by
-#         # Sobol needs to be reverse-transformed.
-#         out = {}
-#         for gpvalue, var in zip(result, searchspace):
-#             out[var.name] = var.point_from_unit(float(gpvalue))
-#         return out
-#
-#     def suggest(self, history, searchspace):
-#         if 'SALib' not in sys.modules:
-#             raise ImportError('No module named SALib')
-#
-#         if self.sequence is None:
-#             self.n_dims = searchspace.n_dims
-#             self.offset = len(history) + self._SKIP
-#             self._set_sequence()
-#         try:
-#             points = self.sequence[self.offset+ self.counter]
-#             self.counter += 1
-#         except IndexError:
-#             raise RuntimeError('Increase sobol sequence length')
-#
-#         return self._from_unit_cube(points, searchspace)
 
 
 class RandomSearch(BaseStrategy):
@@ -225,14 +176,16 @@ class HyperoptTPE(BaseStrategy):
         chosen_params_container = []
 
         def suggest(*args, **kwargs):
-            return tpe.suggest(*args, **kwargs, gamma=self.gamma, n_startup_jobs=self.seeds)
+            return tpe.suggest(*args,
+                               **kwargs,
+                               gamma=self.gamma,
+                               n_startup_jobs=self.seeds)
 
         def mock_fn(x):
             # http://stackoverflow.com/a/3190783/1079728
             # to get around no nonlocal keywork in python2
             chosen_params_container.append(x)
             return 0
-
 
         fmin(fn=mock_fn,
              algo=tpe.suggest,
@@ -257,6 +210,7 @@ class HyperoptTPE(BaseStrategy):
 
 class Bayes(BaseStrategy):
     short_name = 'bayes'
+
     def __init__(self,
                  acquisition=None,
                  surrogate=None,
@@ -265,8 +219,7 @@ class Bayes(BaseStrategy):
                  seeds=1,
                  max_feval=5E4,
                  max_iter=1E5,
-                 n_iter=50
-                ):
+                 n_iter=50):
         self.seed = seed
         self.seeds = seeds
         self.max_feval = max_feval
@@ -277,8 +230,15 @@ class Bayes(BaseStrategy):
             surrogate = 'gp'
         self.surrogate = surrogate
         if kernels is None:
-            kernels = [{'name': 'GPy.kern.Matern52', 'params': {'ARD': True},
-                              'options': {'independent': False}}]
+            kernels = [{
+                'name': 'GPy.kern.Matern52',
+                'params': {
+                    'ARD': True
+                },
+                'options': {
+                    'independent': False
+                }
+            }]
         self.kernel_params = kernels
         if acquisition is None:
             acquisition = {'name': 'osprey', 'params': {}}
@@ -338,10 +298,13 @@ class Bayes(BaseStrategy):
         # Define and fit model
         if self.surrogate == 'gp':
             kernel = GaussianProcessKernel(self.kernel_params, self.n_dims)
-            model = MaximumLikelihoodGaussianProcess(X=X, Y=Y, kernel=kernel.kernel,
+            model = MaximumLikelihoodGaussianProcess(X=X,
+                                                     Y=Y,
+                                                     kernel=kernel.kernel,
                                                      max_feval=self.max_feval)
         else:
-            raise NotImplementedError('Surrogate model not recognised.  Please choose from: gp')
+            raise NotImplementedError(
+                'Surrogate model not recognised.  Please choose from: gp')
         model.fit()
 
         # Define acquisition function and get best candidate

@@ -26,7 +26,7 @@ def test_1():
                                    g.cv_results_['mean_test_score'][0])
 
     test_scores = np.hstack(
-        [g.cv_results_['split{i}_test_score'] for i in range(cv)])
+        [g.cv_results_[f'split{i}_test_score'] for i in range(cv)])
     assert np.all(out['test_scores'] == test_scores)
 
 

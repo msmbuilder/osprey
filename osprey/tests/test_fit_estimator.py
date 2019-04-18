@@ -5,7 +5,7 @@ from nose.plugins.skip import SkipTest
 from six import iteritems
 from sklearn.datasets import make_regression
 from sklearn.linear_model import Lasso
-from sklearn.grid_search import GridSearchCV
+from sklearn.model_selection import GridSearchCV
 
 from osprey.fit_estimator import fit_and_score_estimator
 
@@ -22,10 +22,12 @@ def test_1():
     g = GridSearchCV(estimator=lasso, param_grid=param_grid, cv=cv)
     g.fit(X, y)
 
-    np.testing.assert_almost_equal(
-        out['mean_test_score'], g.grid_scores_[0].mean_validation_score)
+    np.testing.assert_almost_equal(out['mean_test_score'],
+                                   g.cv_results_['mean_test_score'][0])
 
-    assert np.all(out['test_scores'] == g.grid_scores_[0].cv_validation_scores)
+    test_scores = np.hstack(
+        [g.cv_results_['split{}_test_score'.format(i)] for i in range(cv)])
+    assert np.all(out['test_scores'] == test_scores)
 
 
 def test_2():
@@ -35,7 +37,10 @@ def test_2():
         raise SkipTest(e)
 
     X = [np.random.randint(2, size=10), np.random.randint(2, size=11)]
-    out = fit_and_score_estimator(
-        MarkovStateModel(), {'verbose': False}, cv=2, X=X, y=None, verbose=0)
+    out = fit_and_score_estimator(MarkovStateModel(), {'verbose': False},
+                                  cv=2,
+                                  X=X,
+                                  y=None,
+                                  verbose=0)
     np.testing.assert_array_equal(out['n_train_samples'], [11, 10])
     np.testing.assert_array_equal(out['n_test_samples'], [10, 11])

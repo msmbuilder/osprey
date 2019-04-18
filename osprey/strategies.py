@@ -65,7 +65,8 @@ class BaseStrategy(object):
         -------
         is_repeated_suggestion : bool
         """
-        if any(params == hparams and hstatus == 'SUCCEEDED' for hparams, hscore, hstatus in history):
+        if any(params == hparams and hstatus == 'SUCCEEDED'
+               for hparams, hscore, hstatus in history):
             return True
         else:
             return False
@@ -189,8 +190,10 @@ class HyperoptTPE(BaseStrategy):
                 if isinstance(var, EnumVariable):
                     # get the index in the choices of the parameter, and use
                     # that.
-                    matches = [i for i, c in enumerate(var.choices)
-                               if c == params[var.name]]
+                    matches = [
+                        i for i, c in enumerate(var.choices)
+                        if c == params[var.name]
+                    ]
                     assert len(matches) == 1
                     vals[var.name] = matches
                 else:
@@ -204,13 +207,19 @@ class HyperoptTPE(BaseStrategy):
                     'idxs': dict((k, [i]) for k in hp_searchspace.keys()),
                     'tid': i,
                     'vals': vals,
-                    'workdir': None},
+                    'workdir': None
+                },
                 'result': result,
                 'tid': i,
                 # bunch of fixed fields that hyperopt seems to require
-                'owner': None, 'spec': None, 'state': 2, 'book_time': None,
-                'exp_key': None, 'refresh_time': None, 'version': 0
-                })
+                'owner': None,
+                'spec': None,
+                'state': 2,
+                'book_time': None,
+                'exp_key': None,
+                'refresh_time': None,
+                'version': 0
+            })
 
         trials.refresh()
         chosen_params_container = []
@@ -224,8 +233,12 @@ class HyperoptTPE(BaseStrategy):
             chosen_params_container.append(x)
             return 0
 
-        fmin(fn=mock_fn, algo=suggest, space=hp_searchspace, trials=trials,
-             max_evals=len(trials.trials)+1,
+
+        fmin(fn=mock_fn,
+             algo=tpe.suggest,
+             space=hp_searchspace,
+             trials=trials,
+             max_evals=len(trials.trials) + 1,
              **self._hyperopt_fmin_random_kwarg(random))
         chosen_params = chosen_params_container[0]
 
@@ -238,15 +251,19 @@ class HyperoptTPE(BaseStrategy):
             kwargs = {'rstate': random, 'allow_trials_fmin': False}
         elif 'rseed' in inspect.getargspec(fmin).args:
             # 0.0.2 version uses different argument
-            kwargs = {'rseed': random.randint(2**32-1)}
+            kwargs = {'rseed': random.randint(2**32 - 1)}
         return kwargs
 
 
 class Bayes(BaseStrategy):
     short_name = 'bayes'
     # TODO : n_iter, max_iter should be in acquisition params
-
-    def __init__(self, kernels=None, acquisition=None, surrogate=None, seed=None, seeds=1, n_iter=50, max_feval=5E4, max_iter=1E5):
+    def __init__(self,
+                 acquisition=None,
+                 seed=None,
+                 seeds=1,
+                 max_feval=5E4,
+                 max_iter=1E5):
         self.seed = seed
         self.seeds = seeds
         self.max_feval = max_feval
@@ -288,8 +305,7 @@ class Bayes(BaseStrategy):
                 raise RuntimeError('unrecognized status: %s' % status)
 
         return (np.array(X).reshape(-1, self.n_dims),
-                np.array(Y).reshape(-1, 1),
-                np.array(V).reshape(-1, 1),
+                np.array(Y).reshape(-1, 1), np.array(V).reshape(-1, 1),
                 np.array(ignore).reshape(-1, self.n_dims))
 
     def _from_unit(self, result, searchspace):
@@ -350,9 +366,12 @@ class GridSearch(BaseStrategy):
         # Convert searchspace to param_grid
         if self.param_grid is None:
             if not all(isinstance(v, EnumVariable) for v in searchspace):
-                raise RuntimeError("GridSearchStrategy is defined only for all-enum search space")
+                raise RuntimeError(
+                    "GridSearchStrategy is defined only for all-enum search space"
+                )
 
-            self.param_grid = ParameterGrid(dict((v.name, v.choices) for v in searchspace))
+            self.param_grid = ParameterGrid(
+                dict((v.name, v.choices) for v in searchspace))
 
         # NOTE: there is no way of signaling end of parameters to be searched against
         # so user should pick correctly number of evaluations

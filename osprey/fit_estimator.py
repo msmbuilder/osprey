@@ -25,7 +25,7 @@ def fit_and_score_estimator(estimator, parameters, cv, X, y=None, scoring=None,
     """Fit and score an estimator with cross-validation
 
     This function is basically a copy of sklearn's
-    grid_search._BaseSearchCV._fit(), which is the core of the GridSearchCV
+    model_selection._BaseSearchCV._fit(), which is the core of the GridSearchCV
     fit() method. Unfortunately, that class does _not_ return the training
     set scores, which we want to save in the database, and because of the
     way it's written, you can't change it by subclassing or monkeypatching.

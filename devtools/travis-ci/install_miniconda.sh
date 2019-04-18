@@ -13,4 +13,4 @@ export PATH=$HOME/miniconda3/bin:$PATH
 
 conda install -yq python=$CONDA_PY
 conda update -yq conda
-conda install -yq conda-build jinja2
+conda install -yq conda-build jinja2 conda-verify

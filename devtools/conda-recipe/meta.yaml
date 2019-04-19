@@ -36,10 +36,9 @@ test:
     - msmbuilder
     - msmb_data
     - mdtraj
+    - hyperopt
     - coverage
     - python-coveralls
-
-
 
   imports:
     - osprey
